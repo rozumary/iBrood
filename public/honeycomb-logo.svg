@@ -1,0 +1,27 @@
+<svg width="48" height="48" viewBox="0 0 960 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Top hexagon -->
+  <path d="M340 75 L620 75 L760 300 L620 525 L340 525 L200 300 Z" fill="#D4A574" stroke="#000" stroke-width="40"/>
+  
+  <!-- Left middle hexagon -->
+  <path d="M60 300 L340 300 L480 525 L340 750 L60 750 L-80 525 Z" fill="#F5D99F" stroke="#000" stroke-width="40"/>
+  
+  <!-- Right middle hexagon -->
+  <path d="M620 300 L900 300 L1040 525 L900 750 L620 750 L480 525 Z" fill="#F5EAB3" stroke="#000" stroke-width="40"/>
+  
+  <!-- Bottom left hexagon -->
+  <path d="M200 525 L480 525 L620 750 L480 975 L200 975 L60 750 Z" fill="#F5EAB3" stroke="#000" stroke-width="40"/>
+  
+  <!-- Bottom right hexagon -->
+  <path d="M480 525 L760 525 L900 750 L760 975 L480 975 L340 750 Z" fill="#D4A574" stroke="#000" stroke-width="40"/>
+  
+  <!-- Center hexagon -->
+  <path d="M340 300 L620 300 L760 525 L620 750 L340 750 L200 525 Z" fill="#F5D99F" stroke="#000" stroke-width="40"/>
+  
+  <!-- Inner small hexagon -->
+  <path d="M410 450 L550 450 L620 525 L550 600 L410 600 L340 525 Z" fill="#D4A574" stroke="#000" stroke-width="40"/>
+  
+  <!-- Honey drips -->
+  <path d="M760 750 L760 850 Q760 900 720 900 Q680 900 680 850 L680 800" fill="#F5EAB3" stroke="#000" stroke-width="30" stroke-linecap="round"/>
+  <path d="M200 750 L200 850 Q200 900 160 900 Q120 900 120 850 L120 800" fill="#F5EAB3" stroke="#000" stroke-width="30" stroke-linecap="round"/>
+  <path d="M480 750 L480 850 Q480 900 440 900 Q400 900 400 850 L400 800" fill="#F5EAB3" stroke="#000" stroke-width="30" stroke-linecap="round"/>
+</svg>
