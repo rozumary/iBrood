@@ -44,3 +44,5 @@ venv/
 
 # YOLO model now tracked with Git LFS
 public/models/
+
+.vercel

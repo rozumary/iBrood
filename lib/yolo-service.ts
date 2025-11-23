@@ -48,27 +48,22 @@ export class YOLOQueenCellService {
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
     try {
-      // Get your computer's IP for mobile access
-      // Run: ipconfig (Windows) or ifconfig (Mac/Linux) to find your IP
-      const computerIP = window.location.hostname === 'localhost' 
-        ? 'localhost' 
-        : window.location.hostname
-      
       const endpoints = [
-        `http://${computerIP}:5000/analyze`,
-        'http://localhost:5000/analyze',
+        'https://rozu1726-ibrood-api.hf.space/api/predict',
       ]
       
       let response
       for (const endpoint of endpoints) {
         try {
           console.log(`📡 Trying API at ${endpoint}`)
+          
+          const formData = new FormData()
+          const blob = await fetch(imageData).then(r => r.blob())
+          formData.append('data', blob)
+          
           response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ image: imageData })
+            body: formData
           })
           if (response.ok) break
         } catch (e) {
