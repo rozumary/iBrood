@@ -42,7 +42,5 @@ env/
 venv/
 *.egg-info/
 
-# YOLO model (too large for git)
-*.pt
-best-seg.pt
+# YOLO model now tracked with Git LFS
 public/models/
