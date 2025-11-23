@@ -48,31 +48,19 @@ export class YOLOQueenCellService {
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
     try {
-      const endpoints = [
-        'https://rozu1726-ibrood-api.hf.space/api/predict',
-      ]
+      const endpoint = 'https://rozu1726-ibrood-api.hf.space/call/analyze'
       
-      let response
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`📡 Trying API at ${endpoint}`)
-          
-          const formData = new FormData()
-          const blob = await fetch(imageData).then(r => r.blob())
-          formData.append('data', blob)
-          
-          response = await fetch(endpoint, {
-            method: 'POST',
-            body: formData
-          })
-          if (response.ok) break
-        } catch (e) {
-          console.log(`❌ ${endpoint} failed`)
-          continue
-        }
-      }
+      console.log(`📡 Calling API at ${endpoint}`)
       
-      console.log('📊 API Response status:', response.status)
+      const blob = await fetch(imageData).then(r => r.blob())
+      const formData = new FormData()
+      formData.append('data', blob)
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({data: [imageData]}),
+        headers: {'Content-Type': 'application/json'}
+      })
       
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`)
@@ -80,6 +68,11 @@ export class YOLOQueenCellService {
       
       const result = await response.json()
       console.log('✅ YOLO Results:', result)
+      
+      if (result.data && result.data[0]) {
+        return {...result.data[0], imagePreview: imageData}
+      }
+      
       return result
     } catch (error) {
       console.error('❌ API call failed:', error)
