@@ -1,17 +1,16 @@
 # dependencies
-node_modules/
-/.pnp
+node_modules
+.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage
 
 # next.js
-/.next/
-/out/
-
-# production
-/build
+.next/
+out/
+build
+dist
 
 # misc
 .DS_Store
@@ -23,7 +22,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -31,6 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# netlify
+.netlify
 
 # python
 __pycache__/
@@ -40,12 +45,15 @@ __pycache__/
 .Python
 env/
 venv/
-*.egg-info/
+ENV/
+api/__pycache__/
 
-# YOLO model now tracked with Git LFS
-public/models/
+# model files (too large for git)
+*.pt
+*.pth
+*.onnx
+best-seg.pt
 
-.vercel
-
-# Local Netlify folder
-.netlify
+# IDE
+.vscode/
+.idea/
