@@ -47,14 +47,13 @@ export class YOLOQueenCellService {
 
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
-    try {
-      const endpoint = 'https://rozu1726-ibrood-api.hf.space/call/analyze'
-      
-      console.log(`📡 Calling API at ${endpoint}`)
-      
-      const blob = await fetch(imageData).then(r => r.blob())
-      const formData = new FormData()
-      formData.append('data', blob)
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://rozu1726-ibrood-api.hf.space'
+    const isGradio = baseUrl.includes('hf.space')
+    
+    if (isGradio) {
+      // Gradio API format
+      const endpoint = `${baseUrl}/call/analyze`
+      console.log(`📡 Calling Gradio API at ${endpoint}`)
       
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -67,18 +66,33 @@ export class YOLOQueenCellService {
       }
       
       const result = await response.json()
-      console.log('✅ YOLO Results:', result)
+      const eventId = result.event_id
       
-      if (result.data && result.data[0]) {
-        return {...result.data[0], imagePreview: imageData}
+      // Poll for results
+      const resultResponse = await fetch(`${baseUrl}/call/analyze/${eventId}`)
+      const finalResult = await resultResponse.json()
+      
+      console.log('✅ YOLO Results:', finalResult)
+      return {...finalResult.data[1], imagePreview: imageData}
+    } else {
+      // Flask API format
+      const endpoint = `${baseUrl}/analyze`
+      console.log(`📡 Calling Flask API at ${endpoint}`)
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({image: imageData}),
+        headers: {'Content-Type': 'application/json'}
+      })
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
       }
       
-      return result
-    } catch (error) {
-      console.error('❌ API call failed:', error)
-      console.log('🔄 Using mock data instead')
-      // Fallback to mock data
-      return this.getMockAnalysis(imageData)
+      const result = await response.json()
+      console.log('✅ YOLO Results:', result)
+      
+      return {...result, imagePreview: imageData}
     }
   }
 
@@ -177,53 +191,7 @@ export class YOLOQueenCellService {
     return recommendations.length > 0 ? recommendations : ['Continue regular monitoring']
   }
 
-  private getMockAnalysis(imageData: string): QueenCellAnalysis {
-    return {
-      totalQueenCells: 3,
-      cells: [
-        {
-          id: 1,
-          type: "Mature",
-          confidence: 94,
-          bbox: [100, 150, 80, 120],
-          maturityPercentage: 95,
-          estimatedHatchingDays: 2,
-          description: "Conical tip dark, ready to hatch",
-        },
-        {
-          id: 2,
-          type: "Semi-Mature", 
-          confidence: 89,
-          bbox: [300, 200, 75, 110],
-          maturityPercentage: 70,
-          estimatedHatchingDays: 5,
-          description: "Uniform color, consistent development",
-        },
-        {
-          id: 3,
-          type: "Capped",
-          confidence: 91,
-          bbox: [500, 180, 70, 100],
-          maturityPercentage: 40,
-          estimatedHatchingDays: 7,
-          description: "Partially sealed, transition stage",
-        },
-      ],
-      maturityDistribution: {
-        open: 0,
-        capped: 1,
-        mature: 1,
-        semiMature: 1,
-        failed: 0
-      },
-      recommendations: [
-        "Monitor for emergence within 2-3 days",
-        "Prepare secondary nucleus for cell separation",
-        "Ensure adequate royal jelly supply",
-      ],
-      imagePreview: imageData,
-    }
-  }
+
 }
 
 export const yoloService = new YOLOQueenCellService()

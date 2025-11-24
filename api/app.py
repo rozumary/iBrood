@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ultralytics import YOLO
-import cv2
 import numpy as np
 import base64
 from PIL import Image
@@ -30,19 +29,15 @@ MATURITY_MAP = {
 
 @app.route('/analyze', methods=['POST'])
 def analyze_image():
-    print('📡 Received analysis request')
     try:
         data = request.json
-        print(f'🖼️ Image data length: {len(data["image"])} characters')
         image_data = data['image'].split(',')[1]
         
         image_bytes = base64.b64decode(image_data)
         image = Image.open(io.BytesIO(image_bytes))
         image_np = np.array(image)
         
-        print('🤖 Running YOLO model inference...')
         results = model(image_np, conf=0.25, iou=0.45)
-        print(f'📊 Model results: {len(results)} result(s)')
         
         detections = []
         distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
@@ -89,13 +84,21 @@ def analyze_image():
                     elif 'Failed' in class_name:
                         distribution['failed'] += 1
         
-        recommendations = generate_recommendations(distribution, len(detections))
+        recommendations = []
+        if distribution['mature'] > 0:
+            recommendations.append(f"Monitor {distribution['mature']} mature cell(s) for emergence within 2-3 days")
+        if distribution['failed'] > 0:
+            recommendations.append(f"Remove {distribution['failed']} failed cell(s) to prevent disease")
+        if len(detections) > 5:
+            recommendations.append('High queen cell count - consider swarm prevention measures')
+        if distribution['semiMature'] > 0:
+            recommendations.append('Prepare secondary nucleus for cell separation')
         
         response = {
             'totalQueenCells': len(detections),
             'cells': detections,
             'maturityDistribution': distribution,
-            'recommendations': recommendations,
+            'recommendations': recommendations if recommendations else ['Continue regular monitoring'],
             'imagePreview': data['image']
         }
         
@@ -104,19 +107,5 @@ def analyze_image():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def generate_recommendations(distribution, total_cells):
-    recommendations = []
-    
-    if distribution['mature'] > 0:
-        recommendations.append(f"Monitor {distribution['mature']} mature cell(s) for emergence within 2-3 days")
-    if distribution['failed'] > 0:
-        recommendations.append(f"Remove {distribution['failed']} failed cell(s) to prevent disease")
-    if total_cells > 5:
-        recommendations.append('High queen cell count - consider swarm prevention measures')
-    if distribution['semiMature'] > 0:
-        recommendations.append('Prepare secondary nucleus for cell separation')
-    
-    return recommendations if recommendations else ['Continue regular monitoring']
-
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=7860)

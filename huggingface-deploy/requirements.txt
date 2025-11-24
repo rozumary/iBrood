@@ -2,5 +2,4 @@ gradio
 ultralytics
 opencv-python-headless
 pillow
-torch
-torchvision
+numpy

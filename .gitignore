@@ -46,3 +46,6 @@ venv/
 public/models/
 
 .vercel
+
+# Local Netlify folder
+.netlify

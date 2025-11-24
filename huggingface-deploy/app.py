@@ -1,7 +1,6 @@
 import gradio as gr
 from ultralytics import YOLO
 import numpy as np
-import base64
 import cv2
 
 model = YOLO('best-seg.pt')
@@ -16,9 +15,19 @@ MATURITY_MAP = {
 }
 
 def analyze(image):
-    results = model(image)
+    results = model(image, conf=0.25, iou=0.45)
+    
+    annotated = image.copy()
     detections = []
     distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
+    
+    color_map = {
+        'Open Cell': (255, 165, 0),
+        'Capped Cell': (255, 255, 0),
+        'Semi-Matured Cell': (225, 105, 65),
+        'Matured Cell': (128, 0, 128),
+        'Failed Cell': (255, 99, 71)
+    }
     
     for r in results:
         boxes = r.boxes
@@ -28,26 +37,29 @@ def analyze(image):
             for i, box in enumerate(boxes):
                 cls = int(box.cls[0])
                 conf = float(box.conf[0])
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
                 
                 class_name = CLASS_NAMES.get(cls, 'Unknown')
                 maturity_info = MATURITY_MAP.get(class_name, {'days': 0, 'percentage': 0, 'description': 'Unknown'})
                 
-                mask_data = None
+                color = color_map.get(class_name, (255, 255, 255))
+                
+                cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(annotated, f"{class_name} {conf:.0%}", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                
                 if masks is not None and i < len(masks.data):
-                    mask = masks.data[i].cpu().numpy().astype('uint8') * 255
-                    mask_encoded = base64.b64encode(mask.tobytes()).decode('utf-8')
-                    mask_data = {'data': mask_encoded, 'shape': list(mask.shape)}
+                    mask = masks.data[i].cpu().numpy()
+                    mask_resized = cv2.resize(mask, (annotated.shape[1], annotated.shape[0]))
+                    annotated[mask_resized > 0.5] = annotated[mask_resized > 0.5] * 0.5 + np.array(color) * 0.5
                 
                 detections.append({
                     'id': i + 1,
                     'type': class_name,
                     'confidence': round(conf * 100),
-                    'bbox': [int(x1), int(y1), int(x2-x1), int(y2-y1)],
+                    'bbox': [x1, y1, x2-x1, y2-y1],
                     'percentage': maturity_info['percentage'],
                     'estimatedHatchingDays': maturity_info['days'],
-                    'description': maturity_info['description'],
-                    'mask': mask_data
+                    'description': maturity_info['description']
                 })
                 
                 if 'Semi-Matured' in class_name:
@@ -69,17 +81,19 @@ def analyze(image):
     if len(detections) > 5:
         recommendations.append('High queen cell count - consider swarm prevention measures')
     
-    return {
+    result = {
         'totalQueenCells': len(detections),
         'cells': detections,
         'maturityDistribution': distribution,
         'recommendations': recommendations if recommendations else ['Continue regular monitoring']
     }
+    
+    return annotated, result
 
 demo = gr.Interface(
     fn=analyze,
     inputs=gr.Image(type="numpy"),
-    outputs=gr.JSON(),
+    outputs=[gr.Image(label="Detected Queen Cells"), gr.JSON(label="Analysis Results")],
     title="iBrood Queen Cell Analyzer",
     api_name="analyze"
 )
