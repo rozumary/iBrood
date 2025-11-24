@@ -7,7 +7,7 @@ from PIL import Image
 import io
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 model = YOLO('best-seg.pt')
 
@@ -27,8 +27,14 @@ MATURITY_MAP = {
     'Failed Cell': {'days': 0, 'percentage': 0, 'description': 'Dead cell; failed process'}
 }
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({'status': 'Flask server running', 'endpoints': ['/analyze']})
+
+@app.route('/analyze', methods=['POST', 'OPTIONS'])
 def analyze_image():
+    if request.method == 'OPTIONS':
+        return '', 204
     try:
         data = request.json
         image_data = data['image'].split(',')[1]
@@ -108,4 +114,4 @@ def analyze_image():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7860)
+    app.run(host='0.0.0.0', port=5000)

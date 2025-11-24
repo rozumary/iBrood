@@ -47,53 +47,26 @@ export class YOLOQueenCellService {
 
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://rozu1726-ibrood-api.hf.space'
-    const isGradio = baseUrl.includes('hf.space')
+    const endpoint = '/api/predict'
     
-    if (isGradio) {
-      // Gradio API format
-      const endpoint = `${baseUrl}/call/analyze`
-      console.log(`📡 Calling Gradio API at ${endpoint}`)
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify({data: [imageData]}),
-        headers: {'Content-Type': 'application/json'}
-      })
-      
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`)
-      }
-      
-      const result = await response.json()
-      const eventId = result.event_id
-      
-      // Poll for results
-      const resultResponse = await fetch(`${baseUrl}/call/analyze/${eventId}`)
-      const finalResult = await resultResponse.json()
-      
-      console.log('✅ YOLO Results:', finalResult)
-      return {...finalResult.data[1], imagePreview: imageData}
-    } else {
-      // Flask API format
-      const endpoint = `${baseUrl}/analyze`
-      console.log(`📡 Calling Flask API at ${endpoint}`)
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify({image: imageData}),
-        headers: {'Content-Type': 'application/json'}
-      })
-      
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`)
-      }
-      
-      const result = await response.json()
-      console.log('✅ YOLO Results:', result)
-      
-      return {...result, imagePreview: imageData}
+    console.log(`📡 Calling API at ${endpoint}`)
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({data: [imageData]}),
+      headers: {'Content-Type': 'application/json'}
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('API Error:', errorText)
+      throw new Error(`API request failed with status ${response.status}`)
     }
+    
+    const result = await response.json()
+    console.log('✅ YOLO Results:', result)
+    
+    return {...result.data[1], imagePreview: imageData}
   }
 
   private async runInference(image: HTMLImageElement): Promise<Detection[]> {
