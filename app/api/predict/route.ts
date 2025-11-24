@@ -5,30 +5,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const imageData = body.data?.[0]
     
-    // Try Flask first (localhost)
-    try {
-      const flaskResponse = await fetch('http://localhost:5000/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData }),
-        signal: AbortSignal.timeout(5000)
-      })
-      
-      if (flaskResponse.ok) {
-        const flaskData = await flaskResponse.json()
-        return NextResponse.json({ data: [null, flaskData] })
-      }
-    } catch (flaskError) {
-      console.log('Flask unavailable, trying HF...')
-    }
-    
-    // Try Hugging Face Gradio
+    // Try Hugging Face first (for production)
     try {
       const hfResponse = await fetch('https://rozu1726-ibrood-api.hf.space/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: [imageData] }),
-        signal: AbortSignal.timeout(15000)
+        signal: AbortSignal.timeout(30000)
       })
       
       if (hfResponse.ok) {
@@ -39,7 +22,26 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (hfError) {
-      console.log('HF Space unavailable, using mock data')
+      console.log('HF Space error:', hfError)
+    }
+    
+    // Try Flask (localhost - for development only)
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const flaskResponse = await fetch('http://localhost:5000/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageData }),
+          signal: AbortSignal.timeout(3000)
+        })
+        
+        if (flaskResponse.ok) {
+          const flaskData = await flaskResponse.json()
+          return NextResponse.json({ data: [null, flaskData] })
+        }
+      } catch (flaskError) {
+        console.log('Flask unavailable')
+      }
     }
     
     // If both fail, return mock data
