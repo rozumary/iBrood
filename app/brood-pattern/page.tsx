@@ -12,8 +12,13 @@ export default function BroodPatternPage() {
   const [showResults, setShowResults] = useState(false)
 
   const handleImageCapture = async (imageData: string) => {
+    alert('⚠️ Brood Pattern Analysis Coming Soon!\n\nCurrently only Queen Cell Analysis is available.\nPlease use the Queen Cell Analysis page for now.')
+    return
+  }
+
+  const handleImageCaptureOld = async (imageData: string) => {
     try {
-      console.log('🔄 Starting brood pattern analysis...')
+      console.log('🔄 Starting brood pattern analysis... [NO MOCK DATA v2.0]')
       
       const response = await fetch('/api/predict', {
         method: 'POST',
