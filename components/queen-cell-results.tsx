@@ -74,7 +74,7 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
               mask: cell.mask
             }))}
           />
-          <div className="absolute top-6 right-6 bg-accent text-white px-4 py-2 rounded-lg font-semibold">
+          <div className="absolute top-2 right-2 bg-accent text-white px-3 py-1 rounded-md text-sm font-semibold shadow-lg">
             {results.totalQueenCells} Cells Detected
           </div>
         </div>

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: ibrood-pwa
+    env: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

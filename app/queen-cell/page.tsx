@@ -20,7 +20,6 @@ export default function QueenCellPage() {
     try {
       const results = await yoloService.analyzeImage(imageData)
       
-      // Check if no cells detected
       if (results.totalQueenCells === 0) {
         alert('⚠️ No queen cells detected!\n\nPlease make sure the queen cell is visible. Try using lighter images or avoid blurry photos.')
         setIsAnalyzing(false)
@@ -32,7 +31,12 @@ export default function QueenCellPage() {
       setShowResults(true)
     } catch (error) {
       console.error('Analysis failed:', error)
-      alert('Analysis failed. Please try again.')
+      if (error instanceof Error && error.message.includes('quota')) {
+        localStorage.clear()
+        alert('Storage was full. Cleared and ready to try again!')
+      } else {
+        alert('Analysis failed. Please try again.')
+      }
     } finally {
       setIsAnalyzing(false)
     }
@@ -66,7 +70,15 @@ export default function QueenCellPage() {
                     <p className="text-sm text-muted mt-2">Running YOLO detection</p>
                   </div>
                 ) : (
-                  <ImageUploader onImageCapture={handleImageCapture} />
+                  <>
+                    <ImageUploader onImageCapture={handleImageCapture} />
+                    <button
+                      onClick={() => { localStorage.clear(); alert('Storage cleared!') }}
+                      className="mt-4 px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Clear Storage
+                    </button>
+                  </>
                 )}
               </div>
             ) : (

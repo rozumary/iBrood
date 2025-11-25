@@ -5,6 +5,47 @@ import numpy as np
 import base64
 from PIL import Image
 import io
+import cv2
+
+def calculate_iou(box1, box2):
+    """Calculate Intersection over Union (IoU) of two bounding boxes"""
+    x1, y1, x2, y2 = box1
+    x3, y3, x4, y4 = box2
+    
+    # Calculate intersection area
+    xi1, yi1 = max(x1, x3), max(y1, y3)
+    xi2, yi2 = min(x2, x4), min(y2, y4)
+    
+    if xi2 <= xi1 or yi2 <= yi1:
+        return 0
+    
+    inter_area = (xi2 - xi1) * (yi2 - yi1)
+    box1_area = (x2 - x1) * (y2 - y1)
+    box2_area = (x4 - x3) * (y4 - y3)
+    union_area = box1_area + box2_area - inter_area
+    
+    return inter_area / union_area if union_area > 0 else 0
+
+def custom_nms(detections, iou_threshold=0.3):
+    """Apply Non-Maximum Suppression to remove overlapping detections"""
+    if not detections:
+        return detections
+    
+    # Sort by confidence (highest first)
+    detections.sort(key=lambda x: x['confidence'], reverse=True)
+    
+    filtered = []
+    for current in detections:
+        keep = True
+        for kept in filtered:
+            iou = calculate_iou(current['bbox_xyxy'], kept['bbox_xyxy'])
+            if iou > iou_threshold:
+                keep = False
+                break
+        if keep:
+            filtered.append(current)
+    
+    return filtered
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -45,8 +86,7 @@ def analyze_image():
         
         results = model(image_np, conf=0.25, iou=0.45)
         
-        detections = []
-        distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
+        raw_detections = []
         
         for r in results:
             boxes = r.boxes
@@ -68,27 +108,40 @@ def analyze_image():
                         mask_data = {'data': mask_encoded, 'shape': list(mask.shape)}
                     
                     detection = {
-                        'id': i + 1,
                         'type': class_name,
                         'confidence': round(conf * 100),
                         'bbox': [int(x1), int(y1), int(x2-x1), int(y2-y1)],
+                        'bbox_xyxy': [int(x1), int(y1), int(x2), int(y2)],
                         'maturityPercentage': maturity_info['percentage'],
                         'estimatedHatchingDays': maturity_info['days'],
                         'description': maturity_info['description'],
                         'mask': mask_data
                     }
-                    detections.append(detection)
-                    
-                    if 'Semi-Matured' in class_name:
-                        distribution['semiMature'] += 1
-                    elif 'Matured' in class_name:
-                        distribution['mature'] += 1
-                    elif 'Capped' in class_name:
-                        distribution['capped'] += 1
-                    elif 'Open' in class_name:
-                        distribution['open'] += 1
-                    elif 'Failed' in class_name:
-                        distribution['failed'] += 1
+                    raw_detections.append(detection)
+        
+        # Apply custom NMS to remove overlapping detections
+        filtered_detections = custom_nms(raw_detections, iou_threshold=0.25)
+        
+        # Process final detections
+        detections = []
+        distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
+        
+        for i, detection in enumerate(filtered_detections):
+            detection['id'] = i + 1
+            del detection['bbox_xyxy']  # Remove helper field
+            detections.append(detection)
+            
+            class_name = detection['type']
+            if 'Semi-Matured' in class_name:
+                distribution['semiMature'] += 1
+            elif 'Matured' in class_name:
+                distribution['mature'] += 1
+            elif 'Capped' in class_name:
+                distribution['capped'] += 1
+            elif 'Open' in class_name:
+                distribution['open'] += 1
+            elif 'Failed' in class_name:
+                distribution['failed'] += 1
         
         recommendations = []
         if distribution['mature'] > 0:
@@ -114,4 +167,6 @@ def analyze_image():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    print('Starting Flask API on all interfaces...')
+    print('Access via: http://localhost:5000 or http://[YOUR_IP]:5000')
+    app.run(host='0.0.0.0', port=5000, debug=False)

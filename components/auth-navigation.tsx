@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 
 export default function AuthNavigation() {
   return (
@@ -8,8 +9,13 @@ export default function AuthNavigation() {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-2 bg-accent rounded-lg group-hover:shadow-lg transition-shadow">
-              <span className="text-white font-heading font-bold text-lg">i</span>
+            <div className="p-1.5 bg-accent rounded-lg group-hover:shadow-lg transition-shadow">
+              <Image 
+                src="/honeycomb-logo.svg" 
+                alt="iBrood Logo" 
+                width={28} 
+                height={28}
+              />
             </div>
             <span className="font-heading font-bold text-xl">iBrood</span>
           </Link>

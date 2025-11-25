@@ -11,8 +11,8 @@ export default function LandingPage() {
       <header className="bg-surface border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-accent rounded-lg">
-              <span className="text-white font-heading font-bold text-lg">i</span>
+            <div className="p-1.5 bg-accent rounded-lg">
+              <img src="/honeycomb-logo.svg" alt="iBrood" className="w-7 h-7" />
             </div>
             <span className="font-heading font-bold text-xl">iBrood</span>
           </div>
@@ -31,7 +31,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="max-w-7xl mx-auto px-6 py-20 text-center">
           <h1 className="text-5xl md:text-6xl font-heading font-bold text-text-primary mb-6">
-            Smart Beekeeping with iBrood
+            Intelligent Beekeeping with iBrood
           </h1>
           <p className="text-xl text-muted mb-8 max-w-3xl mx-auto">
             AI-powered analysis for queen cell development and brood patterns. Monitor your hive health with intelligent insights.

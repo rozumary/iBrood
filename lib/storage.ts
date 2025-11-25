@@ -11,15 +11,23 @@ interface QueenCellAnalysis {
 const STORAGE_KEY = 'ibrood_queen_cell_analyses'
 
 export const saveAnalysis = (analysis: any) => {
-  const analyses = getAnalyses()
-  const newAnalysis: QueenCellAnalysis = {
-    id: Date.now().toString(),
-    timestamp: Date.now(),
-    ...analysis
+  try {
+    const analyses = getAnalyses()
+    const { imagePreview, ...analysisWithoutImage } = analysis
+    const newAnalysis: QueenCellAnalysis = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      ...analysisWithoutImage,
+      imagePreview: '' // Don't store large images
+    }
+    analyses.unshift(newAnalysis)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(analyses.slice(0, 20)))
+    return newAnalysis
+  } catch (error) {
+    console.warn('Storage quota exceeded, clearing old data')
+    localStorage.removeItem(STORAGE_KEY)
+    return { id: Date.now().toString(), timestamp: Date.now(), ...analysis, imagePreview: '' }
   }
-  analyses.unshift(newAnalysis)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(analyses.slice(0, 50))) // Keep last 50
-  return newAnalysis
 }
 
 export const getAnalyses = (): QueenCellAnalysis[] => {

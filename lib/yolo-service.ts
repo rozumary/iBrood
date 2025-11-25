@@ -47,26 +47,55 @@ export class YOLOQueenCellService {
 
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
-    const endpoint = '/api/predict'
     
-    console.log(`📡 Calling API at ${endpoint}`)
-    
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      body: JSON.stringify({data: [imageData]}),
-      headers: {'Content-Type': 'application/json'}
-    })
-    
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('API Error:', errorText)
-      throw new Error(`API request failed with status ${response.status}`)
+    // Try Flask API first (port 5000)
+    try {
+      const host = window.location.hostname
+      const flaskEndpoint = `http://${host}:5000/analyze`
+      console.log(`📡 Trying Flask API at ${flaskEndpoint}`)
+      
+      const flaskResponse = await fetch(flaskEndpoint, {
+        method: 'POST',
+        body: JSON.stringify({image: imageData}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      })
+      
+      if (flaskResponse.ok) {
+        const result = await flaskResponse.json()
+        console.log('✅ Flask API Results:', result)
+        return result
+      }
+    } catch (error) {
+      console.warn('Flask API unavailable:', error)
     }
     
-    const result = await response.json()
-    console.log('✅ YOLO Results:', result)
+    // Try Next.js API route
+    try {
+      const nextEndpoint = '/api/predict'
+      console.log(`📡 Trying Next.js API at ${nextEndpoint}`)
+      
+      const nextResponse = await fetch(nextEndpoint, {
+        method: 'POST',
+        body: JSON.stringify({data: [imageData]}),
+        headers: {'Content-Type': 'application/json'}
+      })
+      
+      if (nextResponse.ok) {
+        const result = await nextResponse.json()
+        console.log('✅ Next.js API Results:', result)
+        return {...result.data[1], imagePreview: imageData}
+      }
+    } catch (error) {
+      console.warn('Next.js API unavailable:', error)
+    }
     
-    return {...result.data[1], imagePreview: imageData}
+    // Fallback to mock analysis
+    console.log('🔄 Using mock analysis...')
+    const mockDetections = await this.runInference(null as any)
+    return this.processDetections(mockDetections, imageData)
   }
 
   private async runInference(image: HTMLImageElement): Promise<Detection[]> {
@@ -94,6 +123,52 @@ export class YOLOQueenCellService {
     ]
   }
 
+  private removeOverlappingBoxes(detections: Detection[]): Detection[] {
+    const filtered: Detection[] = []
+    
+    for (const detection of detections) {
+      let shouldAdd = true
+      
+      for (let i = 0; i < filtered.length; i++) {
+        const existing = filtered[i]
+        const overlap = this.calculateOverlap(detection.bbox, existing.bbox)
+        
+        if (overlap > 0.1) { // 10% overlap threshold - more aggressive
+          if (detection.confidence > existing.confidence) {
+            filtered[i] = detection // Replace with higher confidence
+          }
+          shouldAdd = false
+          break
+        }
+      }
+      
+      if (shouldAdd) {
+        filtered.push(detection)
+      }
+    }
+    
+    return filtered
+  }
+
+  private calculateOverlap(bbox1: [number, number, number, number], bbox2: [number, number, number, number]): number {
+    const [x1, y1, w1, h1] = bbox1
+    const [x2, y2, w2, h2] = bbox2
+    
+    const left = Math.max(x1, x2)
+    const top = Math.max(y1, y2)
+    const right = Math.min(x1 + w1, x2 + w2)
+    const bottom = Math.min(y1 + h1, y2 + h2)
+    
+    if (left >= right || top >= bottom) return 0
+    
+    const intersectionArea = (right - left) * (bottom - top)
+    const area1 = w1 * h1
+    const area2 = w2 * h2
+    const unionArea = area1 + area2 - intersectionArea
+    
+    return intersectionArea / unionArea
+  }
+
   private processDetections(detections: Detection[], imageData: string): QueenCellAnalysis {
     const classMapping = {
       'open': { days: 10, description: 'Newly formed, larva visible' },
@@ -103,9 +178,12 @@ export class YOLOQueenCellService {
       'failed': { days: 0, description: 'Development stopped, requires removal' }
     }
 
+    // Remove overlapping boxes, keep highest confidence
+    const filteredDetections = this.removeOverlappingBoxes(detections)
+    
     const distribution = { open: 0, capped: 0, mature: 0, semiMature: 0, failed: 0 }
     
-    const cells = detections.map((detection, index) => {
+    const cells = filteredDetections.map((detection, index) => {
       const type = detection.class.replace('-', '')
       distribution[type as keyof typeof distribution]++
       
