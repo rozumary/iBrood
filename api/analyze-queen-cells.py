@@ -12,27 +12,55 @@ from huggingface_hub import hf_hub_download
 app = Flask(__name__)
 CORS(app)
 
-# Load model from Hugging Face or local fallback
-try:
-    print("🤖 Loading model from Hugging Face...")
-    # Replace with your actual Hugging Face repo
-    model_path = hf_hub_download(repo_id="Rozu1726/ibrood-api", filename="best-seg.pt")
-    model = YOLO(model_path)
-    print(f"✅ Model loaded from Hugging Face: {model_path}")
-except Exception as e:
-    print(f"❌ Hugging Face failed: {e}")
-    # Fallback to local model
-    local_paths = ['best-seg.pt', 'api/best-seg.pt']
-    model_path = None
+# Initialize model variables
+model = None
+model_loaded = False
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        'status': 'healthy', 
+        'model_loaded': model_loaded,
+        'model_available': model is not None
+    }), 200
+
+def load_model():
+    global model, model_loaded
+    
+    # Try local model first (faster for production)
+    local_paths = ['best-seg.pt', 'api/best-seg.pt', os.path.join(os.path.dirname(__file__), 'best-seg.pt')]
+    
     for path in local_paths:
+        print(f"🔍 Checking local model: {path}")
         if os.path.exists(path):
-            model_path = path
-            break
-    if model_path:
-        print(f"🔄 Using local model: {model_path}")
+            try:
+                model = YOLO(path)
+                model_loaded = True
+                print(f"✅ Local model loaded: {path}")
+                return True
+            except Exception as e:
+                print(f"❌ Local model failed: {e}")
+                continue
+    
+    # Fallback to Hugging Face
+    try:
+        print("🤖 Loading model from Hugging Face...")
+        model_path = hf_hub_download(
+            repo_id="Rozu1726/ibrood-api", 
+            filename="best-seg.pt",
+            cache_dir="/tmp/huggingface"
+        )
         model = YOLO(model_path)
-    else:
-        raise FileNotFoundError("No model found")
+        model_loaded = True
+        print(f"✅ Model loaded from Hugging Face: {model_path}")
+        return True
+    except Exception as e:
+        print(f"❌ Hugging Face failed: {e}")
+        model_loaded = False
+        return False
+
+# Load model on startup
+load_model()
 
 CLASS_NAMES = {
     0: 'Capped Cell',
@@ -53,6 +81,15 @@ MATURITY_MAP = {
 @app.route('/analyze', methods=['POST'])
 def analyze_image():
     print('📡 Received analysis request')
+    
+    if model is None:
+        print('❌ Model not loaded, attempting to reload...')
+        if not load_model():
+            return jsonify({
+                'error': 'Model not available. Please check server logs.',
+                'details': 'Model loading failed during startup and retry'
+            }), 503
+    
     try:
         data = request.json
         if not data or 'image' not in data:

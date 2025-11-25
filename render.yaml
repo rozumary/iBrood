@@ -1,26 +1,16 @@
 services:
   - type: web
-    name: ibrood-pwa
-    env: node
+    name: ibrood
+    env: docker
     region: oregon
-    plan: hobby
-    buildCommand: npm ci && npm run build
-    startCommand: npm start
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
-      - key: API_URL
-        value: https://ibrood-api.onrender.com
-  
-  - type: web
-    name: ibrood-api
-    env: python
-    region: oregon
-    plan: hobby
-    buildCommand: pip install -r api/requirements.txt
-    startCommand: cd api && python analyze-queen-cells.py
-    envVars:
       - key: FLASK_ENV
         value: production
       - key: PORT
-        value: 5000
+        value: 3000
+      - key: API_URL
+        value: http://localhost:5000

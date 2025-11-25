@@ -5,18 +5,41 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const imageData = body.data?.[0]
     
-    console.log('🚀 Calling Flask API on Render...')
+    if (!imageData) {
+      return NextResponse.json(
+        { error: 'No image data provided' },
+        { status: 400 }
+      )
+    }
     
-    const API_URL = process.env.API_URL || 'https://ibrood-api.onrender.com'
+    console.log('🚀 Calling Flask API...')
+    
+    const API_URL = process.env.API_URL || 'http://localhost:5000'
+    
+    // Check Flask health first
+    try {
+      const healthCheck = await fetch(`${API_URL}/health`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000)
+      })
+      if (!healthCheck.ok) {
+        console.log('⚠️ Flask health check failed')
+      }
+    } catch (healthError) {
+      console.log('⚠️ Flask not responding to health check:', healthError)
+    }
     
     const response = await fetch(`${API_URL}/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: imageData })
+      body: JSON.stringify({ image: imageData }),
+      signal: AbortSignal.timeout(60000) // 60 second timeout
     })
     
     if (!response.ok) {
-      throw new Error(`API failed with status: ${response.status}`)
+      const errorText = await response.text()
+      console.error('❌ API error response:', errorText)
+      throw new Error(`API failed with status: ${response.status} - ${errorText}`)
     }
     
     const result = await response.json()
