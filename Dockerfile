@@ -38,6 +38,7 @@ RUN npm run build
 ENV FLASK_ENV=production
 ENV NODE_ENV=production
 ENV API_URL=http://localhost:5000
+ENV NEXT_PUBLIC_API_URL=http://localhost:5000
 ENV PORT=3000
 
 # Expose ports

@@ -48,10 +48,11 @@ export class YOLOQueenCellService {
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
     
-    // Try Flask API first (port 5000)
+    // Try Flask API first
     try {
-      const host = window.location.hostname
-      const flaskEndpoint = `http://${host}:5000/analyze`
+      // Use environment variable or fallback to localhost for development
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const flaskEndpoint = `${apiUrl}/analyze`
       console.log(`📡 Trying Flask API at ${flaskEndpoint}`)
       
       const flaskResponse = await fetch(flaskEndpoint, {

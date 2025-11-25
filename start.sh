@@ -6,30 +6,31 @@ cd /app/api
 
 # Set environment variables for Flask
 export FLASK_ENV=production
-export PORT=5000
+export FLASK_PORT=5000
 
 # Start Flask in background
 python analyze-queen-cells.py &
 FLASK_PID=$!
 
 echo "⏳ Waiting for Flask to be ready..."
-sleep 10
+sleep 15
 
 # Check if Flask is running
 if ! kill -0 $FLASK_PID 2>/dev/null; then
     echo "❌ Flask failed to start"
+    tail -20 /app/api/*.log 2>/dev/null || echo "No logs found"
     exit 1
 fi
 
-# Test Flask health endpoint
+# Test Flask health endpoint with retries
 echo "🔍 Testing Flask health..."
-for i in {1..5}; do
+for i in {1..10}; do
     if curl -f http://localhost:5000/health > /dev/null 2>&1; then
         echo "✅ Flask is healthy"
         break
     fi
-    echo "⏳ Attempt $i/5 - Flask not ready yet..."
-    sleep 2
+    echo "⏳ Attempt $i/10 - Flask not ready yet..."
+    sleep 3
 done
 
 echo "✅ Flask started (PID: $FLASK_PID)"
