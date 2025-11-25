@@ -10,7 +10,5 @@ services:
         value: production
       - key: FLASK_ENV
         value: production
-      - key: PORT
-        value: 3000
       - key: API_URL
-        value: http://localhost:5000
+        value: https://ibrood.onrender.com

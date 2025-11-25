@@ -30,6 +30,9 @@ def health_check():
 def load_model():
     global model, model_loaded
     
+    if model_loaded and model is not None:
+        return True
+    
     # Try local model first (faster for production)
     local_paths = ['best-seg.pt', 'api/best-seg.pt', os.path.join(os.path.dirname(__file__), 'best-seg.pt')]
     
@@ -45,13 +48,18 @@ def load_model():
                 print(f"❌ Local model failed: {e}")
                 continue
     
-    # Fallback to Hugging Face
+    # Fallback to Hugging Face with better caching
     try:
         print("🤖 Loading model from Hugging Face...")
+        # Use Render's persistent storage if available
+        cache_dir = os.environ.get('RENDER_CACHE_DIR', os.path.join(os.path.dirname(__file__), 'model_cache'))
+        os.makedirs(cache_dir, exist_ok=True)
+        
         model_path = hf_hub_download(
             repo_id="Rozu1726/ibrood-api", 
             filename="best-seg.pt",
-            cache_dir="/tmp/huggingface"
+            cache_dir=cache_dir,
+            force_download=False
         )
         model = YOLO(model_path)
         model_loaded = True
@@ -64,6 +72,15 @@ def load_model():
 
 # Load model on startup
 load_model()
+
+# Warm up model with dummy inference
+if model is not None:
+    try:
+        dummy_img = np.zeros((640, 640, 3), dtype=np.uint8)
+        model(dummy_img, conf=0.5)
+        print("✅ Model warmed up")
+    except:
+        pass
 
 CLASS_NAMES = {
     0: 'Capped Cell',
@@ -109,13 +126,19 @@ def analyze_image():
         try:
             image_bytes = base64.b64decode(image_data)
             image = Image.open(io.BytesIO(image_bytes))
+            
+            # Resize large images for faster processing
+            if image.size[0] > 1280 or image.size[1] > 1280:
+                image.thumbnail((1280, 1280), Image.Resampling.LANCZOS)
+            
             image_np = np.array(image)
         except Exception as e:
             return jsonify({'error': f'Invalid image data: {str(e)}'}), 400
         
         print('🤖 Running YOLO model inference...')
         try:
-            results = model(image_np, conf=0.25, iou=0.45)
+            # Optimize inference parameters
+            results = model(image_np, conf=0.3, iou=0.5, imgsz=640, half=True)
             print(f'📊 Model results: {len(results)} result(s)')
         except Exception as model_error:
             return jsonify({'error': f'Model inference failed: {str(model_error)}'}), 500
@@ -207,4 +230,5 @@ def generate_recommendations(distribution, total_cells):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') != 'production'
+    print(f'🚀 Starting Flask on port {port}')
     app.run(debug=debug, host='0.0.0.0', port=port)
