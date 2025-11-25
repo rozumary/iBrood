@@ -92,36 +92,11 @@ export class YOLOQueenCellService {
       console.warn('Next.js API unavailable:', error)
     }
     
-    // Fallback to mock analysis
-    console.log('🔄 Using mock analysis...')
-    const mockDetections = await this.runInference(null as any)
-    return this.processDetections(mockDetections, imageData)
+    // No fallback - throw error if APIs fail
+    throw new Error('All API endpoints failed. Please check your connection and try again.')
   }
 
-  private async runInference(image: HTMLImageElement): Promise<Detection[]> {
-    // TODO: Replace with actual YOLO inference
-    // Example structure for when you integrate the real model:
-    /*
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')!
-    canvas.width = 640
-    canvas.height = 640
-    ctx.drawImage(image, 0, 0, 640, 640)
-    
-    const imageData = ctx.getImageData(0, 0, 640, 640)
-    const tensor = tf.browser.fromPixels(imageData).expandDims(0).div(255.0)
-    
-    const predictions = await this.model.predict(tensor)
-    return this.parseYOLOOutput(predictions)
-    */
-    
-    // Mock detections for now
-    return [
-      { class: 'mature', confidence: 0.94, bbox: [100, 150, 80, 120] },
-      { class: 'semi-mature', confidence: 0.89, bbox: [300, 200, 75, 110] },
-      { class: 'capped', confidence: 0.91, bbox: [500, 180, 70, 100] }
-    ]
-  }
+
 
   private removeOverlappingBoxes(detections: Detection[]): Detection[] {
     const filtered: Detection[] = []
