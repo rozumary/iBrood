@@ -18,11 +18,14 @@ model_loaded = False
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({
-        'status': 'healthy', 
-        'model_loaded': model_loaded,
-        'model_available': model is not None
-    }), 200
+    try:
+        return jsonify({
+            'status': 'healthy', 
+            'model_loaded': model_loaded,
+            'model_available': model is not None
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 def load_model():
     global model, model_loaded
@@ -111,8 +114,11 @@ def analyze_image():
             return jsonify({'error': f'Invalid image data: {str(e)}'}), 400
         
         print('🤖 Running YOLO model inference...')
-        results = model(image_np, conf=0.25, iou=0.45)
-        print(f'📊 Model results: {len(results)} result(s)')
+        try:
+            results = model(image_np, conf=0.25, iou=0.45)
+            print(f'📊 Model results: {len(results)} result(s)')
+        except Exception as model_error:
+            return jsonify({'error': f'Model inference failed: {str(model_error)}'}), 500
         
         detections = []
         distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
