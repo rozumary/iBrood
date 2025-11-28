@@ -1,17 +1,16 @@
 """
 Hugging Face Space entry point for iBrood app
-This imports the FastAPI app from backend/huggingface-deploy/main.py
 """
 
-import sys
 import os
+import sys
 
-# When running in Hugging Face, main.py is in the root /app directory
-# Add root path so we can import main directly
-sys.path.insert(0, os.path.dirname(__file__))
+# Set environment variable to tell main.py we're in Hugging Face
+os.environ['HF_SPACE'] = '1'
 
-# Import the FastAPI app from main.py
+# Import and get the app
 from main import app
 
-# Export for uvicorn
 __all__ = ["app"]
+
+
