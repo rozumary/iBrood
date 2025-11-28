@@ -51,40 +51,40 @@ logger.info("✅ Using Hugging Face API for model inference")
 
 # Exact mapping from model output to friendly names
 QUEEN_CLASS_MAP = {
-    0: "Open Queen Cell",      # Index 0
-    1: "Capped Queen Cell",    # Index 1
-    2: "Semi-Mature Cell",     # Index 2
-    3: "Matured Cell",         # Index 3
-    4: "Failed Cell"           # Index 4
+    0: "Capped Cell",         # Index 0
+    1: "Failed Cell",         # Index 1
+    2: "Matured Cell",        # Index 2
+    3: "Open Cell",           # Index 3
+    4: "Semi-Matured Cell"    # Index 4
 }
 
 QUEEN_CLASS_ATTRIBUTES = {
-    "Open Queen Cell": {
+    "Open Cell": {
         "description": "Elongated, open-ended; larva is seen",
         "age": "3-5 days old",
-        "hatching": "3-5 days until hatch",
-        "color": "#1900FF"
+        "hatching": "5-7 days until hatch",
+        "color": "#FF6500"
     },
-    "Capped Queen Cell": {
+    "Capped Cell": {
         "description": "Partially sealed cell; transition stage",
         "age": "4-6 days old",
-        "hatching": "1-3 days until hatch",
-        "color": "#FD5D00"
+        "hatching": "3-5 days until hatch",
+        "color": "#FFD700"
     },
-    "Semi-Mature Cell": {
-        "description": "Uniform color; development stage",
+    "Semi-Matured Cell": {
+        "description": "Uniform color",
         "age": "5-8 days old",
-        "hatching": "1-2 days until hatch",
-        "color": "#0AE5EC"
+        "hatching": "1-3 days until hatch",
+        "color": "#E16941"
     },
     "Matured Cell": {
-        "description": "Conical tip dark; dotted lines evident; ready to hatch",
-        "age": "9-10 days old",
-        "hatching": "Due anytime - IMMEDIATE HATCH EXPECTED",
-        "color": "#7700FF"
+        "description": "Conical tip dark; dotted lines on conical tip evident; ready to hatch",
+        "age": "8-10 days old",
+        "hatching": "Ready to hatch anytime",
+        "color": "#800080"
     },
     "Failed Cell": {
-        "description": "Dead cell; failed development process",
+        "description": "Dead cell; failed process",
         "age": "Development ceased",
         "hatching": "No hatch expected",
         "color": "#FF0000"
@@ -92,9 +92,9 @@ QUEEN_CLASS_ATTRIBUTES = {
 }
 
 QUEEN_LABEL_SHORT = {
-    "Open Queen Cell": "Open",
-    "Capped Queen Cell": "Capped",
-    "Semi-Mature Cell": "Semi-M",
+    "Open Cell": "Open",
+    "Capped Cell": "Capped",
+    "Semi-Matured Cell": "Semi-M",
     "Matured Cell": "MATURE",
     "Failed Cell": "Failed"
 }
@@ -142,6 +142,131 @@ BROOD_CLASS_ATTRIBUTES = {
 
 # Healthy brood classes
 HEALTHY_BROOD_CLASSES = {"egg", "larva", "pupa"}
+
+# ==================== PROCESSING FUNCTIONS ====================
+
+def process_queen_detections(hf_result):
+    """Process HF API response into detailed queen cell analysis"""
+    detections = hf_result.get('detections', [])
+    annotated_image = hf_result.get('annotated_image', '')
+    
+    # Count by class
+    class_counts = {}
+    processed_cells = []
+    
+    for i, detection in enumerate(detections):
+        class_id = detection.get('class', 0)
+        confidence = detection.get('confidence', 0)
+        bbox = detection.get('bbox', [])
+        
+        # Map class ID to name
+        class_name = QUEEN_CLASS_MAP.get(class_id, "Unknown")
+        attributes = QUEEN_CLASS_ATTRIBUTES.get(class_name, {})
+        
+        # Count classes
+        class_counts[class_name] = class_counts.get(class_name, 0) + 1
+        
+        # Build detailed cell info
+        cell_info = {
+            "id": i + 1,
+            "type": class_name,
+            "confidence": round(confidence * 100) if confidence < 1 else round(confidence),
+            "bbox": bbox,
+            "description": attributes.get('description', ''),
+            "age": attributes.get('age', ''),
+            "estimated_hatching": attributes.get('hatching', ''),
+            "color": attributes.get('color', '#000000')
+        }
+        processed_cells.append(cell_info)
+    
+    # Generate recommendations
+    recommendations = []
+    mature_count = class_counts.get('Matured Cell', 0)
+    failed_count = class_counts.get('Failed Cell', 0)
+    total_count = len(detections)
+    
+    if mature_count > 0:
+        recommendations.append(f"URGENT: {mature_count} mature cell(s) ready to hatch - monitor closely")
+    if failed_count > 0:
+        recommendations.append(f"Remove {failed_count} failed cell(s) to prevent disease spread")
+    if total_count > 5:
+        recommendations.append("High queen cell count - consider swarm prevention measures")
+    if total_count == 0:
+        recommendations.append("No queen cells detected - colony may need queen assessment")
+    
+    return {
+        "totalQueenCells": total_count,
+        "cells": processed_cells,
+        "summary": class_counts,
+        "maturityDistribution": class_counts,
+        "recommendations": recommendations if recommendations else ["Continue regular monitoring"],
+        "image_base64": annotated_image.replace('data:image/jpeg;base64,', '') if annotated_image else None
+    }
+
+def process_brood_detections(hf_result):
+    """Process HF API response into detailed brood analysis"""
+    detections = hf_result.get('detections', [])
+    
+    # Count by class
+    class_counts = {}
+    processed_items = []
+    
+    for i, detection in enumerate(detections):
+        class_id = detection.get('class', 0)
+        confidence = detection.get('confidence', 0)
+        bbox = detection.get('bbox', [])
+        
+        # Map class ID to name
+        class_name = BROOD_CLASS_MAP.get(class_id, "unknown")
+        attributes = BROOD_CLASS_ATTRIBUTES.get(class_name, {})
+        
+        # Count classes
+        display_name = attributes.get('display_name', class_name)
+        class_counts[display_name] = class_counts.get(display_name, 0) + 1
+        
+        # Build detailed item info
+        item_info = {
+            "id": i + 1,
+            "type": display_name,
+            "confidence": round(confidence * 100) if confidence < 1 else round(confidence),
+            "bbox": bbox,
+            "description": attributes.get('description', ''),
+            "age": attributes.get('age', ''),
+            "health": attributes.get('health', 'UNKNOWN'),
+            "color": attributes.get('color', '#000000')
+        }
+        processed_items.append(item_info)
+    
+    # Calculate health metrics
+    total_count = len(detections)
+    healthy_count = sum(1 for d in detections if BROOD_CLASS_MAP.get(d.get('class', 0)) in HEALTHY_BROOD_CLASSES)
+    empty_count = class_counts.get('Empty Comb', 0)
+    
+    health_percentage = (healthy_count / total_count * 100) if total_count > 0 else 0
+    
+    # Generate recommendations
+    recommendations = []
+    if health_percentage > 80:
+        recommendations.append("Excellent brood health - colony is thriving")
+    elif health_percentage > 60:
+        recommendations.append("Good brood health - continue monitoring")
+    else:
+        recommendations.append("Monitor brood health closely - consider veterinary consultation")
+    
+    if empty_count > total_count * 0.3:
+        recommendations.append("High empty comb ratio - check queen laying pattern")
+    
+    return {
+        "totalDetections": total_count,
+        "items": processed_items,
+        "broodDistribution": class_counts,
+        "healthMetrics": {
+            "healthyBrood": healthy_count,
+            "totalBrood": total_count,
+            "healthPercentage": round(health_percentage, 1)
+        },
+        "recommendations": recommendations if recommendations else ["Continue regular monitoring"]
+    }
 
 # ==================== ROUTES ====================
 
@@ -198,7 +323,14 @@ async def detect_queen(file: UploadFile = File(...)):
                     status_code=500
                 )
             
-            return response.json()
+            # Process HF API response
+            hf_result = response.json()
+            
+            # Transform to detailed analysis
+            processed_result = process_queen_detections(hf_result)
+            
+            logger.info(f"✅ Queen detection completed: {processed_result['totalQueenCells']} cells found")
+            return processed_result
 
     except Exception as e:
         logger.error(f"❌ Error in queen detection: {str(e)}")
@@ -233,7 +365,14 @@ async def detect_brood(file: UploadFile = File(...)):
                     status_code=500
                 )
             
-            return response.json()
+            # Process HF API response
+            hf_result = response.json()
+            
+            # Transform to detailed analysis
+            processed_result = process_brood_detections(hf_result)
+            
+            logger.info(f"✅ Brood detection completed: {processed_result['totalDetections']} items found")
+            return processed_result
 
     except Exception as e:
         logger.error(f"❌ Error in brood detection: {str(e)}")
