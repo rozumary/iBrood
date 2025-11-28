@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>iBrood Detection</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(to bottom right, #fffbe7, #fff7c4);
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      color: #d1950c;
+      font-weight: bold;
+    }
+
+    .btn-upload {
+      background-color: #f0c03d;
+      color: #3f3200;
+      font-weight: bold;
+      border: none;
+    }
+
+    .btn-upload:hover {
+      background-color: #dab029;
+    }
+
+    .preview-img,
+    .output-img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      border: 1px solid #f3d25b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      border-radius: 12px;
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .output-img {
+      border-style: dashed;
+      border-width: 2px;
+      border-color: #f0c03d;
+      background-color: #fffbe7;
+      padding: 8px;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(218, 176, 41, 0.15);
+    }
+
+    .side-card {
+      background-color: #fff8e1;
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
+    }
+
+    .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      border: none;
+      padding: 0.5rem 0;
+    }
+
+    .legend-entry {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .legend-entry span {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      margin-right: 8px;
+      border-radius: 4px;
+      border: 1px solid #333;
+    }
+
+    #legend {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed #ccc;
+      justify-content: flex-start;
+    }
+
+    #loading-spinner {
+      display: none;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container-fluid px-5 pt-4 pb-5">
+    <h1 class="text-center mb-4"><i class="bi bi-bezier2"></i> iBrood Detection</h1>
+
+    <form id="upload-form" class="mb-4">
+      <div class="input-group mx-auto" style="max-width: 600px;">
+        <input type="file" class="form-control" id="image-input" accept="image/*" required />
+        <button type="submit" class="btn btn-upload"><i class="bi bi-search"></i> Detect</button>
+      </div>
+    </form>
+
+    <!-- Spinner while loading -->
+    <div id="loading-spinner">
+      <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Analyzing...</span>
+      </div>
+      <p class="text-warning fw-bold mt-2">Analyzing results…</p>
+    </div>
+
+    <div class="row gx-5">
+      <div class="col-lg-8">
+        <!-- Preview Image -->
+        <div id="image-section">
+          <img id="preview" class="preview-img d-none" alt="Preview Image" />
+        </div>
+
+        <!-- Annotated Output -->
+        <div id="output-wrapper" class="d-none">
+          <h5><i class="bi bi-image"></i> Annotated Output</h5>
+          <img id="output-img" class="output-img" alt="Output Image" />
+          <div id="legend"></div>
+        </div>
+      </div>
+
+      <!-- Summary and Score -->
+      <div class="col-lg-4">
+        <div class="side-card d-none" id="result-box">
+          <h5 class="mb-3"><i class="bi bi-graph-up"></i> Portion Detection</h5>
+          <ul class="list-group list-group-flush mb-4" id="summary-list"></ul>
+
+          <h6><i class="bi bi-heart-pulse"></i> Health</h6>
+          <ul class="list-group">
+            <li class="list-group-item"><i class="bi bi-activity me-1"></i> Estimated Score: <span
+                id="score-text">...</span></li>
+            <li class="list-group-item"><i class="bi bi-check2-circle me-1"></i> Verdict: <span
+                id="verdict-text">...</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const form = document.getElementById('upload-form');
+    const imageInput = document.getElementById('image-input');
+    const preview = document.getElementById('preview');
+    const outputImg = document.getElementById('output-img');
+    const resultBox = document.getElementById('result-box');
+    const summaryList = document.getElementById('summary-list');
+    const scoreText = document.getElementById('score-text');
+    const verdictText = document.getElementById('verdict-text');
+    const legend = document.getElementById('legend');
+    const outputWrapper = document.getElementById('output-wrapper');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('d-none');
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = imageInput.files[0];
+      if (!file) return alert("Please select an image.");
+
+      // Reset UI
+      preview.classList.remove('d-none');
+      outputWrapper.classList.add('d-none');
+      resultBox.classList.add('d-none');
+      summaryList.innerHTML = '';
+      legend.innerHTML = '';
+      scoreText.textContent = "...";
+      verdictText.textContent = "...";
+
+      // Show loading
+      loadingSpinner.style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/detect', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        const data = await res.json();
+        const summary = data.summary || {};
+        const legendData = data.legend || {};
+
+        // Populate Summary
+        if (Object.keys(summary).length === 0) {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = 'No exact detection. Providing estimated analysis...';
+          summaryList.appendChild(li);
+        } else {
+          for (const [label, count] of Object.entries(summary)) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `<span><i class="bi bi-droplet-half me-1"></i>${label}</span><strong>${count}</strong>`;
+            summaryList.appendChild(li);
+          }
+        }
+
+        // Health Info
+        scoreText.textContent = `${data.health_score ?? 'N/A'}%`;
+        verdictText.textContent = data.verdict || 'Undetermined';
+
+        // Output Image
+        if (data.image_base64) {
+          outputImg.src = "data:image/jpeg;base64," + data.image_base64;
+          outputWrapper.classList.remove('d-none');
+        }
+
+        // Legend
+        for (const [label, color] of Object.entries(legendData)) {
+          const div = document.createElement('div');
+          div.className = 'legend-entry';
+          div.innerHTML = `<span style="background:${color}"></span> ${label}`;
+          legend.appendChild(div);
+        }
+
+        // Show results
+        resultBox.classList.remove('d-none');
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        // Always hide spinner
+        loadingSpinner.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+
+</html>
