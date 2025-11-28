@@ -44,7 +44,7 @@ if os.path.exists(os.path.join(frontend_path, "static")):
 templates = Jinja2Templates(directory=templates_path)
 
 # ==================== HUGGING FACE API CONFIG ====================
-HF_API_URL = "https://huggingface.co/spaces/Rozu1726/ibrood-api"
+HF_API_URL = "https://rozu1726-ibrood-app.hf.space"
 logger.info("✅ Using Hugging Face API for model inference")
 
 # ==================== QUEEN CELL CLASSES - ONLY 5 CLASSES ====================

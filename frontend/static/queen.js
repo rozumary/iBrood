@@ -6,147 +6,155 @@ const preview = document.getElementById('preview');
 const resultBox = document.getElementById('result');
 const outputImg = document.getElementById('output-img');
 
-// === Short label mapping for display ===
-const shortLabelMap = {
-  "Queen Cup (Initiation)": "Queen Cup",
-  "Open Queen Cell (3–5 days, larva visible)": "Open Cell",
-  "Closed Queen Cell (5–8 days, uniform cap)": "Closed Cell",
-  "Matured Queen Cell (dark conical tip)": "Matured",
-  "Post Hatch Cell (jagged/open tip, emerged)": "Hatched",
-  "Failed Cell (dead/abnormal)": "Failed"
+// === QUEEN CELL DETECTION FRONTEND SCRIPT ===
+
+// Short display names for UI
+const SHORT_LABELS = {
+    "Open Queen Cell": "Open",
+    "Capped Queen Cell": "Capped",
+    "Semi-Mature Cell": "Semi-Mature",
+    "Matured Cell": "Matured",
+    "Failed Cell": "Failed"
 };
 
-// === Preview the selected image ===
-imageInput.addEventListener('change', () => {
-  const file = imageInput.files[0];
-  if (file) {
-    preview.src = URL.createObjectURL(file);
-    preview.classList.remove('d-none');
-  }
-});
+// Estimated hatching fallback (ensures correct display)
+const HATCHING_BY_TYPE = {
+    "Open Queen Cell": "3–5 days until hatch",
+    "Capped Queen Cell": "1–3 days until hatch",
+    "Semi-Mature Cell": "1–2 days until hatch",
+    "Matured Cell": "Due anytime – IMMEDIATE HATCH EXPECTED",
+    "Failed Cell": "No hatch expected"
+};
 
-// === Handle form submission and detection ===
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("image-input");
+    const result = document.getElementById("result");
+    const outputImg = document.getElementById("output-img");
+    const downloadBtn = document.getElementById("download-btn");
 
-  const file = imageInput.files[0];
-  if (!file) {
-    alert("Please select an image before submitting.");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  // Reset result display
-  outputImg.src = '';
-  outputImg.classList.add("d-none");
-  resultBox.innerHTML = '';
-  resultBox.classList.add("d-none");
-
-  try {
-    // Show processing message
-    resultBox.innerHTML = `
-      <div class="text-muted">
-        <i class="bi bi-hourglass-split"></i> Detecting queen cell maturity...
-      </div>`;
-    resultBox.classList.remove("d-none");
-
-    const res = await fetch("http://127.0.0.1:8000/queen_detect", {
-      method: "POST",
-      body: formData
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error("Queen detection failed:\n" + errorText);
-    }
-
-    const data = await res.json();
-
-    if (!data.image_base64) {
-      throw new Error("No image returned from detection.");
-    }
-
-    // === Show output image ===
-    outputImg.src = "data:image/jpeg;base64," + data.image_base64;
-    outputImg.classList.remove("d-none");
-
-    // === Build Detection Summary ===
-    let summaryHTML = `
-      <h5><i class="bi bi-collection"></i> Detection Summary</h5>
-      <ul class="list-group mb-3">`;
-
-    for (const [label, count] of Object.entries(data.summary)) {
-      summaryHTML += `
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          ${label}
-          <span class="badge bg-dark rounded-pill">${count}</span>
-        </li>`;
-    }
-    summaryHTML += `</ul>`;
-
-    // === Final Verdict Message ===
-    if (data.result) {
-      summaryHTML += `
-        <div class="alert alert-info">
-          <i class="bi bi-patch-check"></i> <strong>Verdict:</strong> ${data.result}
-        </div>`;
-    }
-
-    // === Estimated Hatching Table ===
-    if (data.cells && data.cells.length > 0) {
-      const grouped = {};
-
-      data.cells.forEach(cell => {
-        const fullLabel = cell.type;
-        const shortLabel = shortLabelMap[fullLabel] || fullLabel;
-
-        // Ensure "Matured" cells always show "Due any time"
-        let hatching = cell.estimated_hatching || '–';
-        if (shortLabel === "Matured") hatching = "Due any time";
-
-        if (!grouped[shortLabel]) {
-          grouped[shortLabel] = {
-            count: 0,
-            estimated_hatching: hatching
-          };
+    window.detectQueenCell = async function () {
+        if (!input.files || !input.files[0]) {
+            alert("Please select an image.");
+            return;
         }
-        grouped[shortLabel].count++;
-      });
 
-      summaryHTML += `
-        <h6><i class="bi bi-calendar-event"></i> Estimated Hatching</h6>
-        <table class="table table-sm table-bordered">
-          <thead class="table-light">
-            <tr>
-              <th>Queen Cell Type</th>
-              <th>Count</th>
-              <th>Estimated Hatching</th>
-            </tr>
-          </thead>
-          <tbody>`;
+        const formData = new FormData();
+        formData.append("file", input.files[0]);
 
-      for (const [shortType, info] of Object.entries(grouped)) {
-        summaryHTML += `
-          <tr>
-            <td>${shortType}</td>
-            <td>${info.count}</td>
-            <td>${info.estimated_hatching}</td>
-          </tr>`;
-      }
+        result.innerHTML = `
+            <p class="text-muted">
+                <i class="bi bi-hourglass-split"></i> Analyzing queen cells...
+            </p>
+        `;
 
-      summaryHTML += `</tbody></table>`;
-    }
+        outputImg.style.display = "none";
+        downloadBtn.style.display = "none";
 
-    resultBox.innerHTML = summaryHTML;
-    resultBox.classList.remove("d-none");
+        try {
+            const res = await fetch("/queen_detect", {
+                method: "POST",
+                body: formData
+            });
 
-  } catch (err) {
-    console.error(err);
-    resultBox.innerHTML = `
-      <div class="text-danger">
-        <i class="bi bi-x-circle"></i> ${err.message}
-      </div>`;
-  }
+            if (!res.ok) {
+                const msg = await res.text();
+                throw new Error(msg);
+            }
+
+            const data = await res.json();
+
+            // === Display annotated image ===
+            if (data.image_base64) {
+                outputImg.src = `data:image/jpeg;base64,${data.image_base64}`;
+                outputImg.style.display = "block";
+                downloadBtn.style.display = "inline-block";
+            }
+
+            // =====================================================
+            // 1. SUMMARY TABLE (counts per class)
+            // =====================================================
+            let html = `
+                <div class="alert alert-warning">
+                    <h5><i class="bi bi-clipboard-check"></i> Detected Queen Cell Types:</h5>
+                    ${Object.entries(data.summary || {}).map(([label, count]) => `
+                        <div class="d-flex justify-content-between">
+                            <span>${SHORT_LABELS[label] || label}</span>
+                            <span class="badge bg-dark">${count}</span>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+
+            // =====================================================
+            // 2. HATCHING TABLE (group cells by class)
+            // =====================================================
+            if (data.cells && data.cells.length > 0) {
+                const grouped = {};
+
+                data.cells.forEach(cell => {
+                    const type = cell.type;
+                    const shortName = SHORT_LABELS[type] || type;
+
+                    if (!grouped[shortName]) {
+                        grouped[shortName] = {
+                            count: 0,
+                            estimated_hatching: cell.estimated_hatching || HATCHING_BY_TYPE[type] || "–"
+                        };
+                    }
+
+                    grouped[shortName].count++;
+                });
+
+                html += `
+                    <h5 class="mt-4"><i class="bi bi-calendar-event"></i> Estimated Hatching Time</h5>
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Queen Cell Type</th>
+                                <th>Count</th>
+                                <th>Estimated Hatching</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(grouped).map(([label, info]) => `
+                                <tr>
+                                    <td>${label}</td>
+                                    <td>${info.count}</td>
+                                    <td>${info.estimated_hatching}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            result.innerHTML = html;
+
+        } catch (err) {
+            console.error("DETECTION ERROR:", err);
+            result.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-x-circle"></i> Detection failed.<br>
+                    <small>${err.message}</small>
+                </div>
+            `;
+        }
+    };
+
+    // === Reset Form ===
+    window.resetForm = function () {
+        input.value = "";
+        outputImg.src = "";
+        outputImg.style.display = "none";
+        downloadBtn.style.display = "none";
+        result.innerHTML = "";
+    };
+
+    // === Download Image ===
+    window.downloadImage = function () {
+        const link = document.createElement("a");
+        link.href = outputImg.src;
+        link.download = "annotated_queen_cells.jpg";
+        link.click();
+    };
 });

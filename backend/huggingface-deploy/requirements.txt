@@ -3,3 +3,5 @@ uvicorn
 pillow
 python-multipart
 ultralytics>=8.3.0
+httpx
+jinja2

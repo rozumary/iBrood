@@ -1,8 +1,3 @@
-FROM python:3.10-slim
-
-WORKDIR /app
-
-
 FROM python:3.9
 
 RUN useradd -m -u 1000 user
