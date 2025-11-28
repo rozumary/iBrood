@@ -2,13 +2,17 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+FROM python:3.9
 
-# Expose port 7860 for Hugging Face Spaces
-EXPOSE 7860
+RUN useradd -m -u 1000 user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
 
-# Run with uvicorn on 0.0.0.0:7860
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+WORKDIR /app
+
+COPY --chown=user ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+COPY --chown=user . /app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
