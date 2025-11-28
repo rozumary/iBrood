@@ -6,8 +6,8 @@ WORKDIR /app
 COPY backend/huggingface-deploy/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app files
-COPY backend/huggingface-deploy/main.py .
+# Copy app files (main.py is in backend/, not huggingface-deploy/)
+COPY backend/main.py .
 COPY app.py .
 
 # Copy frontend files (templates and static)
