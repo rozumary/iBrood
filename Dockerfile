@@ -12,6 +12,8 @@ COPY app.py ./
 
 # Copy frontend files (templates and static)
 COPY frontend/ ./frontend/
+# Also copy frontend into backend so backend/main.py can load templates by relative path
+COPY frontend/ ./backend/frontend/
 
 # Expose port 7860 for Hugging Face Spaces
 EXPOSE 7860
