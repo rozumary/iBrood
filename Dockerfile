@@ -2,11 +2,16 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Copy requirements and install
 COPY backend/huggingface-deploy/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/huggingface-deploy/ .
-COPY frontend/ ../frontend/
+# Copy app files
+COPY backend/huggingface-deploy/main.py .
+COPY app.py .
+
+# Copy frontend files (templates and static)
+COPY frontend/ ./frontend/
 
 # Expose port 7860 for Hugging Face Spaces
 EXPOSE 7860
