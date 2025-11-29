@@ -24,13 +24,21 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
   const [showMasks, setShowMasks] = useState(false)
 
   const getColor = (type: string) => {
-    const normalized = type.toLowerCase().replace(/[\s-]/g, '')
-    if (normalized.includes('open')) return '#f97316' // orange
-    if (normalized.includes('capped')) return '#eab308' // yellow
-    if (normalized.includes('semi') || normalized.includes('semimatured')) return '#1d4ed8' // royal blue
-    if (normalized.includes('matured') && !normalized.includes('semi')) return '#9333ea' // purple
-    if (normalized.includes('failed')) return '#dc2626' // red
-    return '#6b7280'
+    // Updated to match the correct class names
+    switch (type) {
+      case "Open Cell":
+        return '#1900FF' // vibrant blue
+      case "Capped Cell":
+        return '#FD5D00' // vibrant orange
+      case "Semi-Matured Cell":
+        return '#0AE5EC' // cyan
+      case "Matured Cell":
+        return '#7700FF' // purple
+      case "Failed Cell":
+        return '#FF0000' // red
+      default:
+        return '#6b7280' // gray for unknown
+    }
   }
 
   useEffect(() => {
@@ -70,57 +78,138 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
         const scaledY = y * scaleY
         const scaledWidth = width * scaleX
         const scaledHeight = height * scaleY
-        
+
         const color = getColor(detection.type)
-        
-        // Draw masks if enabled and available
+        let maskRendered = false
+
+        // Draw segmentation overlay if masks are available and enabled
         if (showMasks && detection.mask) {
           try {
-            const maskBytes = Uint8Array.from(atob(detection.mask.data), c => c.charCodeAt(0))
+            const maskData = detection.mask.data
             const [maskHeight, maskWidth] = detection.mask.shape
-            
-            // Set overlay style for masks
-            ctx.globalAlpha = 0.4
-            ctx.fillStyle = color
-            
-            // Draw mask pixels as overlay
+
+            // Check if mask data is valid
+            if (!maskData || maskHeight <= 0 || maskWidth <= 0) {
+              throw new Error('Invalid mask data')
+            }
+
+            const maskBytes = Uint8Array.from(atob(maskData), c => c.charCodeAt(0))
+
+            // Create a temporary canvas for mask rendering
+            const maskCanvas = document.createElement('canvas')
+            maskCanvas.width = maskWidth
+            maskCanvas.height = maskHeight
+            const maskCtx = maskCanvas.getContext('2d')
+            if (!maskCtx) throw new Error('Cannot get mask canvas context')
+
+            // Create image data for the mask
+            const imageData = maskCtx.createImageData(maskWidth, maskHeight)
+            const data = imageData.data
+
+            let hasNonZeroPixels = false
+
+            // Draw only mask boundary pixels for accurate cell shape tracing
             for (let i = 0; i < maskHeight; i++) {
               for (let j = 0; j < maskWidth; j++) {
                 const maskIdx = i * maskWidth + j
-                if (maskBytes[maskIdx] > 0) {
-                  const pixelX = (j / maskWidth) * canvasWidth
-                  const pixelY = (i / maskHeight) * canvasHeight
-                  ctx.fillRect(pixelX, pixelY, canvasWidth / maskWidth, canvasHeight / maskHeight)
+                if (maskIdx < maskBytes.length && maskBytes[maskIdx] > 0) {
+                  hasNonZeroPixels = true
+
+                  // Check if this is a boundary pixel (has at least one neighbor that is 0)
+                  let isBoundary = false
+                  const neighbors = [
+                    [i-1, j], [i+1, j], [i, j-1], [i, j+1],
+                    [i-1, j-1], [i-1, j+1], [i+1, j-1], [i+1, j+1]
+                  ]
+
+                  for (const [ni, nj] of neighbors) {
+                    if (ni >= 0 && ni < maskHeight && nj >= 0 && nj < maskWidth) {
+                      const neighborIdx = ni * maskWidth + nj
+                      if (neighborIdx < maskBytes.length && maskBytes[neighborIdx] === 0) {
+                        isBoundary = true
+                        break
+                      }
+                    } else {
+                      // Edge of mask area is also boundary
+                      isBoundary = true
+                      break
+                    }
+                  }
+
+                  if (isBoundary) {
+                    // Convert hex color to RGB
+                    const r = parseInt(color.slice(1, 3), 16)
+                    const g = parseInt(color.slice(3, 5), 16)
+                    const b = parseInt(color.slice(5, 7), 16)
+
+                    const pixelIdx = (i * maskWidth + j) * 4
+                    data[pixelIdx] = r     // R
+                    data[pixelIdx + 1] = g // G
+                    data[pixelIdx + 2] = b // B
+                    data[pixelIdx + 3] = 200 // Alpha (higher for boundary visibility)
+                  }
                 }
               }
             }
-            
+
+            if (!hasNonZeroPixels) {
+              throw new Error('Mask has no non-zero pixels')
+            }
+
+            maskCtx.putImageData(imageData, 0, 0)
+
+            // Position and scale the mask overlay to match the detection bounding box
+            ctx.globalAlpha = 0.8
+            ctx.drawImage(maskCanvas, 0, 0, maskWidth, maskHeight, scaledX, scaledY, scaledWidth, scaledHeight)
             ctx.globalAlpha = 1.0
+            maskRendered = true
+
+            console.log(`✅ Rendered mask for ${detection.type}: ${maskWidth}x${maskHeight}`)
+
           } catch (error) {
-            console.error('Error rendering mask:', error)
+            console.warn(`⚠️  Mask rendering failed for ${detection.type}, using enhanced box:`, error instanceof Error ? error.message : String(error))
+            // Fallback: draw enhanced bounding box only (no fill to distinguish from mask)
+            ctx.strokeStyle = color
+            ctx.lineWidth = 8
+            ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
+            ctx.globalAlpha = 1.0
           }
         }
-        
-        // Draw bounding box with thicker border
-        ctx.strokeStyle = color
-        ctx.lineWidth = 4
-        ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
-        
-        // Draw semi-transparent fill
-        ctx.fillStyle = color
-        ctx.globalAlpha = 0.15
-        ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
-        ctx.globalAlpha = 1.0
-        
+
+        if (showMasks) {
+          // When masks are "shown", display filled bounding boxes with higher opacity for emphasis only if mask wasn't rendered
+          ctx.strokeStyle = color
+          ctx.lineWidth = 6
+          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
+
+          // Only fill with box if mask wasn't successfully rendered
+          if (!maskRendered) {
+            ctx.fillStyle = color
+            ctx.globalAlpha = 0.35
+            ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
+            ctx.globalAlpha = 1.0
+          }
+        } else {
+          // Default view: show standard bounding boxes
+          ctx.strokeStyle = color
+          ctx.lineWidth = 4
+          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
+
+          ctx.fillStyle = color
+          ctx.globalAlpha = 0.15
+          ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
+          ctx.globalAlpha = 1.0
+        }
+
         // Draw label with Space Grotesk font
         const label = `${detection.type} ${detection.confidence}%`
         ctx.font = 'bold 16px "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
         const textWidth = ctx.measureText(label).width
-        
+
         // Label background
         ctx.fillStyle = color
         ctx.fillRect(scaledX, scaledY - 34, textWidth + 24, 30)
-        
+
         // Label text
         ctx.fillStyle = 'white'
         ctx.textBaseline = 'top'
@@ -149,7 +238,7 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
           {showMasks ? 'Hide Masks' : 'Show Masks'}
         </button>
         <span className="text-sm text-gray-600">
-          Toggle segmentation masks overlay
+          {showMasks ? 'Segmentation overlay - colored masks show exact queen cell boundaries' : 'Standard bounding boxes - outline detection areas'}
         </span>
       </div>
       

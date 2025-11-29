@@ -1,5 +1,7 @@
-gradio
-ultralytics
-opencv-python-headless
+fastapi
+uvicorn
+httpx
+jinja2
+python-multipart
 pillow
-numpy
+ultralytics>=8.3.0

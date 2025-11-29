@@ -11,7 +11,7 @@ import { yoloService } from "@/lib/yolo-service"
 import { saveAnalysis } from "@/lib/storage"
 
 export default function QueenCellPage() {
-  const [analysisResults, setAnalysisResults] = useState(null)
+  const [analysisResults, setAnalysisResults] = useState<any>(null)
   const [showResults, setShowResults] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
@@ -21,7 +21,7 @@ export default function QueenCellPage() {
       const results = await yoloService.analyzeImage(imageData)
       
       if (results.totalQueenCells === 0) {
-        alert('⚠️ No queen cells detected!\n\nPlease make sure the queen cell is visible. Try using lighter images or avoid blurry photos.')
+        alert('⚠️ No queen cells detected!\n\nTips for better detection:\n• Ensure good lighting\n• Avoid blurry or dark images\n• Make sure queen cells are clearly visible\n• Try a different angle or closer shot')
         setIsAnalyzing(false)
         return
       }
@@ -31,22 +31,34 @@ export default function QueenCellPage() {
       setShowResults(true)
     } catch (error) {
       console.error('Analysis failed:', error)
-      if (error instanceof Error && error.message.includes('quota')) {
-        localStorage.clear()
-        alert('Storage was full. Cleared and ready to try again!')
-      } else {
-        alert('Analysis failed. Please try again.')
+      let errorMessage = 'Analysis failed. Please try again.'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('quota')) {
+          localStorage.clear()
+          errorMessage = 'Storage was full. Cleared and ready to try again!'
+        } else if (error.message.includes('too small')) {
+          errorMessage = 'Image too small. Please use an image at least 320x320 pixels.'
+        } else if (error.message.includes('too large')) {
+          errorMessage = 'Image too large. Please use an image smaller than 10MB.'
+        } else if (error.message.includes('format')) {
+          errorMessage = 'Invalid image format. Please use JPEG, PNG, or WebP images.'
+        } else if (error.message.includes('API')) {
+          errorMessage = 'Server connection failed. Please check your internet connection and try again.'
+        }
       }
+      
+      alert(errorMessage)
     } finally {
       setIsAnalyzing(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-4xl font-heading font-bold text-text-primary mb-2">Queen Cell Analysis</h1>
           <p className="text-sm sm:text-base text-muted">
@@ -67,7 +79,8 @@ export default function QueenCellPage() {
                   <div className="bg-surface rounded-lg border border-border p-8 text-center">
                     <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                     <p className="text-lg font-medium text-text-primary">Analyzing Queen Cells...</p>
-                    <p className="text-sm text-muted mt-2">Running YOLO detection</p>
+                    <p className="text-sm text-muted mt-2">Processing image and running AI detection</p>
+                    <p className="text-xs text-muted mt-1">This may take 10-30 seconds</p>
                   </div>
                 ) : (
                   <>

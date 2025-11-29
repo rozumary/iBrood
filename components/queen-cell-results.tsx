@@ -7,9 +7,14 @@ import ImageWithMasks from "./image-with-masks"
 interface QueenCellResult {
   id: number
   type: string
-  percentage: number
-  estimatedHatchingDays: number
   confidence: number
+  bbox: [number, number, number, number]
+  mask?: {
+    data: string
+    shape: [number, number]
+  }
+  maturityPercentage: number
+  estimatedHatchingDays: number
   description: string
 }
 
@@ -35,25 +40,36 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
   }
 
   const getCellColor = (type: string) => {
-    const normalized = type.toLowerCase().replace(/[\s-]/g, '')
-    if (normalized.includes('mature') && !normalized.includes('semi')) return "bg-purple-600"
-    if (normalized.includes('semi')) return "bg-blue-700"
-    if (normalized.includes('capped')) return "bg-yellow-500"
-    if (normalized.includes('open')) return "bg-orange-500"
-    if (normalized.includes('failed')) return "bg-red-600"
-    return "bg-gray-500"
+    // Updated to match the correct class names and hex colors
+    switch (type) {
+      case "Open Cell":
+        return "#1900FF" // vibrant blue
+      case "Capped Cell":
+        return "#FD5D00" // vibrant orange
+      case "Semi-Matured Cell":
+        return "#0AE5EC" // cyan
+      case "Matured Cell":
+        return "#7700FF" // purple
+      case "Failed Cell":
+        return "#FF0000" // red
+      default:
+        return "#6b7280" // gray
+    }
   }
 
   const getCellLightColor = (type: string) => {
+    // Exact mapping to match the correct class names
     switch (type) {
-      case "Mature":
+      case "Open Cell":
+        return "bg-blue-50 text-blue-600"
+      case "Capped Cell":
+        return "bg-orange-50 text-orange-600"
+      case "Semi-Matured Cell":
+        return "bg-cyan-50 text-cyan-600"
+      case "Matured Cell":
         return "bg-purple-50 text-purple-600"
-      case "Semi-Mature":
-        return "bg-yellow-50 text-warning"
-      case "Capped":
-        return "bg-blue-50 text-info"
-      case "Open":
-        return "bg-blue-50 text-info"
+      case "Failed Cell":
+        return "bg-red-50 text-red-600"
       default:
         return "bg-gray-50 text-muted"
     }
@@ -119,14 +135,14 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
             <div key={cell.id} className="border border-border rounded-lg p-4 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-start gap-4 flex-1">
-                  <div className={`p-3 rounded-lg text-white font-bold text-lg ${getCellColor(cell.type)}`}>
+                  <div className="p-3 rounded-lg text-white font-bold text-lg" style={{ backgroundColor: getCellColor(cell.type) }}>
                     {index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-text-primary">{cell.type} Queen Cell</h4>
+                      <h4 className="font-semibold text-text-primary">{cell.type}</h4>
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getCellLightColor(cell.type)}`}>
-                        {cell.percentage}%
+                        {cell.maturityPercentage}%
                       </span>
                     </div>
                     <p className="text-sm text-muted mb-2">{cell.description}</p>
@@ -143,7 +159,13 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
 
               {/* Progress bar */}
               <div className="w-full h-2 bg-border rounded-full overflow-hidden">
-                <div className={`h-full ${getCellColor(cell.type)}`} style={{ width: `${cell.percentage}%` }} />
+                <div
+                  className="h-full"
+                  style={{
+                    width: `${cell.maturityPercentage}%`,
+                    backgroundColor: getCellColor(cell.type)
+                  }}
+                />
               </div>
             </div>
           ))}

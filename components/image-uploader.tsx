@@ -19,25 +19,41 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const imageData = reader.result as string
-        setPreview(imageData)
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, or WebP)')
+        return
       }
-      reader.readAsDataURL(file)
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image too large. Please select an image smaller than 10MB.')
+        return
+      }
+      
+      processAndResizeImage(file)
     }
   }
 
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const imageData = reader.result as string
-        setPreview(imageData)
-        setIsCapturing(false)
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, or WebP)')
+        return
       }
-      reader.readAsDataURL(file)
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image too large. Please select an image smaller than 10MB.')
+        return
+      }
+      
+      processAndResizeImage(file)
+      setIsCapturing(false)
     }
   }
 
@@ -45,6 +61,52 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
     if (preview) {
       onImageCapture(preview)
     }
+  }
+
+  const processAndResizeImage = (file: File) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      // Calculate new dimensions (max 1280px on longest side)
+      const maxSize = 1280
+      let { width, height } = img
+      
+      if (width > height) {
+        if (width > maxSize) {
+          height = (height * maxSize) / width
+          width = maxSize
+        }
+      } else {
+        if (height > maxSize) {
+          width = (width * maxSize) / height
+          height = maxSize
+        }
+      }
+      
+      // Set canvas size
+      canvas.width = width
+      canvas.height = height
+      
+      // Draw and compress image
+      ctx?.drawImage(img, 0, 0, width, height)
+      
+      // Convert to JPEG with quality compression
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+      setPreview(compressedDataUrl)
+    }
+    
+    img.onerror = () => {
+      alert('Failed to process image. Please try a different image.')
+    }
+    
+    // Load the image
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      img.src = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
   }
 
   const clearPreview = () => {
@@ -95,7 +157,7 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
         className="bg-surface rounded-lg border-2 border-dashed border-border p-6 sm:p-8 cursor-pointer hover:border-accent hover:bg-surface-hover transition-all group"
         onClick={() => fileInputRef.current?.click()}
       >
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="p-4 bg-yellow-100 rounded-lg group-hover:bg-accent group-hover:text-white transition-colors">
             <Upload className="w-8 h-8 text-accent group-hover:text-white" />
@@ -115,7 +177,7 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
         <input
           ref={cameraInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
           capture="environment"
           onChange={handleCameraCapture}
           className="hidden"

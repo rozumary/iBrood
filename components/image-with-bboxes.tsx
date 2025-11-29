@@ -19,13 +19,20 @@ export default function ImageWithBboxes({ imageUrl, detections }: ImageWithBboxe
   const imgRef = useRef<HTMLImageElement>(null)
 
   const getColor = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'open': return '#3b82f6' // blue
-      case 'capped': return '#06b6d4' // cyan
-      case 'semi-mature': return '#eab308' // yellow
-      case 'mature': return '#22c55e' // green
-      case 'failed': return '#ef4444' // red
-      default: return '#6b7280' // gray
+    // Updated to match the correct class names and hex colors
+    switch (type) {
+      case "Open Cell":
+        return "#1900FF" // vibrant blue
+      case "Capped Cell":
+        return "#FD5D00" // vibrant orange
+      case "Semi-Matured Cell":
+        return "#0AE5EC" // cyan
+      case "Matured Cell":
+        return "#7700FF" // purple
+      case "Failed Cell":
+        return "#FF0000" // red
+      default:
+        return "#6b7280" // gray
     }
   }
 
@@ -38,6 +45,22 @@ export default function ImageWithBboxes({ imageUrl, detections }: ImageWithBboxe
     if (!ctx) return
 
     const drawBboxes = () => {
+      // Set canvas size to match image aspect ratio
+      const maxWidth = 800
+      const maxHeight = 600
+      const imgAspect = img.naturalWidth / img.naturalHeight
+      
+      let canvasWidth = maxWidth
+      let canvasHeight = maxWidth / imgAspect
+      
+      if (canvasHeight > maxHeight) {
+        canvasHeight = maxHeight
+        canvasWidth = maxHeight * imgAspect
+      }
+      
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+      
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       

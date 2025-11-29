@@ -48,53 +48,108 @@ export class YOLOQueenCellService {
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
     console.log('🔍 Starting YOLO analysis...')
     
-    // Try Flask API first
-    try {
-      // Use environment variable or fallback to localhost for development
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const flaskEndpoint = `${apiUrl}/analyze`
-      console.log(`📡 Trying Flask API at ${flaskEndpoint}`)
-      
-      const flaskResponse = await fetch(flaskEndpoint, {
-        method: 'POST',
-        body: JSON.stringify({image: imageData}),
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+    // Validate image data format
+    if (!imageData || !imageData.includes('data:image')) {
+      throw new Error('Invalid image format. Please select a valid image file.')
+    }
+    
+    // Check image size (rough estimate from base64 length)
+    const sizeInBytes = (imageData.length * 3) / 4
+    if (sizeInBytes > 15 * 1024 * 1024) { // 15MB limit
+      throw new Error('Image too large. Please use an image smaller than 10MB.')
+    }
+    
+    const maxRetries = 2
+    let lastError: Error | null = null
+    
+    // Try Flask API first with retries
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const isProduction = window.location.protocol === 'https:'
+        const apiUrl = isProduction 
+          ? `https://${window.location.hostname}/api` 
+          : 'http://localhost:8000'
+        const flaskEndpoint = `${apiUrl}/analyze`
+        console.log(`📡 Trying Flask API at ${flaskEndpoint} (attempt ${attempt})`)
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 45000)
+        
+        const flaskResponse = await fetch(flaskEndpoint, {
+          method: 'POST',
+          body: JSON.stringify({image: imageData}),
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          signal: controller.signal
+        })
+        
+        clearTimeout(timeoutId)
+        
+        if (flaskResponse.ok) {
+          const result = await flaskResponse.json()
+          console.log('✅ Flask API Results:', result)
+          return result
+        } else {
+          const errorText = await flaskResponse.text()
+          throw new Error(`Server error: ${flaskResponse.status} - ${errorText}`)
         }
-      })
-      
-      if (flaskResponse.ok) {
-        const result = await flaskResponse.json()
-        console.log('✅ Flask API Results:', result)
-        return result
+      } catch (error) {
+        lastError = error as Error
+        console.warn(`Flask API attempt ${attempt} failed:`, error)
+        
+        if (attempt < maxRetries && !lastError.message.includes('abort')) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+        }
       }
-    } catch (error) {
-      console.warn('Flask API unavailable:', error)
     }
     
-    // Try Next.js API route
-    try {
-      const nextEndpoint = '/api/predict'
-      console.log(`📡 Trying Next.js API at ${nextEndpoint}`)
-      
-      const nextResponse = await fetch(nextEndpoint, {
-        method: 'POST',
-        body: JSON.stringify({data: [imageData]}),
-        headers: {'Content-Type': 'application/json'}
-      })
-      
-      if (nextResponse.ok) {
-        const result = await nextResponse.json()
-        console.log('✅ Next.js API Results:', result)
-        return {...result.data[1], imagePreview: imageData}
+    // Try Next.js API route with retries
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const nextEndpoint = '/api/predict'
+        console.log(`📡 Trying Next.js API at ${nextEndpoint} (attempt ${attempt})`)
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 60000)
+        
+        const nextResponse = await fetch(nextEndpoint, {
+          method: 'POST',
+          body: JSON.stringify({data: [imageData]}),
+          headers: {'Content-Type': 'application/json'},
+          signal: controller.signal
+        })
+        
+        clearTimeout(timeoutId)
+        
+        if (nextResponse.ok) {
+          const result = await nextResponse.json()
+          console.log('✅ Next.js API Results:', result)
+          return {...result.data[1], imagePreview: imageData}
+        } else {
+          const errorText = await nextResponse.text()
+          throw new Error(`API error: ${nextResponse.status} - ${errorText}`)
+        }
+      } catch (error) {
+        lastError = error as Error
+        console.warn(`Next.js API attempt ${attempt} failed:`, error)
+        
+        if (attempt < maxRetries && !lastError.message.includes('abort')) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+        }
       }
-    } catch (error) {
-      console.warn('Next.js API unavailable:', error)
     }
     
-    // No fallback - throw error if APIs fail
-    throw new Error('All API endpoints failed. Please check your connection and try again.')
+    // All attempts failed
+    const errorMessage = lastError?.message || 'Unknown error'
+    if (errorMessage.includes('abort') || errorMessage.includes('timeout')) {
+      throw new Error('Request timed out. The server may be busy. Please try again.')
+    } else if (errorMessage.includes('fetch')) {
+      throw new Error('Network error. Please check your internet connection and try again.')
+    } else {
+      throw new Error(`Analysis failed: ${errorMessage}`)
+    }
   }
 
 
@@ -222,3 +277,69 @@ export class YOLOQueenCellService {
 }
 
 export const yoloService = new YOLOQueenCellService()
+
+// Helper function to validate and compress images on the client side
+export const validateAndCompressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      reject(new Error('Invalid file type. Please use JPEG, PNG, or WebP images.'))
+      return
+    }
+    
+    if (file.size > 10 * 1024 * 1024) {
+      reject(new Error('File too large. Please use an image smaller than 10MB.'))
+      return
+    }
+    
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      try {
+        const maxSize = 1280
+        let { width, height } = img
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width
+            width = maxSize
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height
+            height = maxSize
+          }
+        }
+        
+        if (width < 320 || height < 320) {
+          reject(new Error('Image too small. Minimum size is 320x320 pixels.'))
+          return
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        ctx?.drawImage(img, 0, 0, width, height)
+        
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85)
+        resolve(compressedDataUrl)
+      } catch (error) {
+        reject(new Error('Failed to process image. Please try a different image.'))
+      }
+    }
+    
+    img.onerror = () => {
+      reject(new Error('Failed to load image. Please check the file and try again.'))
+    }
+    
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      img.src = e.target?.result as string
+    }
+    reader.onerror = () => {
+      reject(new Error('Failed to read file. Please try again.'))
+    }
+    reader.readAsDataURL(file)
+  })
+}

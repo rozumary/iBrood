@@ -12,21 +12,21 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    console.log('🚀 Calling Flask API...')
+    console.log('🚀 Calling FastAPI API...')
     
-    const API_URL = process.env.API_URL || 'http://localhost:5000'
+    const API_URL = process.env.API_URL || 'http://localhost:8000'
     
-    // Check Flask health first
+    // Check FastAPI health first
     try {
       const healthCheck = await fetch(`${API_URL}/health`, {
         method: 'GET',
         signal: AbortSignal.timeout(5000)
       })
       if (!healthCheck.ok) {
-        console.log('⚠️ Flask health check failed')
+        console.log('⚠️ FastAPI health check failed')
       }
     } catch (healthError) {
-      console.log('⚠️ Flask not responding to health check:', healthError)
+      console.log('⚠️ FastAPI not responding to health check:', healthError)
     }
     
     const response = await fetch(`${API_URL}/analyze`, {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
     
     const result = await response.json()
-    console.log('✅ Flask API success')
+    console.log('✅ FastAPI API success')
     return NextResponse.json({ data: [null, result] })
     
   } catch (error) {

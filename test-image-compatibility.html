@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compatibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        input[type="file"] { margin: 10px 0; }
+        canvas { border: 1px solid #ccc; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🐝 iBrood Image Compatibility Test</h1>
+    <p>Test different image formats and sizes to ensure compatibility with the queen cell analysis system.</p>
+
+    <div class="test-section">
+        <h2>📁 File Upload Test</h2>
+        <input type="file" id="fileInput" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
+        <button onclick="testFiles()">Test Selected Files</button>
+        <div id="fileResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🖼️ Image Processing Test</h2>
+        <canvas id="testCanvas" width="400" height="300"></canvas>
+        <div>
+            <button onclick="generateTestImage('small')">Test Small Image (200x200)</button>
+            <button onclick="generateTestImage('medium')">Test Medium Image (800x600)</button>
+            <button onclick="generateTestImage('large')">Test Large Image (2000x1500)</button>
+        </div>
+        <div id="processResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 API Connection Test</h2>
+        <button onclick="testAPIConnection()">Test API Endpoints</button>
+        <div id="apiResults"></div>
+    </div>
+
+    <script>
+        function showResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        function testFiles() {
+            clearResults('fileResults');
+            const files = document.getElementById('fileInput').files;
+            
+            if (files.length === 0) {
+                showResult('fileResults', '⚠️ Please select at least one file', 'error');
+                return;
+            }
+
+            Array.from(files).forEach((file, index) => {
+                testSingleFile(file, index + 1);
+            });
+        }
+
+        function testSingleFile(file, fileNumber) {
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+
+            // Test file type
+            if (!validTypes.includes(file.type)) {
+                showResult('fileResults', `❌ File ${fileNumber}: Invalid type (${file.type}). Use JPEG, PNG, or WebP.`, 'error');
+                return;
+            }
+
+            // Test file size
+            if (file.size > maxSize) {
+                showResult('fileResults', `❌ File ${fileNumber}: Too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max 10MB.`, 'error');
+                return;
+            }
+
+            // Test image processing
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Test dimensions
+                    if (img.width < 320 || img.height < 320) {
+                        showResult('fileResults', `❌ File ${fileNumber}: Too small (${img.width}x${img.height}). Min 320x320.`, 'error');
+                        return;
+                    }
+
+                    // Test compression
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate resize dimensions
+                    const maxSize = 1280;
+                    let { width, height } = img;
+                    
+                    if (width > height) {
+                        if (width > maxSize) {
+                            height = (height * maxSize) / width;
+                            width = maxSize;
+                        }
+                    } else {
+                        if (height > maxSize) {
+                            width = (width * maxSize) / height;
+                            height = maxSize;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    const compressedSize = (compressedDataUrl.length * 3) / 4;
+                    
+                    showResult('fileResults', 
+                        `✅ File ${fileNumber}: ${file.name}<br>
+                        📏 Original: ${img.width}x${img.height} (${(file.size / 1024).toFixed(1)}KB)<br>
+                        📐 Processed: ${Math.round(width)}x${Math.round(height)} (${(compressedSize / 1024).toFixed(1)}KB)`, 
+                        'success'
+                    );
+                };
+                img.onerror = function() {
+                    showResult('fileResults', `❌ File ${fileNumber}: Failed to load image`, 'error');
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() {
+                showResult('fileResults', `❌ File ${fileNumber}: Failed to read file`, 'error');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function generateTestImage(size) {
+            clearResults('processResults');
+            const canvas = document.getElementById('testCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            switch(size) {
+                case 'small': width = 200; height = 200; break;
+                case 'medium': width = 800; height = 600; break;
+                case 'large': width = 2000; height = 1500; break;
+            }
+            
+            // Create test image
+            const testCanvas = document.createElement('canvas');
+            testCanvas.width = width;
+            testCanvas.height = height;
+            const testCtx = testCanvas.getContext('2d');
+            
+            // Draw test pattern
+            testCtx.fillStyle = '#f0f0f0';
+            testCtx.fillRect(0, 0, width, height);
+            
+            testCtx.fillStyle = '#ffcc00';
+            testCtx.fillRect(width * 0.2, height * 0.2, width * 0.6, height * 0.6);
+            
+            testCtx.fillStyle = '#333';
+            testCtx.font = `${Math.min(width, height) * 0.1}px Arial`;
+            testCtx.textAlign = 'center';
+            testCtx.fillText(`${width}x${height}`, width / 2, height / 2);
+            
+            // Test processing
+            const originalDataUrl = testCanvas.toDataURL('image/jpeg', 0.9);
+            const originalSize = (originalDataUrl.length * 3) / 4;
+            
+            // Process like the app would
+            const maxSize = 1280;
+            let newWidth = width, newHeight = height;
+            
+            if (width > height) {
+                if (width > maxSize) {
+                    newHeight = (height * maxSize) / width;
+                    newWidth = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    newWidth = (width * maxSize) / height;
+                    newHeight = maxSize;
+                }
+            }
+            
+            canvas.width = Math.min(400, newWidth);
+            canvas.height = Math.min(300, newHeight);
+            ctx.drawImage(testCanvas, 0, 0, canvas.width, canvas.height);
+            
+            const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const processedSize = (processedDataUrl.length * 3) / 4;
+            
+            if (width < 320 || height < 320) {
+                showResult('processResults', `❌ ${size.toUpperCase()}: Too small (${width}x${height})`, 'error');
+            } else if (originalSize > 15 * 1024 * 1024) {
+                showResult('processResults', `❌ ${size.toUpperCase()}: Too large (${(originalSize / 1024 / 1024).toFixed(2)}MB)`, 'error');
+            } else {
+                showResult('processResults', 
+                    `✅ ${size.toUpperCase()}: Processed successfully<br>
+                    📏 Original: ${width}x${height} (${(originalSize / 1024).toFixed(1)}KB)<br>
+                    📐 Processed: ${Math.round(newWidth)}x${Math.round(newHeight)} (${(processedSize / 1024).toFixed(1)}KB)`, 
+                    'success'
+                );
+            }
+        }
+
+        async function testAPIConnection() {
+            clearResults('apiResults');
+            
+            // Test Next.js API
+            try {
+                showResult('apiResults', '🔄 Testing Next.js API endpoint...', 'info');
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: ['data:image/jpeg;base64,test'] })
+                });
+                
+                if (response.ok) {
+                    showResult('apiResults', '✅ Next.js API: Reachable', 'success');
+                } else {
+                    showResult('apiResults', `⚠️ Next.js API: Responded with ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('apiResults', `❌ Next.js API: ${error.message}`, 'error');
+            }
+            
+            // Test Flask API (local)
+            try {
+                showResult('apiResults', '🔄 Testing Flask API (localhost:5000)...', 'info');
+                const response = await fetch('http://localhost:5000/health', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult('apiResults', `✅ Flask API: ${result.status} (model: ${result.model_loaded})`, 'success');
+                } else {
+                    showResult('apiResults', `⚠️ Flask API: Responded with ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('apiResults', `❌ Flask API: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-generate a test on page load
+        window.onload = function() {
+            generateTestImage('medium');
+        };
+    </script>
+</body>
+</html>

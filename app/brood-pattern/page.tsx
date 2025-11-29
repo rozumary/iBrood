@@ -12,7 +12,7 @@ export default function BroodPatternPage() {
   const [showResults, setShowResults] = useState(false)
 
   const handleImageCapture = async (imageData: string) => {
-    alert('⚠️ Brood Pattern Analysis Coming Soon!\n\nCurrently only Queen Cell Analysis is available.\nPlease use the Queen Cell Analysis page for now.')
+    alert('🚧 Brood Pattern Analysis Coming Soon!\n\n✅ Queen Cell Analysis is fully functional\n🔬 Brood pattern model is in development\n\nPlease use Queen Cell Analysis for now.')
     return
   }
 

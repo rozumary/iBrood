@@ -12,3 +12,7 @@ services:
         value: production
       - key: API_URL
         value: https://ibrood.onrender.com
+      - key: HUGGINGFACE_HUB_CACHE
+        value: /tmp/hf_cache
+      - key: RENDER_CACHE_DIR
+        value: /tmp/model_cache

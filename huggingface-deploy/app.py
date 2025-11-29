@@ -1,101 +1,205 @@
-import gradio as gr
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
-import numpy as np
-import cv2
+import os
+import logging
+from PIL import Image
+import io
+import base64
 
-model = YOLO('best-seg.pt')
+# ==================== INITIALIZE APP ====================
+app = FastAPI(title="iBrood Detection API", version="1.0.0")
 
-CLASS_NAMES = {0: 'Capped Cell', 1: 'Failed Cell', 2: 'Matured Cell', 3: 'Open Cell', 4: 'Semi-Matured Cell'}
-MATURITY_MAP = {
-    'Open Cell': {'days': 10, 'percentage': 10, 'description': 'Elongated, open-ended; larva is seen (3-5 days old)'},
-    'Capped Cell': {'days': 7, 'percentage': 40, 'description': 'Partially sealed cell; transition stage (4-6 days old)'},
-    'Semi-Matured Cell': {'days': 5, 'percentage': 70, 'description': 'Uniform color (5-8 days old)'},
-    'Matured Cell': {'days': 2, 'percentage': 95, 'description': 'Conical tip dark; ready to hatch'},
-    'Failed Cell': {'days': 0, 'percentage': 0, 'description': 'Dead cell; failed process'}
-}
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-def analyze(image):
-    results = model(image, conf=0.25, iou=0.45)
+# ==================== CORS ====================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ==================== LOAD MODEL ====================
+os.environ['DISPLAY'] = ':0'
+os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '0'
+
+model = None
+try:
+    import cv2
+    logger.info("✅ OpenCV imported successfully")
     
-    annotated = image.copy()
+    if os.path.exists('best-seg.pt'):
+        file_size = os.path.getsize('best-seg.pt')
+        logger.info(f"Model file size: {file_size} bytes")
+        
+        if file_size > 1000:
+            model = YOLO('best-seg.pt')
+            model.overrides['verbose'] = False
+            dummy_img = Image.new('RGB', (640, 640), color='white')
+            _ = model(dummy_img, verbose=False)
+            logger.info("✅ Model loaded and optimized successfully")
+        else:
+            logger.error("❌ Model file too small, likely corrupted")
+    else:
+        logger.error("❌ Model file 'best-seg.pt' not found")
+        
+except ImportError as e:
+    logger.error(f"❌ OpenCV import error: {e}")
+except Exception as e:
+    logger.error(f"❌ Error loading model: {e}")
+
+# ==================== DETECTION FUNCTIONS ====================
+def process_detection(results, original_image):
+    """Process YOLO results and return formatted response with annotated image"""
+    import cv2
+    import numpy as np
+    
     detections = []
-    distribution = {'open': 0, 'capped': 0, 'mature': 0, 'semiMature': 0, 'failed': 0}
     
-    color_map = {
-        'Open Cell': (255, 165, 0),
-        'Capped Cell': (255, 255, 0),
-        'Semi-Matured Cell': (225, 105, 65),
-        'Matured Cell': (128, 0, 128),
-        'Failed Cell': (255, 99, 71)
+    # Convert PIL to OpenCV format
+    img_array = np.array(original_image)
+    if len(img_array.shape) == 3:
+        img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    
+    # Class names and neon colors
+    class_names = {0: 'Capped', 1: 'Failed', 2: 'Matured', 3: 'Open', 4: 'Semi-Matured'}
+    colors = {
+        0: (0, 255, 255),      # Neon Yellow for Capped
+        1: (0, 50, 255),       # Neon Red for Failed
+        2: (255, 100, 255),    # Neon Purple for Matured
+        3: (0, 200, 255),      # Neon Orange for Open
+        4: (255, 150, 0)       # Neon Blue for Semi-Mature
     }
     
-    for r in results:
-        boxes = r.boxes
-        masks = r.masks
-        
-        if boxes is not None:
-            for i, box in enumerate(boxes):
+    # Text colors (lighter versions)
+    text_colors = {
+        0: (150, 255, 255),    # Light Yellow
+        1: (150, 150, 255),    # Light Red
+        2: (255, 200, 255),    # Light Purple
+        3: (150, 255, 255),    # Light Orange
+        4: (255, 200, 150)     # Light Blue
+    }
+    
+    # Modern styling
+    thickness = 3
+    font_scale = 0.6
+    
+    for result in results:
+        if result.boxes is not None:
+            for box in result.boxes:
                 cls = int(box.cls[0])
                 conf = float(box.conf[0])
                 x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
                 
-                class_name = CLASS_NAMES.get(cls, 'Unknown')
-                maturity_info = MATURITY_MAP.get(class_name, {'days': 0, 'percentage': 0, 'description': 'Unknown'})
+                detection = {
+                    "confidence": conf,
+                    "class": cls,
+                    "bbox": [x1, y1, x2, y2]
+                }
+                detections.append(detection)
                 
-                color = color_map.get(class_name, (255, 255, 255))
+                # Draw modern bounding box
+                color = colors.get(cls, (255, 255, 255))
+                cv2.rectangle(img_array, (x1, y1), (x2, y2), color, thickness)
                 
-                cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
-                cv2.putText(annotated, f"{class_name} {conf:.0%}", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                # Create shorter label
+                label = f"{class_names.get(cls, 'Unknown')} {conf:.0%}"
                 
-                if masks is not None and i < len(masks.data):
-                    mask = masks.data[i].cpu().numpy()
-                    mask_resized = cv2.resize(mask, (annotated.shape[1], annotated.shape[0]))
-                    annotated[mask_resized > 0.5] = annotated[mask_resized > 0.5] * 0.5 + np.array(color) * 0.5
-                
-                detections.append({
-                    'id': i + 1,
-                    'type': class_name,
-                    'confidence': round(conf * 100),
-                    'bbox': [x1, y1, x2-x1, y2-y1],
-                    'percentage': maturity_info['percentage'],
-                    'estimatedHatchingDays': maturity_info['days'],
-                    'description': maturity_info['description']
-                })
-                
-                if 'Semi-Matured' in class_name:
-                    distribution['semiMature'] += 1
-                elif 'Matured' in class_name:
-                    distribution['mature'] += 1
-                elif 'Capped' in class_name:
-                    distribution['capped'] += 1
-                elif 'Open' in class_name:
-                    distribution['open'] += 1
-                elif 'Failed' in class_name:
-                    distribution['failed'] += 1
+                # Draw text with matching neon color (Space Grotesque style)
+                text_color = text_colors.get(cls, (255, 255, 255))
+                cv2.putText(img_array, label, (x1, y1 - 8), cv2.FONT_HERSHEY_DUPLEX, font_scale, text_color, 2)
     
-    recommendations = []
-    if distribution['mature'] > 0:
-        recommendations.append(f"Monitor {distribution['mature']} mature cell(s) for emergence within 2-3 days")
-    if distribution['failed'] > 0:
-        recommendations.append(f"Remove {distribution['failed']} failed cell(s) to prevent disease")
-    if len(detections) > 5:
-        recommendations.append('High queen cell count - consider swarm prevention measures')
+    # Convert back to PIL and encode to base64
+    if len(img_array.shape) == 3:
+        img_array = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
     
-    result = {
-        'totalQueenCells': len(detections),
-        'cells': detections,
-        'maturityDistribution': distribution,
-        'recommendations': recommendations if recommendations else ['Continue regular monitoring']
+    annotated_image = Image.fromarray(img_array)
+    
+    # Convert to base64 with maximum speed
+    buffered = io.BytesIO()
+    annotated_image.save(buffered, format="JPEG", quality=70)
+    img_base64 = base64.b64encode(buffered.getvalue()).decode()
+    
+    return {
+        "detections": detections, 
+        "count": len(detections),
+        "annotated_image": f"data:image/jpeg;base64,{img_base64}"
     }
-    
-    return annotated, result
 
-demo = gr.Interface(
-    fn=analyze,
-    inputs=gr.Image(type="numpy"),
-    outputs=[gr.Image(label="Detected Queen Cells"), gr.JSON(label="Analysis Results")],
-    title="iBrood Queen Cell Analyzer",
-    api_name="analyze"
-)
+# ==================== QUEEN DETECTION ====================
+@app.post("/queen_detect")
+async def detect_queen(file: UploadFile = File(...)):
+    try:
+        if model is None:
+            return JSONResponse({
+                "error": "Model not loaded", 
+                "message": "Model file may be corrupted. Please check the best-seg.pt file."
+            }, status_code=500)
+            
+        # Read and process image
+        file_content = await file.read()
+        image = Image.open(io.BytesIO(file_content))
+        
+        # Keep original image size for quality
+        max_size = 640
+        if max(image.size) > max_size:
+            ratio = max_size / max(image.size)
+            new_size = (int(image.size[0] * ratio), int(image.size[1] * ratio))
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+        
+        # Fast detection settings
+        results = model(image, verbose=False, conf=0.3, iou=0.5, imgsz=640)
+        response = process_detection(results, image)
+        
+        return response
+        
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
-demo.launch()
+# ==================== BROOD DETECTION ====================
+@app.post("/detect")
+async def detect_brood(file: UploadFile = File(...)):
+    try:
+        if model is None:
+            return JSONResponse({
+                "error": "Model not loaded", 
+                "message": "Model file may be corrupted. Please check the best-seg.pt file."
+            }, status_code=500)
+            
+        # Read and process image
+        file_content = await file.read()
+        image = Image.open(io.BytesIO(file_content))
+        
+        # Keep original image size for quality
+        max_size = 640
+        if max(image.size) > max_size:
+            ratio = max_size / max(image.size)
+            new_size = (int(image.size[0] * ratio), int(image.size[1] * ratio))
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+        
+        # Fast detection settings
+        results = model(image, verbose=False, conf=0.3, iou=0.5, imgsz=640)
+        response = process_detection(results, image)
+        
+        return response
+        
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/")
+async def home():
+    return {"message": "iBrood Detection API is running"}
+
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy", 
+        "message": "iBrood Detection API is running",
+        "model_loaded": model is not None
+    }
