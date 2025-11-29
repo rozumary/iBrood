@@ -30,10 +30,10 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="p-1.5 bg-accent rounded-lg group-hover:shadow-lg transition-shadow">
-              <Image 
-                src="/honeycomb-logo.svg" 
-                alt="iBrood Logo" 
-                width={28} 
+              <Image
+                src="/IMG_3630.png"
+                alt="iBrood Logo"
+                width={28}
                 height={28}
               />
             </div>

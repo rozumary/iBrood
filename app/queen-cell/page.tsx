@@ -54,11 +54,12 @@ export default function QueenCellPage() {
     }
   }
 
+  // Using inline styles for reliable sticky footer behavior
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navigation />
 
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main style={{ flex: '1' }} className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-4xl font-heading font-bold text-text-primary mb-2">Queen Cell Analysis</h1>
           <p className="text-sm sm:text-base text-muted">
