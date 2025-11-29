@@ -24,11 +24,12 @@ export default function LoginPage() {
       alert("Please fill in all fields")
     }
   }
+  // Using inline styles for reliable sticky footer behavior
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuthNavigation />
 
-      <main className="max-w-md mx-auto px-6 py-16">
+      <main style={{ flex: '1' }} className="max-w-lg mx-auto px-6 py-16">
         <div className="bg-surface rounded-lg border border-border p-8">
           <h1 className="text-3xl font-heading font-bold text-text-primary mb-2 text-center">Log In</h1>
           <p className="text-muted text-center mb-8">Welcome back to iBrood</p>

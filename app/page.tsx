@@ -5,8 +5,9 @@ import { Beef as Bee, Grid3X3, CheckCircle } from "lucide-react"
 import Footer from "@/components/footer"
 
 export default function LandingPage() {
+  // Using inline styles for reliable sticky footer behavior
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <header className="bg-surface border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
