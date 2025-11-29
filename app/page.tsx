@@ -12,7 +12,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-accent rounded-lg">
-              <img src="/honeycomb-logo.svg" alt="iBrood" className="w-7 h-7" />
+              <img src="/IMG_3630.png" alt="iBrood" className="w-7 h-7" />
             </div>
             <span className="font-heading font-bold text-xl">iBrood</span>
           </div>
