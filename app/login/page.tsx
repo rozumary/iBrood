@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuthNavigation />
 
-      <main style={{ flex: '1' }} className="max-w-lg mx-auto px-6 py-16">
+      <main style={{ flex: '1' }} className="max-w-xl mx-auto px-8 py-20">
         <div className="bg-surface rounded-lg border border-border p-8">
           <h1 className="text-3xl font-heading font-bold text-text-primary mb-2 text-center">Log In</h1>
           <p className="text-muted text-center mb-8">Welcome back to iBrood</p>
