@@ -14,10 +14,10 @@ export const metadata: Metadata = {
     icon: [
       {
         url: "/IMG_3630.png",
-        type: "image/png",
+        type: "image/svg+xml",
       },
       {
-        url: "/IMG_3630.png",
+        url: "/favicon.ico",
         sizes: "any",
       },
     ],
@@ -50,8 +50,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/IMG_3630.png?v=1" type="image/png" />
-        <link rel="icon" href="/IMG_3630.png?v=1" sizes="any" />
+        <link rel="icon" href="/IMG_3630.png" type="image/png" />
+        <link rel="icon" href="/IMG_3630.png" sizes="any" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+﻿from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
@@ -32,7 +32,7 @@ os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '0'
 model = None
 try:
     import cv2
-    logger.info("✅ OpenCV imported successfully")
+    logger.info("Γ£à OpenCV imported successfully")
     
     if os.path.exists('best-seg.pt'):
         file_size = os.path.getsize('best-seg.pt')
@@ -43,16 +43,16 @@ try:
             model.overrides['verbose'] = False
             dummy_img = Image.new('RGB', (640, 640), color='white')
             _ = model(dummy_img, verbose=False)
-            logger.info("✅ Model loaded and optimized successfully")
+            logger.info("Γ£à Model loaded and optimized successfully")
         else:
-            logger.error("❌ Model file too small, likely corrupted")
+            logger.error("Γ¥î Model file too small, likely corrupted")
     else:
-        logger.error("❌ Model file 'best-seg.pt' not found")
+        logger.error("Γ¥î Model file 'best-seg.pt' not found")
         
 except ImportError as e:
-    logger.error(f"❌ OpenCV import error: {e}")
+    logger.error(f"Γ¥î OpenCV import error: {e}")
 except Exception as e:
-    logger.error(f"❌ Error loading model: {e}")
+    logger.error(f"Γ¥î Error loading model: {e}")
 
 # ==================== DETECTION FUNCTIONS ====================
 def process_detection(results, original_image):

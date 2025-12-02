@@ -11,6 +11,10 @@ interface QueenCellAnalysis {
     type: string
     confidence: number
     bbox: [number, number, number, number]
+    mask?: {
+      data: string
+      shape: [number, number]
+    }
     maturityPercentage: number
     estimatedHatchingDays: number
     description: string

@@ -85,118 +85,53 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
         // Draw segmentation overlay if masks are available and enabled
         if (showMasks && detection.mask) {
           try {
-            const maskData = detection.mask.data
-            const [maskHeight, maskWidth] = detection.mask.shape
+            const maskInfo = detection.mask as any
 
-            // Check if mask data is valid
-            if (!maskData || maskHeight <= 0 || maskWidth <= 0) {
-              throw new Error('Invalid mask data')
-            }
+            if (maskInfo.type === 'polygon' && maskInfo.points?.length > 0) {
+              const points = maskInfo.points
+              const [imgHeight, imgWidth] = maskInfo.imageShape || [img.naturalHeight, img.naturalWidth]
+              
+              const polyScaleX = canvasWidth / imgWidth
+              const polyScaleY = canvasHeight / imgHeight
 
-            const maskBytes = Uint8Array.from(atob(maskData), c => c.charCodeAt(0))
+              // Convert hex to RGB
+              const r = parseInt(color.slice(1, 3), 16)
+              const g = parseInt(color.slice(3, 5), 16)
+              const b = parseInt(color.slice(5, 7), 16)
 
-            // Create a temporary canvas for mask rendering
-            const maskCanvas = document.createElement('canvas')
-            maskCanvas.width = maskWidth
-            maskCanvas.height = maskHeight
-            const maskCtx = maskCanvas.getContext('2d')
-            if (!maskCtx) throw new Error('Cannot get mask canvas context')
-
-            // Create image data for the mask
-            const imageData = maskCtx.createImageData(maskWidth, maskHeight)
-            const data = imageData.data
-
-            let hasNonZeroPixels = false
-
-            // Draw only mask boundary pixels for accurate cell shape tracing
-            for (let i = 0; i < maskHeight; i++) {
-              for (let j = 0; j < maskWidth; j++) {
-                const maskIdx = i * maskWidth + j
-                if (maskIdx < maskBytes.length && maskBytes[maskIdx] > 0) {
-                  hasNonZeroPixels = true
-
-                  // Check if this is a boundary pixel (has at least one neighbor that is 0)
-                  let isBoundary = false
-                  const neighbors = [
-                    [i-1, j], [i+1, j], [i, j-1], [i, j+1],
-                    [i-1, j-1], [i-1, j+1], [i+1, j-1], [i+1, j+1]
-                  ]
-
-                  for (const [ni, nj] of neighbors) {
-                    if (ni >= 0 && ni < maskHeight && nj >= 0 && nj < maskWidth) {
-                      const neighborIdx = ni * maskWidth + nj
-                      if (neighborIdx < maskBytes.length && maskBytes[neighborIdx] === 0) {
-                        isBoundary = true
-                        break
-                      }
-                    } else {
-                      // Edge of mask area is also boundary
-                      isBoundary = true
-                      break
-                    }
-                  }
-
-                  if (isBoundary) {
-                    // Convert hex color to RGB
-                    const r = parseInt(color.slice(1, 3), 16)
-                    const g = parseInt(color.slice(3, 5), 16)
-                    const b = parseInt(color.slice(5, 7), 16)
-
-                    const pixelIdx = (i * maskWidth + j) * 4
-                    data[pixelIdx] = r     // R
-                    data[pixelIdx + 1] = g // G
-                    data[pixelIdx + 2] = b // B
-                    data[pixelIdx + 3] = 200 // Alpha (higher for boundary visibility)
-                  }
-                }
+              ctx.beginPath()
+              ctx.moveTo(points[0][0] * polyScaleX, points[0][1] * polyScaleY)
+              
+              for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i][0] * polyScaleX, points[i][1] * polyScaleY)
               }
+              ctx.closePath()
+
+              // Fill with semi-transparent color
+              ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.4)`
+              ctx.fill()
+              
+              // Draw outline
+              ctx.strokeStyle = color
+              ctx.lineWidth = 2
+              ctx.stroke()
+
+              maskRendered = true
             }
-
-            if (!hasNonZeroPixels) {
-              throw new Error('Mask has no non-zero pixels')
-            }
-
-            maskCtx.putImageData(imageData, 0, 0)
-
-            // Position and scale the mask overlay to match the detection bounding box
-            ctx.globalAlpha = 0.8
-            ctx.drawImage(maskCanvas, 0, 0, maskWidth, maskHeight, scaledX, scaledY, scaledWidth, scaledHeight)
-            ctx.globalAlpha = 1.0
-            maskRendered = true
-
-            console.log(`✅ Rendered mask for ${detection.type}: ${maskWidth}x${maskHeight}`)
-
           } catch (error) {
-            console.warn(`⚠️  Mask rendering failed for ${detection.type}, using enhanced box:`, error instanceof Error ? error.message : String(error))
-            // Fallback: draw enhanced bounding box only (no fill to distinguish from mask)
-            ctx.strokeStyle = color
-            ctx.lineWidth = 8
-            ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
-            ctx.globalAlpha = 1.0
+            console.warn(`⚠️ Mask failed:`, error)
           }
         }
 
-        if (showMasks) {
-          // When masks are "shown", display filled bounding boxes with higher opacity for emphasis only if mask wasn't rendered
-          ctx.strokeStyle = color
-          ctx.lineWidth = 6
-          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
+        // Draw bounding box
+        ctx.strokeStyle = color
+        ctx.lineWidth = showMasks ? 3 : 2
+        ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
 
-          // Only fill with box if mask wasn't successfully rendered
-          if (!maskRendered) {
-            ctx.fillStyle = color
-            ctx.globalAlpha = 0.35
-            ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
-            ctx.globalAlpha = 1.0
-          }
-        } else {
-          // Default view: show standard bounding boxes
-          ctx.strokeStyle = color
-          ctx.lineWidth = 4
-          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
-
+        // Only fill bounding box if mask wasn't rendered and masks are enabled
+        if (showMasks && !maskRendered) {
           ctx.fillStyle = color
-          ctx.globalAlpha = 0.15
+          ctx.globalAlpha = 0.25
           ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
           ctx.globalAlpha = 1.0
         }

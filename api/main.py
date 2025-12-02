@@ -116,13 +116,11 @@ QUEEN_LABEL_SHORT = {
     "Failed Cell": "Failed"
 }
 
-# ==================== BROOD CLASSES - ONLY 4 CLASSES ====================
-# Exact mapping from model output to friendly names
+# ==================== BROOD CLASSES - ONLY 3 CLASSES ====================
 BROOD_CLASS_MAP = {
     0: "egg",
-    1: "empty_comb",
-    2: "larva",
-    3: "pupa"
+    1: "larva",
+    2: "pupa"
 }
 
 BROOD_CLASS_ATTRIBUTES = {
@@ -146,13 +144,6 @@ BROOD_CLASS_ATTRIBUTES = {
         "age": "8-12 days old",
         "health": "HEALTHY",
         "color": "#3366FF"
-    },
-    "empty_comb": {
-        "display_name": "Empty Comb",
-        "description": "Available for laying or food storage",
-        "age": "N/A",
-        "health": "NEUTRAL",
-        "color": "#999999"
     }
 }
 
@@ -264,7 +255,7 @@ async def analyze_image(request: Request):
         if not image_data or 'data:image' not in image_data:
             return JSONResponse(
                 content={"error": "Invalid image format"},
-                status_code=40
+                status_code=400
             )
         
         # Extract base64 data
@@ -317,7 +308,6 @@ async def analyze_image(request: Request):
                 distribution[type_for_dist] += 1
 
             # Get maturity info
-            maturity_info = QUEEN_CLASS_ATTRIBUTES.get(class_name, {})
             maturity_percentage = {
                 "Open Cell": 10,
                 "Capped Cell": 40,
@@ -392,7 +382,7 @@ async def analyze_image(request: Request):
         )
 
 # ==================== BROOD STATUS DETECTION ENDPOINT ====================
-@app.post("/detect")
+@app.post("/brood_detect")
 async def detect_brood(file: UploadFile = File(...)):
     """
     Detect brood status: Egg, Larva, Pupa, Empty Comb
@@ -407,7 +397,7 @@ async def detect_brood(file: UploadFile = File(...)):
         # Call Hugging Face API
         async with httpx.AsyncClient(timeout=60.0) as client:
             files = {"file": (file.filename, file_content, file.content_type)}
-            response = await client.post(f"{HF_API_URL}/detect", files=files)
+            response = await client.post(f"{HF_API_URL}/brood_detect", files=files)
             
             if response.status_code != 200:
                 logger.error(f"HF API error: {response.status_code}")
@@ -416,7 +406,21 @@ async def detect_brood(file: UploadFile = File(...)):
                     status_code=500
                 )
             
-            return response.json()
+            data = response.json()
+            
+            # Format response for frontend
+            result = {
+                "detections": data.get("detections", []),
+                "count": data.get("count", 0),
+                "counts": data.get("counts", {"egg": 0, "larva": 0, "pupa": 0, "empty_comb": 0}),
+                "health": data.get("health", {"status": "UNKNOWN", "score": 0}),
+                "recommendations": data.get("recommendations", []),
+                "annotated_image": data.get("annotated_image", ""),
+                "annotated_image_with_labels": data.get("annotated_image_with_labels", "")
+            }
+            
+            return JSONResponse(content=result)
+            
     except Exception as e:
         logger.error(f"❌ Error in brood detection: {str(e)}")
         return JSONResponse(
@@ -430,7 +434,7 @@ async def get_brood_status():
     """Get current brood status information"""
     return JSONResponse(content={
         "status": "Ready for brood analysis",
-        "endpoint": "/detect",
+        "endpoint": "/brood_detect",
         "method": "POST",
         "classes": ["egg", "larva", "pupa", "empty_comb"]
     })

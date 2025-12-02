@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy model and app files
 COPY --chown=user:1000 best-seg.pt .
+COPY --chown=user:1000 best-od.pt .
 COPY --chown=user:1000 app.py .
 
 # Expose port 7860 (HF default)

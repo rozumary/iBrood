@@ -7,97 +7,106 @@ import BroodPatternResults from "@/components/brood-pattern-results"
 import BroodHistory from "@/components/brood-history"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+// API URL - use HuggingFace directly or local API
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://rozu1726-ibrood-app.hf.space"
+
 export default function BroodPatternPage() {
   const [analysisResults, setAnalysisResults] = useState(null)
   const [showResults, setShowResults] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleImageCapture = async (imageData: string) => {
-    alert('🚧 Brood Pattern Analysis Coming Soon!\n\n✅ Queen Cell Analysis is fully functional\n🔬 Brood pattern model is in development\n\nPlease use Queen Cell Analysis for now.')
-    return
-  }
-
-  const handleImageCaptureOld = async (imageData: string) => {
     try {
-      console.log('🔄 Starting brood pattern analysis... [NO MOCK DATA v2.0]')
+      setIsLoading(true)
+      console.log('🔄 Starting brood pattern analysis...')
       
-      const response = await fetch('/api/predict', {
+      // Convert base64 to blob for FormData
+      const base64Data = imageData.split(',')[1]
+      const byteCharacters = atob(base64Data)
+      const byteNumbers = new Array(byteCharacters.length)
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: 'image/jpeg' })
+      
+      // Create FormData
+      const formData = new FormData()
+      formData.append('file', blob, 'brood_image.jpg')
+      
+      // Call the brood detection API directly on HuggingFace
+      const response = await fetch(`${API_URL}/brood_detect`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: [imageData] })
+        body: formData
       })
       
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.status}`)
+        let errorMessage = `Analysis failed: ${response.status}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+        } catch {
+          // Response wasn't JSON
+        }
+        throw new Error(errorMessage)
       }
       
       const result = await response.json()
-      const aiResults = result.data[1]
+      console.log('✅ Brood detection result:', result)
       
-      // Validate AI results exist
-      if (!aiResults) {
-        throw new Error('No analysis results received from AI model')
-      }
+      // Transform API results to match UI format - ONLY 3 CLASSES
+      const counts = result.counts || { egg: 0, larva: 0, pupa: 0 }
+      const health = result.health || { status: 'UNKNOWN', score: 0, total_brood: 0, total_cells: 0 }
+      const totalCells = health.total_cells || (counts.egg + counts.larva + counts.pupa)
       
-      // Transform AI results to match UI format - NO FALLBACKS
       const transformedResults = {
-        hiveHealthScore: Math.round(aiResults.health_score * 100),
-        riskLevel: aiResults.risk_level,
-        broodCoverage: Math.round(aiResults.brood_coverage * 100),
+        hiveHealthScore: health.score,
+        healthStatus: health.status,
+        riskLevel: health.status === 'EXCELLENT' ? 'Low' : health.status === 'GOOD' ? 'Low' : health.status === 'FAIR' ? 'Medium' : 'High',
+        broodCoverage: 100, // All detected cells are brood
+        totalDetections: result.count || 0,
+        counts: counts,
         cellBreakdown: [
           {
             type: "Egg",
-            percentage: Math.round(aiResults.cells.egg * 100),
-            count: Math.round(aiResults.cells.egg * 820),
-            description: "Healthy egg laying pattern",
-            color: "bg-yellow-300",
+            percentage: totalCells > 0 ? Math.round((counts.egg / totalCells) * 100) : 0,
+            count: counts.egg,
+            description: "Early development stage (1-3 days old)",
+            color: "bg-orange-300",  // Pastel Orange
           },
           {
             type: "Larva",
-            percentage: Math.round(aiResults.cells.larva * 100),
-            count: Math.round(aiResults.cells.larva * 820),
-            description: "Active brood development",
-            color: "bg-blue-400",
+            percentage: totalCells > 0 ? Math.round((counts.larva / totalCells) * 100) : 0,
+            count: counts.larva,
+            description: "Active growth stage (3-8 days old)",
+            color: "bg-cyan-300",   // Pastel Cyan
           },
           {
             type: "Pupa",
-            percentage: Math.round(aiResults.cells.pupa * 100),
-            count: Math.round(aiResults.cells.pupa * 820),
-            description: "Late-stage pupation",
-            color: "bg-purple-400",
-          },
-          {
-            type: "Dead/Diseased",
-            percentage: Math.round(aiResults.cells.dead_larvae_pupae * 100),
-            count: Math.round(aiResults.cells.dead_larvae_pupae * 820),
-            description: "Monitor for disease signs",
-            color: "bg-red-400",
-          },
-          {
-            type: "Empty Comb",
-            percentage: Math.round(aiResults.cells.empty_comb * 100),
-            count: Math.round(aiResults.cells.empty_comb * 820),
-            description: "Normal variation",
-            color: "bg-gray-300",
-          },
-          {
-            type: "Nectar (Uncapped)",
-            percentage: Math.round(aiResults.cells.nectar_uncapped * 100),
-            count: Math.round(aiResults.cells.nectar_uncapped * 820),
-            description: "Honey production",
-            color: "bg-orange-300",
+            percentage: totalCells > 0 ? Math.round((counts.pupa / totalCells) * 100) : 0,
+            count: counts.pupa,
+            description: "Pre-emergence stage (8-21 days old)",
+            color: "bg-fuchsia-300", // Pastel Purple
           },
         ],
-        recommendations: aiResults.recommendations,
-        imagePreview: imageData,
+        recommendations: result.recommendations || ['Continue regular monitoring'],
+        // Use annotated image (with bounding boxes) as the primary image
+        imagePreview: result.annotated_image || imageData,
+        annotatedImage: result.annotated_image || null,
+        annotatedImageWithLabels: result.annotated_image_with_labels || null,
+        originalImage: imageData,
+        detections: result.detections || []
       }
       
       console.log('✅ Analysis complete:', transformedResults)
       setAnalysisResults(transformedResults)
       setShowResults(true)
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Analysis error:', error)
-      alert(`Analysis failed: ${error.message}. Please check your internet connection and try again.`)
+      alert(`Analysis failed: ${error.message}. Please try again.`)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -122,6 +131,15 @@ export default function BroodPatternPage() {
           <TabsContent value="analyze" className="space-y-6">
             {!showResults ? (
               <div>
+                {isLoading && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-4">
+                      <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-lg font-medium">Analyzing brood pattern...</p>
+                      <p className="text-sm text-muted">This may take a few seconds</p>
+                    </div>
+                  </div>
+                )}
                 <ImageUploader onImageCapture={handleImageCapture} />
               </div>
             ) : (
