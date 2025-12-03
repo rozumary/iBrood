@@ -1,7 +1,7 @@
 "use client"
 
 import { AlertCircle, TrendingUp, BarChart3, Heart, Activity, Check } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import ImageWithBboxesCanvas from "./image-with-bboxes-canvas"
 import { saveBroodAnalysis } from "@/lib/storage"
 import { useTranslation } from "@/lib/translation-context"
@@ -43,6 +43,24 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
   const [showToast, setShowToast] = useState(false)
   const [showAnnotated, setShowAnnotated] = useState(true)
   const [showLabels, setShowLabels] = useState(false)
+  const hasAutoSaved = useRef(false)
+  
+  // Auto-save analysis when results are displayed
+  useEffect(() => {
+    if (results && !hasAutoSaved.current) {
+      hasAutoSaved.current = true
+      saveBroodAnalysis(results)
+      window.dispatchEvent(new Event('analysisUpdated'))
+      console.log('✅ Brood analysis auto-saved to storage')
+    }
+  }, [results])
+  
+  // Reset auto-save flag when results change (new analysis)
+  useEffect(() => {
+    return () => {
+      hasAutoSaved.current = false
+    }
+  }, [])
   
   if (!results) return null
 

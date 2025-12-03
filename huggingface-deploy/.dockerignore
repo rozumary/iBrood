@@ -24,6 +24,11 @@ coverage.xml
 *.swp
 *.swo
 
-# Documentation (keep README)
+# Model files (except the one we need)
+*.pt
+!best-seg.pt
+!best-od.pt
+
+# Documentation
 *.md
 !README.md

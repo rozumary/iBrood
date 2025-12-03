@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { CheckCircle, AlertCircle, Clock, TrendingUp, Check } from "lucide-react"
 import ImageWithMasks from "./image-with-masks"
 import { saveAnalysis } from "@/lib/storage"
@@ -33,6 +33,24 @@ interface QueenCellResultsProps {
 
 export default function QueenCellResults({ results }: QueenCellResultsProps) {
   const [showToast, setShowToast] = useState(false)
+  const hasAutoSaved = useRef(false)
+  
+  // Auto-save analysis when results are displayed
+  useEffect(() => {
+    if (results && !hasAutoSaved.current) {
+      hasAutoSaved.current = true
+      saveAnalysis(results)
+      window.dispatchEvent(new Event('analysisUpdated'))
+      console.log('✅ Queen cell analysis auto-saved to storage')
+    }
+  }, [results])
+  
+  // Reset auto-save flag when results change (new analysis)
+  useEffect(() => {
+    return () => {
+      hasAutoSaved.current = false
+    }
+  }, [])
   
   if (!results) return null
   
