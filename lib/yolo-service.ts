@@ -11,10 +11,6 @@ interface QueenCellAnalysis {
     type: string
     confidence: number
     bbox: [number, number, number, number]
-    mask?: {
-      data: string
-      shape: [number, number]
-    }
     maturityPercentage: number
     estimatedHatchingDays: number
     description: string
@@ -66,78 +62,60 @@ export class YOLOQueenCellService {
     const maxRetries = 2
     let lastError: Error | null = null
     
-    // Try Flask API first with retries
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const isProduction = window.location.protocol === 'https:'
-        const apiUrl = isProduction 
-          ? `https://${window.location.hostname}/api` 
-          : 'http://localhost:8000'
-        const flaskEndpoint = `${apiUrl}/analyze`
-        console.log(`📡 Trying Flask API at ${flaskEndpoint} (attempt ${attempt})`)
-        
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 45000)
-        
-        const flaskResponse = await fetch(flaskEndpoint, {
-          method: 'POST',
-          body: JSON.stringify({image: imageData}),
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          signal: controller.signal
-        })
-        
-        clearTimeout(timeoutId)
-        
-        if (flaskResponse.ok) {
-          const result = await flaskResponse.json()
-          console.log('✅ Flask API Results:', result)
-          return result
-        } else {
-          const errorText = await flaskResponse.text()
-          throw new Error(`Server error: ${flaskResponse.status} - ${errorText}`)
-        }
-      } catch (error) {
-        lastError = error as Error
-        console.warn(`Flask API attempt ${attempt} failed:`, error)
-        
-        if (attempt < maxRetries && !lastError.message.includes('abort')) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
-        }
-      }
-    }
+    // Call HuggingFace API directly
+    const HF_API_URL = "https://rozu1726-ibrood-app.hf.space"
     
-    // Try Next.js API route with retries
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const nextEndpoint = '/api/predict'
-        console.log(`📡 Trying Next.js API at ${nextEndpoint} (attempt ${attempt})`)
+        console.log(`📡 Calling HuggingFace API (attempt ${attempt})...`)
+        
+        // Convert base64 to blob for FormData
+        const base64Data = imageData.split(',')[1]
+        const byteCharacters = atob(base64Data)
+        const byteNumbers = new Array(byteCharacters.length)
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i)
+        }
+        const byteArray = new Uint8Array(byteNumbers)
+        const blob = new Blob([byteArray], { type: 'image/jpeg' })
+        
+        // Create FormData
+        const formData = new FormData()
+        formData.append('file', blob, 'queen_cell_image.jpg')
         
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000)
         
-        const nextResponse = await fetch(nextEndpoint, {
+        const response = await fetch(`${HF_API_URL}/queen_detect`, {
           method: 'POST',
-          body: JSON.stringify({data: [imageData]}),
-          headers: {'Content-Type': 'application/json'},
+          body: formData,
           signal: controller.signal
         })
         
         clearTimeout(timeoutId)
         
-        if (nextResponse.ok) {
-          const result = await nextResponse.json()
-          console.log('✅ Next.js API Results:', result)
-          return {...result.data[1], imagePreview: imageData}
+        if (response.ok) {
+          const result = await response.json()
+          console.log('✅ HuggingFace API Results:', result)
+          
+          // Transform the response to match expected format
+          return {
+            totalQueenCells: result.total_detections || result.totalQueenCells || 0,
+            cells: result.cells || result.detections || [],
+            maturityDistribution: result.maturity_distribution || result.maturityDistribution || {
+              open: 0, capped: 0, mature: 0, semiMature: 0, failed: 0
+            },
+            recommendations: result.recommendations || [],
+            imagePreview: imageData,
+            annotatedImage: result.annotated_image || result.annotatedImage || null
+          }
         } else {
-          const errorText = await nextResponse.text()
-          throw new Error(`API error: ${nextResponse.status} - ${errorText}`)
+          const errorText = await response.text()
+          throw new Error(`Server error: ${response.status} - ${errorText}`)
         }
       } catch (error) {
         lastError = error as Error
-        console.warn(`Next.js API attempt ${attempt} failed:`, error)
+        console.warn(`HuggingFace API attempt ${attempt} failed:`, error)
         
         if (attempt < maxRetries && !lastError.message.includes('abort')) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
@@ -150,7 +128,7 @@ export class YOLOQueenCellService {
     if (errorMessage.includes('abort') || errorMessage.includes('timeout')) {
       throw new Error('Request timed out. The server may be busy. Please try again.')
     } else if (errorMessage.includes('fetch')) {
-      throw new Error('Network error. Please check your internet connection and try again.')
+      throw new Error('API connection failed. Please check your internet connection and try again.')
     } else {
       throw new Error(`Analysis failed: ${errorMessage}`)
     }
