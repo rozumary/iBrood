@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { CheckCircle, AlertCircle, Clock, TrendingUp, Check } from "lucide-react"
 import ImageWithMasks from "./image-with-masks"
+import { saveAnalysis } from "@/lib/storage"
 
 interface QueenCellResult {
   id: number
@@ -23,6 +24,7 @@ interface Results {
   cells: QueenCellResult[]
   recommendations: string[]
   imagePreview: string
+  maturityDistribution?: any
 }
 
 interface QueenCellResultsProps {
@@ -35,6 +37,12 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
   if (!results) return null
   
   const handleSave = () => {
+    // Save queen cell analysis to storage
+    saveAnalysis(results)
+    
+    // Dispatch custom event to notify dashboard
+    window.dispatchEvent(new Event('analysisUpdated'))
+    
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }

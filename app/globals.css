@@ -4,77 +4,82 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color scheme for iBrood - very light yellow minimalist design */
-  --background: oklch(0.99 0.001 70);
-  --foreground: oklch(0.1 0 0);
-  --card: oklch(0.98 0.002 70);
-  --card-foreground: oklch(0.1 0 0);
-  --popover: oklch(0.98 0.002 70);
-  --popover-foreground: oklch(0.1 0 0);
-  --primary: oklch(0.65 0.15 35);
+  /* 🐝 BEE THEME - Warm honeycomb inspired design */
+  --background: oklch(0.995 0.008 85);
+  --foreground: oklch(0.15 0.02 50);
+  --card: oklch(0.99 0.012 80);
+  --card-foreground: oklch(0.15 0.02 50);
+  --popover: oklch(0.99 0.012 80);
+  --popover-foreground: oklch(0.15 0.02 50);
+  /* Primary: Honey Orange */
+  --primary: oklch(0.72 0.18 55);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.003 70);
-  --secondary-foreground: oklch(0.1 0 0);
-  --muted: oklch(0.5 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.58 0.187 35);
+  /* Secondary: Light honey */
+  --secondary: oklch(0.96 0.025 85);
+  --secondary-foreground: oklch(0.2 0.02 50);
+  --muted: oklch(0.55 0.02 60);
+  --muted-foreground: oklch(0.5 0.01 60);
+  /* Accent: Vibrant Orange */
+  --accent: oklch(0.7 0.19 50);
   --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.002 70);
-  --input: oklch(0.92 0.002 70);
-  --ring: oklch(0.58 0.187 35);
-  /* Updated chart colors to distinct yellow, gold, orange, and red palette */
-  --chart-1: #ffd700;
-  --chart-2: #ffa500;
-  --chart-3: #ff8c00;
-  --chart-4: #e74c3c;
-  --chart-5: #ff6b6b;
-  --radius: 0.5rem;
-  --sidebar: oklch(0.98 0.002 70);
-  --sidebar-foreground: oklch(0.1 0 0);
-  --sidebar-primary: oklch(0.58 0.187 35);
+  /* Destructive stays orange-ish instead of red */
+  --destructive: oklch(0.65 0.2 40);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.02 80);
+  --input: oklch(0.94 0.015 80);
+  --ring: oklch(0.7 0.19 50);
+  /* Chart colors: honey gradient */
+  --chart-1: #FFB703;
+  --chart-2: #FB8500;
+  --chart-3: #FCA311;
+  --chart-4: #E85D04;
+  --chart-5: #FFD166;
+  --radius: 0.625rem;
+  --sidebar: oklch(0.98 0.015 85);
+  --sidebar-foreground: oklch(0.15 0.02 50);
+  --sidebar-primary: oklch(0.7 0.19 50);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.58 0.187 35);
+  --sidebar-accent: oklch(0.7 0.19 50);
   --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.92 0.002 70);
-  --sidebar-ring: oklch(0.58 0.187 35);
+  --sidebar-border: oklch(0.92 0.02 80);
+  --sidebar-ring: oklch(0.7 0.19 50);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.58 0.187 35);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  /* Updated chart colors for dark mode with brighter yellow and red tones */
-  --chart-1: #ffed4e;
-  --chart-2: #ffb946;
-  --chart-3: #ff9f43;
-  --chart-4: #ff6b6b;
-  --chart-5: #ff5252;
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.58 0.187 35);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* 🐝 BEE THEME DARK MODE - Rich amber tones */
+  --background: oklch(0.16 0.02 50);
+  --foreground: oklch(0.96 0.01 80);
+  --card: oklch(0.2 0.025 50);
+  --card-foreground: oklch(0.96 0.01 80);
+  --popover: oklch(0.2 0.025 50);
+  --popover-foreground: oklch(0.96 0.01 80);
+  --primary: oklch(0.75 0.18 55);
+  --primary-foreground: oklch(0.15 0.02 50);
+  --secondary: oklch(0.28 0.03 55);
+  --secondary-foreground: oklch(0.96 0.01 80);
+  --muted: oklch(0.3 0.02 55);
+  --muted-foreground: oklch(0.7 0.01 60);
+  --accent: oklch(0.72 0.19 50);
+  --accent-foreground: oklch(0.15 0.02 50);
+  --destructive: oklch(0.55 0.18 40);
+  --destructive-foreground: oklch(0.96 0.01 80);
+  --border: oklch(0.32 0.03 55);
+  --input: oklch(0.28 0.025 55);
+  --ring: oklch(0.72 0.19 50);
+  /* Chart colors for dark mode */
+  --chart-1: #FFD166;
+  --chart-2: #FFB703;
+  --chart-3: #FB8500;
+  --chart-4: #FCA311;
+  --chart-5: #E85D04;
+  --sidebar: oklch(0.22 0.025 50);
+  --sidebar-foreground: oklch(0.96 0.01 80);
+  --sidebar-primary: oklch(0.72 0.19 50);
+  --sidebar-primary-foreground: oklch(0.15 0.02 50);
+  --sidebar-accent: oklch(0.3 0.03 55);
+  --sidebar-accent-foreground: oklch(0.96 0.01 80);
+  --sidebar-border: oklch(0.32 0.03 55);
+  --sidebar-ring: oklch(0.72 0.19 50);
 }
 
 @theme inline {
@@ -136,34 +141,35 @@
     @apply bg-card;
   }
   .bg-surface-hover {
-    @apply bg-muted/50;
+    @apply bg-amber-50;
   }
   .text-success {
-    @apply text-green-600;
+    @apply text-sky-600;
   }
   .bg-success {
-    @apply bg-green-600;
+    @apply bg-sky-600;
   }
   .text-warning {
-    @apply text-yellow-600;
+    @apply text-amber-600;
   }
   .bg-warning {
-    @apply bg-yellow-600;
+    @apply bg-amber-500;
   }
   .text-info {
-    @apply text-blue-600;
+    @apply text-sky-600;
   }
   .bg-info {
-    @apply bg-blue-600;
+    @apply bg-sky-600;
   }
+  /* Changed from red to orange for bee theme */
   .text-danger {
-    @apply text-red-600;
+    @apply text-orange-600;
   }
   .bg-danger {
-    @apply bg-red-600;
+    @apply bg-orange-600;
   }
   .bg-accent-secondary {
-    @apply bg-accent/90;
+    @apply bg-accent/85;
   }
   .font-heading {
     font-family: var(--font-heading), system-ui, sans-serif;
@@ -174,8 +180,198 @@
     font-weight: normal;
   }
   
+  /* Enhanced hover effects */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+  
+  /* Honeycomb gradient backgrounds */
+  .bg-honey-gradient {
+    background: linear-gradient(135deg, #FFF8E7 0%, #FFE8B8 100%);
+  }
+  .bg-honey-gradient-dark {
+    background: linear-gradient(135deg, #2D2417 0%, #3D3020 100%);
+  }
+  
   /* Hide any watermarks or branding */
   [data-netlify], .netlify-badge, .netlify-watermark {
     display: none !important;
   }
+}
+
+/* Compact Mode Styles */
+.compact {
+  font-size: 0.9rem;
+}
+
+.compact .p-4 {
+  padding: 0.75rem;
+}
+
+.compact .p-6 {
+  padding: 1rem;
+}
+
+.compact .p-8 {
+  padding: 1.25rem;
+}
+
+.compact .text-xl {
+  font-size: 1rem;
+}
+
+.compact .text-2xl {
+  font-size: 1.25rem;
+}
+
+.compact .text-3xl {
+  font-size: 1.5rem;
+}
+
+.compact .text-4xl {
+  font-size: 1.75rem;
+}
+
+.compact .gap-4 {
+  gap: 0.75rem;
+}
+
+.compact .gap-6 {
+  gap: 1rem;
+}
+
+.compact .mb-4 {
+  margin-bottom: 0.75rem;
+}
+
+.compact .mb-6 {
+  margin-bottom: 1rem;
+}
+
+.compact .mb-8 {
+  margin-bottom: 1.25rem;
+}
+
+.compact .py-8 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.compact .space-y-4 > * + * {
+  margin-top: 0.75rem;
+}
+
+.compact .space-y-6 > * + * {
+  margin-top: 1rem;
+}
+
+/* Font Size Settings */
+.font-size-small {
+  font-size: 14px !important;
+}
+
+.font-size-small * {
+  font-size: inherit;
+}
+
+.font-size-small h1, .font-size-small .text-4xl, .font-size-small .text-3xl {
+  font-size: 1.5rem !important;
+}
+
+.font-size-small h2, .font-size-small .text-2xl {
+  font-size: 1.25rem !important;
+}
+
+.font-size-small h3, .font-size-small .text-xl {
+  font-size: 1.1rem !important;
+}
+
+.font-size-small .text-lg {
+  font-size: 1rem !important;
+}
+
+.font-size-small .text-base {
+  font-size: 0.875rem !important;
+}
+
+.font-size-small .text-sm {
+  font-size: 0.75rem !important;
+}
+
+.font-size-small .text-xs {
+  font-size: 0.65rem !important;
+}
+
+/* Default font size - no special styles needed */
+.font-size-default {
+  font-size: 16px;
+}
+
+/* Large font size for better readability */
+.font-size-large {
+  font-size: 18px !important;
+}
+
+.font-size-large h1, .font-size-large .text-4xl, .font-size-large .text-3xl {
+  font-size: 2.5rem !important;
+}
+
+.font-size-large h2, .font-size-large .text-2xl {
+  font-size: 2rem !important;
+}
+
+.font-size-large h3, .font-size-large .text-xl {
+  font-size: 1.5rem !important;
+}
+
+.font-size-large .text-lg {
+  font-size: 1.25rem !important;
+}
+
+.font-size-large .text-base {
+  font-size: 1.125rem !important;
+}
+
+.font-size-large .text-sm {
+  font-size: 1rem !important;
+}
+
+.font-size-large .text-xs {
+  font-size: 0.875rem !important;
+}
+
+/* Extra Large font size for accessibility */
+.font-size-xlarge {
+  font-size: 20px !important;
+}
+
+.font-size-xlarge h1, .font-size-xlarge .text-4xl, .font-size-xlarge .text-3xl {
+  font-size: 3rem !important;
+}
+
+.font-size-xlarge h2, .font-size-xlarge .text-2xl {
+  font-size: 2.25rem !important;
+}
+
+.font-size-xlarge h3, .font-size-xlarge .text-xl {
+  font-size: 1.75rem !important;
+}
+
+.font-size-xlarge .text-lg {
+  font-size: 1.5rem !important;
+}
+
+.font-size-xlarge .text-base {
+  font-size: 1.25rem !important;
+}
+
+.font-size-xlarge .text-sm {
+  font-size: 1.125rem !important;
+}
+
+.font-size-xlarge .text-xs {
+  font-size: 1rem !important;
 }

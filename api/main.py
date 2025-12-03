@@ -332,14 +332,23 @@ async def analyze_image(request: Request):
                 "Failed Cell": "Dead cell; failed process"
             }.get(class_name, "Unknown cell type")
             
-            # Handle mask data if available
+            # Handle mask data if available - pass through polygon format
             mask_data = None
-            if "mask" in det:
-                # The mask should be binary data encoded as base64
-                mask_data = {
-                    "data": det["mask"]["data"] if isinstance(det["mask"], dict) and "data" in det["mask"] else det.get("mask", ""),
-                    "shape": det["mask"]["shape"] if isinstance(det["mask"], dict) and "shape" in det["mask"] else [int(y2-y1), int(x2-x1)]
-                }
+            if "mask" in det and det["mask"]:
+                mask_info = det["mask"]
+                if isinstance(mask_info, dict):
+                    if mask_info.get("type") == "polygon":
+                        # Pass polygon mask directly
+                        mask_data = {
+                            "type": "polygon",
+                            "points": mask_info.get("points", []),
+                            "imageShape": mask_info.get("imageShape", [int(y2-y1), int(x2-x1)])
+                        }
+                    elif "data" in mask_info:
+                        mask_data = {
+                            "data": mask_info["data"],
+                            "shape": mask_info.get("shape", [int(y2-y1), int(x2-x1)])
+                        }
 
             cell = {
                 "id": i + 1,

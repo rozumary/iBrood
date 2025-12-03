@@ -48,32 +48,28 @@ export default function ImageWithBboxesCanvas({ imageUrl, detections, showLabels
         const height = y2 - y1
         const color = BROOD_COLORS[detection.class] || '#FFFFFF'
 
-        // Draw bounding box
+        // Draw THIN bounding box - clean modern style
         ctx.strokeStyle = color
-        ctx.lineWidth = 2
+        ctx.lineWidth = 1  // Thin line like in the screenshot
         ctx.strokeRect(x1, y1, width, height)
 
-        // Draw label if enabled
+        // Draw percentage label if enabled - JUST THE PERCENTAGE
         if (showLabels) {
-          const label = `${detection.class_name.charAt(0).toUpperCase() + detection.class_name.slice(1)} ${Math.round(detection.confidence * 100)}%`
+          const percentage = Math.round(detection.confidence * 100)
+          const label = `${percentage}%`
           
-          // Calculate font size based on image size (responsive)
-          const fontSize = Math.max(12, Math.min(16, canvas.width / 50))
+          // Small, clean font size
+          const fontSize = Math.max(10, Math.min(12, canvas.width / 80))
           ctx.font = `500 ${fontSize}px "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`
           
-          const textMetrics = ctx.measureText(label)
-          const textWidth = textMetrics.width
-          const textHeight = fontSize
-          const padding = 4
+          // Position at top-left corner of box, slightly inside
+          const textX = x1 + 2
+          const textY = y1 + fontSize + 2
 
-          // Label background
+          // Draw text with the same color as box (no background)
           ctx.fillStyle = color
-          ctx.fillRect(x1, y1 - textHeight - padding * 2, textWidth + padding * 2, textHeight + padding * 2)
-
-          // Label text
-          ctx.fillStyle = 'white'
           ctx.textBaseline = 'top'
-          ctx.fillText(label, x1 + padding, y1 - textHeight - padding)
+          ctx.fillText(label, textX, y1 + 2)
         }
       })
     }

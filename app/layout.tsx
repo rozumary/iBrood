@@ -2,6 +2,9 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Space_Grotesk, Inter } from "next/font/google"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { TranslationProvider } from "@/lib/translation-context"
+import FontSizeInitializer from "@/components/font-size-initializer"
 
 const _spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-heading" })
 const _spaceGroteskBody = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" })
@@ -61,7 +64,17 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="512x512" href="/IMG_3630.png" />
       </head>
       <body className={`${_spaceGrotesk.variable} ${_spaceGroteskBody.variable} font-body bg-background text-foreground`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TranslationProvider>
+            <FontSizeInitializer />
+            {children}
+          </TranslationProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

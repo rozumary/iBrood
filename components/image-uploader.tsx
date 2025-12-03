@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Camera, Upload, X } from "lucide-react"
+import { Camera, Upload, X, Search } from "lucide-react"
 
 interface ImageUploaderProps {
   onImageCapture: (imageData: string) => void
@@ -116,16 +116,16 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   if (preview) {
     return (
       <div className="space-y-6">
-        <div className="bg-surface rounded-lg border border-border p-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm">
           <div className="relative">
             <img
               src={preview || "/placeholder.svg"}
               alt="Hive frame preview"
-              className="w-full max-h-96 object-contain rounded-lg"
+              className="w-full max-h-96 object-contain rounded-xl"
             />
             <button
               onClick={clearPreview}
-              className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              className="absolute top-3 right-3 p-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
             >
               <X size={20} />
             </button>
@@ -135,13 +135,13 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
         <div className="flex gap-4">
           <button
             onClick={handleAnalyze}
-            className="flex-1 px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-secondary transition-colors"
+            className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
           >
-            Analyze Image
+            <Search className="w-5 h-5" /> Analyze Image
           </button>
           <button
             onClick={clearPreview}
-            className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-surface-hover transition-colors"
+            className="px-6 py-4 border-2 border-amber-200 bg-white/80 rounded-xl font-semibold hover:bg-amber-50 hover:border-amber-300 transition-all duration-300 text-amber-700"
           >
             Choose Different Image
           </button>
@@ -151,27 +151,27 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {/* Upload Card */}
       <div
-        className="bg-surface rounded-lg border-2 border-dashed border-border p-6 sm:p-8 cursor-pointer hover:border-accent hover:bg-surface-hover transition-all group"
+        className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
         onClick={() => fileInputRef.current?.click()}
       >
         <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
         <div className="flex flex-col items-center justify-center gap-4">
-          <div className="p-4 bg-yellow-100 rounded-lg group-hover:bg-accent group-hover:text-white transition-colors">
-            <Upload className="w-8 h-8 text-accent group-hover:text-white" />
+          <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
+            <Upload className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
           </div>
           <div className="text-center">
-            <h3 className="font-semibold text-text-primary mb-2">Upload Image</h3>
-            <p className="text-sm text-muted">Click to select an image from your device</p>
+            <h3 className="font-semibold text-amber-900 mb-2 text-lg">Upload Image</h3>
+            <p className="text-sm text-amber-700/70">Click to select an image from your device</p>
           </div>
         </div>
       </div>
 
       {/* Camera Card */}
       <div
-        className="bg-surface rounded-lg border-2 border-dashed border-border p-6 sm:p-8 cursor-pointer hover:border-accent hover:bg-surface-hover transition-all group"
+        className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
         onClick={() => cameraInputRef.current?.click()}
       >
         <input
@@ -183,12 +183,12 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
           className="hidden"
         />
         <div className="flex flex-col items-center justify-center gap-4">
-          <div className="p-4 bg-yellow-100 rounded-lg group-hover:bg-accent group-hover:text-white transition-colors">
-            <Camera className="w-8 h-8 text-accent group-hover:text-white" />
+          <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
+            <Camera className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
           </div>
           <div className="text-center">
-            <h3 className="font-semibold text-text-primary mb-2">Take Photo</h3>
-            <p className="text-sm text-muted">Use your device camera to capture</p>
+            <h3 className="font-semibold text-amber-900 mb-2 text-lg">Take Photo</h3>
+            <p className="text-sm text-amber-700/70">Use your device camera to capture</p>
           </div>
         </div>
       </div>

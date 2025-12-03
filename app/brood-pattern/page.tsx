@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { Grid3X3 } from "lucide-react"
 import Navigation from "@/components/navigation"
+import Footer from "@/components/footer"
 import ImageUploader from "@/components/image-uploader"
 import BroodPatternResults from "@/components/brood-pattern-results"
 import BroodHistory from "@/components/brood-history"
@@ -111,32 +113,37 @@ export default function BroodPatternPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-heading font-bold text-text-primary mb-2">Brood Pattern Analysis</h1>
-          <p className="text-muted">
-            Upload or capture an image to assess brood health, coverage, and colony condition
+      <main style={{ flex: '1' }} className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-xl">
+              <Grid3X3 className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-heading font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Brood Pattern</h1>
+          </div>
+          <p className="text-amber-700/70 dark:text-amber-300/70 ml-12 sm:ml-14 text-sm sm:text-base">
+            Upload or capture an image to assess brood health
           </p>
         </div>
 
         <Tabs defaultValue="analyze" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
-            <TabsTrigger value="analyze">Analyze</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+          <TabsList className="flex w-full max-w-md overflow-x-auto mb-6 sm:mb-8 bg-amber-100/50 dark:bg-amber-900/30 p-1 rounded-xl gap-1">
+            <TabsTrigger value="analyze" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Analyze</TabsTrigger>
+            <TabsTrigger value="history" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analyze" className="space-y-6">
             {!showResults ? (
               <div>
                 {isLoading && (
-                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-4">
-                      <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-lg font-medium">Analyzing brood pattern...</p>
-                      <p className="text-sm text-muted">This may take a few seconds</p>
+                  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl p-8 sm:p-10 flex flex-col items-center gap-5 shadow-xl border border-amber-200 dark:border-amber-700/50 mx-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-lg sm:text-xl font-semibold text-amber-900 dark:text-amber-100">Analyzing brood pattern...</p>
+                      <p className="text-amber-700/70 dark:text-amber-300/70 text-sm sm:text-base">This may take a few seconds</p>
                     </div>
                   </div>
                 )}
@@ -146,7 +153,7 @@ export default function BroodPatternPage() {
               <div>
                 <button
                   onClick={() => setShowResults(false)}
-                  className="mb-6 px-4 py-2 text-accent hover:bg-surface rounded-lg transition-colors font-medium"
+                  className="mb-6 px-5 py-2.5 text-amber-600 hover:bg-amber-100 rounded-xl transition-all duration-300 font-semibold flex items-center gap-2"
                 >
                   ← Analyze Another Image
                 </button>
@@ -160,6 +167,8 @@ export default function BroodPatternPage() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <Footer />
     </div>
   )
 }

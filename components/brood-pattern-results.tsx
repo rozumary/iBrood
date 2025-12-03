@@ -3,6 +3,8 @@
 import { AlertCircle, TrendingUp, BarChart3, Heart, Activity, Check } from "lucide-react"
 import { useState } from "react"
 import ImageWithBboxesCanvas from "./image-with-bboxes-canvas"
+import { saveBroodAnalysis } from "@/lib/storage"
+import { useTranslation } from "@/lib/translation-context"
 
 interface BroodCell {
   type: string
@@ -37,6 +39,7 @@ interface BroodPatternResultsProps {
 }
 
 export default function BroodPatternResults({ results }: BroodPatternResultsProps) {
+  const { t } = useTranslation()
   const [showToast, setShowToast] = useState(false)
   const [showAnnotated, setShowAnnotated] = useState(true)
   const [showLabels, setShowLabels] = useState(false)
@@ -44,6 +47,12 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
   if (!results) return null
 
   const handleSave = () => {
+    // Save brood analysis to storage
+    saveBroodAnalysis(results)
+    
+    // Dispatch custom event to notify dashboard
+    window.dispatchEvent(new Event('analysisUpdated'))
+    
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
@@ -64,7 +73,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
   const getRiskBgColor = (level: string) => {
     switch (level?.toLowerCase()) {
       case "low":
-        return "bg-green-50 border-green-200"
+        return "bg-sky-50 border-sky-200"
       case "medium":
         return "bg-yellow-50 border-yellow-200"
       case "high":
@@ -77,7 +86,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
   const getHealthColor = (status: string) => {
     switch (status?.toUpperCase()) {
       case "EXCELLENT":
-        return "text-green-600 bg-green-100"
+        return "text-sky-600 bg-sky-100"
       case "GOOD":
         return "text-blue-600 bg-blue-100"
       case "FAIR":
@@ -307,7 +316,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
 
       {/* Toast Notification */}
       {showToast && (
-        <div className="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
+        <div className="fixed bottom-8 right-8 bg-sky-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
           <Check className="w-5 h-5" />
           <span className="font-medium">Analysis saved successfully!</span>
         </div>

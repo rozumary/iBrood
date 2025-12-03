@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Crown, AlertTriangle } from "lucide-react"
 import Navigation from "@/components/navigation"
 import ImageUploader from "@/components/image-uploader"
 import QueenCellResults from "@/components/queen-cell-results"
@@ -21,7 +22,7 @@ export default function QueenCellPage() {
       const results = await yoloService.analyzeImage(imageData)
       
       if (results.totalQueenCells === 0) {
-        alert('⚠️ No queen cells detected!\n\nTips for better detection:\n• Ensure good lighting\n• Avoid blurry or dark images\n• Make sure queen cells are clearly visible\n• Try a different angle or closer shot')
+        alert('No queen cells detected!\n\nTips for better detection:\n• Ensure good lighting\n• Avoid blurry or dark images\n• Make sure queen cells are clearly visible\n• Try a different angle or closer shot')
         setIsAnalyzing(false)
         return
       }
@@ -56,39 +57,46 @@ export default function QueenCellPage() {
 
   // Using inline styles for reliable sticky footer behavior
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
 
-      <main style={{ flex: '1' }} className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main style={{ flex: '1' }} className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-4xl font-heading font-bold text-text-primary mb-2">Queen Cell Analysis</h1>
-          <p className="text-sm sm:text-base text-muted">
-            Upload or capture an image of your hive frame to analyze queen cell maturity and predict hatching time
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-xl">
+              <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-heading font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Queen Cell</h1>
+          </div>
+          <p className="text-amber-700/70 dark:text-amber-300/70 ml-12 sm:ml-14 text-sm sm:text-base">
+            Upload or capture an image to analyze queen cell maturity
           </p>
         </div>
 
         <Tabs defaultValue="analyze" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
-            <TabsTrigger value="analyze">Analyze</TabsTrigger>
-            <TabsTrigger value="logs">Cell Logs</TabsTrigger>
+          <TabsList className="flex w-full max-w-md overflow-x-auto mb-6 sm:mb-8 bg-amber-100/50 dark:bg-amber-900/30 p-1 rounded-xl gap-1">
+            <TabsTrigger value="analyze" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Analyze</TabsTrigger>
+            <TabsTrigger value="logs" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analyze" className="space-y-6">
             {!showResults ? (
               <div>
                 {isAnalyzing ? (
-                  <div className="bg-surface rounded-lg border border-border p-8 text-center">
-                    <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-lg font-medium text-text-primary">Analyzing Queen Cells...</p>
-                    <p className="text-sm text-muted mt-2">Processing image and running AI detection</p>
-                    <p className="text-xs text-muted mt-1">This may take 10-30 seconds</p>
+                  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl p-8 sm:p-10 flex flex-col items-center gap-5 shadow-xl border border-amber-200 dark:border-amber-700/50 mx-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-lg sm:text-xl font-semibold text-amber-900 dark:text-amber-100">Analyzing Queen Cells...</p>
+                      <p className="text-amber-700/70 dark:text-amber-300/70 text-sm sm:text-base">Processing image and running AI detection</p>
+                      <p className="text-xs sm:text-sm text-amber-600/60 dark:text-amber-400/60">This may take a few seconds</p>
+                    </div>
                   </div>
                 ) : (
                   <>
                     <ImageUploader onImageCapture={handleImageCapture} />
                     <button
                       onClick={() => { localStorage.clear(); alert('Storage cleared!') }}
-                      className="mt-4 px-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+                      className="mt-4 px-4 py-2 text-sm text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-300 rounded-lg transition-all duration-300"
                     >
                       Clear Storage
                     </button>
@@ -99,7 +107,7 @@ export default function QueenCellPage() {
               <div>
                 <button
                   onClick={() => setShowResults(false)}
-                  className="mb-6 px-4 py-2 text-accent hover:bg-surface rounded-lg transition-colors font-medium"
+                  className="mb-6 px-5 py-2.5 text-amber-600 hover:bg-amber-100 rounded-xl transition-all duration-300 font-semibold flex items-center gap-2"
                 >
                   ← Analyze Another Image
                 </button>

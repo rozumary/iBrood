@@ -47,7 +47,7 @@ export default function BroodHistory() {
   const getRiskBadge = (level: string) => {
     switch (level) {
       case "low":
-        return "bg-green-100 text-success"
+        return "bg-sky-100 text-success"
       case "medium":
         return "bg-yellow-100 text-warning"
       case "high":

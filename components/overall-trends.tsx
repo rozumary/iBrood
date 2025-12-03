@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { TrendingUp, Calendar, AlertCircle, CheckCircle } from "lucide-react"
 import {
   LineChart,
@@ -13,59 +14,164 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts"
+import { getAnalyses, getBroodAnalyses, getTotalInspections } from "@/lib/storage"
 
 export default function OverallTrends() {
-  const healthTrendData = [
-    { date: "Nov 1", healthScore: 72, broodCoverage: 78 },
-    { date: "Nov 5", healthScore: 75, broodCoverage: 80 },
-    { date: "Nov 10", healthScore: 78, broodCoverage: 82 },
-    { date: "Nov 15", healthScore: 75, broodCoverage: 80 },
-    { date: "Nov 18", healthScore: 82, broodCoverage: 88 },
-    { date: "Nov 20", healthScore: 78, broodCoverage: 85 },
-  ]
+  const [stats, setStats] = useState([
+    { label: "Average Health Score", value: "--", change: "No data", icon: <TrendingUp className="w-5 h-5 text-amber-500" /> },
+    { label: "Total Analysis", value: "0", change: "All time", icon: <CheckCircle className="w-5 h-5 text-orange-500" /> },
+    { label: "Avg. Brood Coverage", value: "--", change: "No data", icon: <CheckCircle className="w-5 h-5 text-amber-600" /> },
+    { label: "Queen Cells Detected", value: "0", change: "Total", icon: <Calendar className="w-5 h-5 text-orange-500" /> },
+  ])
+  const [healthTrendData, setHealthTrendData] = useState<any[]>([])
+  const [queenCellData, setQueenCellData] = useState<any[]>([])
+  const [alerts, setAlerts] = useState<string[]>([])
+  const [positives, setPositives] = useState<string[]>([])
 
-  const queenCellData = [
-    { date: "Nov 1", mature: 0, semiMature: 2, capped: 3 },
-    { date: "Nov 5", mature: 1, semiMature: 2, capped: 2 },
-    { date: "Nov 10", mature: 2, semiMature: 3, capped: 1 },
-    { date: "Nov 15", mature: 1, semiMature: 2, capped: 3 },
-    { date: "Nov 18", mature: 3, semiMature: 2, capped: 1 },
-    { date: "Nov 20", mature: 2, semiMature: 2, capped: 2 },
-  ]
+  useEffect(() => {
+    loadAnalyticsData()
+    
+    // Listen for updates
+    window.addEventListener('storage', loadAnalyticsData)
+    window.addEventListener('analysisUpdated', loadAnalyticsData)
+    
+    return () => {
+      window.removeEventListener('storage', loadAnalyticsData)
+      window.removeEventListener('analysisUpdated', loadAnalyticsData)
+    }
+  }, [])
 
-  const stats = [
-    {
-      label: "Average Health Score",
-      value: "77",
-      change: "+3%",
-      icon: <TrendingUp className="w-5 h-5 text-success" />,
-    },
-    {
-      label: "Total Analyses",
-      value: "24",
-      change: "Last 30 days",
-      icon: <CheckCircle className="w-5 h-5 text-accent" />,
-    },
-    {
-      label: "Avg. Brood Coverage",
-      value: "82%",
-      change: "Very healthy",
-      icon: <CheckCircle className="w-5 h-5 text-success" />,
-    },
-    {
-      label: "Queen Cells Emerged",
-      value: "8",
-      change: "This season",
-      icon: <Calendar className="w-5 h-5 text-accent" />,
-    },
-  ]
+  const loadAnalyticsData = () => {
+    const queenAnalyses = getAnalyses()
+    const broodAnalyses = getBroodAnalyses()
+    const totalInspections = getTotalInspections()
 
+    // Calculate statistics from real data
+    let avgHealthScore = 0
+    let avgBroodCoverage = 0
+    let totalQueenCells = 0
+    const alertList: string[] = []
+    const positiveList: string[] = []
+
+    // Process brood analyses for health scores
+    if (broodAnalyses.length > 0) {
+      const healthScores = broodAnalyses.map(a => a.healthScore || 0).filter(s => s > 0)
+      const coverages = broodAnalyses.map(a => a.broodCoverage || 0).filter(c => c > 0)
+      
+      if (healthScores.length > 0) {
+        avgHealthScore = Math.round(healthScores.reduce((a, b) => a + b, 0) / healthScores.length)
+      }
+      if (coverages.length > 0) {
+        avgBroodCoverage = Math.round(coverages.reduce((a, b) => a + b, 0) / coverages.length)
+      }
+
+      // Generate alerts based on data
+      const latestBrood = broodAnalyses[0]
+      if (latestBrood) {
+        if (latestBrood.healthScore >= 80) {
+          positiveList.push("Excellent brood health detected")
+        } else if (latestBrood.healthScore >= 60) {
+          positiveList.push("Good brood pattern observed")
+        } else {
+          alertList.push("Monitor brood pattern - below optimal health")
+        }
+        
+        if (latestBrood.counts) {
+          if (latestBrood.counts.egg > 0) positiveList.push(`${latestBrood.counts.egg} eggs detected - active laying`)
+          if (latestBrood.counts.larva > 0) positiveList.push(`${latestBrood.counts.larva} larvae developing`)
+        }
+      }
+    }
+
+    // Process queen cell analyses
+    if (queenAnalyses.length > 0) {
+      totalQueenCells = queenAnalyses.reduce((sum, a) => sum + (a.totalQueenCells || 0), 0)
+      
+      const latestQueen = queenAnalyses[0]
+      if (latestQueen) {
+        const dist = latestQueen.maturityDistribution || {}
+        if (dist.mature > 0) {
+          alertList.push(`${dist.mature} mature queen cell(s) - plan management`)
+        }
+        if (dist.capped > 0 || dist['semi-mature'] > 0) {
+          positiveList.push("Queen cells developing normally")
+        }
+        if (latestQueen.totalQueenCells > 0) {
+          positiveList.push(`${latestQueen.totalQueenCells} queen cell(s) detected in last analysis`)
+        }
+      }
+    }
+
+    // Default messages if no data
+    if (alertList.length === 0 && positiveList.length === 0) {
+      alertList.push("No recent analysis data")
+      alertList.push("Perform a queen cell or brood analysis to see insights")
+    }
+    if (positiveList.length === 0 && (queenAnalyses.length > 0 || broodAnalyses.length > 0)) {
+      positiveList.push("Continue regular monitoring")
+    }
+
+    setAlerts(alertList)
+    setPositives(positiveList)
+
+    // Update stats
+    setStats([
+      { 
+        label: "Average Health Score", 
+        value: avgHealthScore > 0 ? avgHealthScore.toString() : "--", 
+        change: avgHealthScore >= 80 ? "Excellent" : avgHealthScore >= 60 ? "Good" : avgHealthScore > 0 ? "Fair" : "No data",
+        icon: <TrendingUp className="w-5 h-5 text-amber-500" /> 
+      },
+      { 
+        label: "Total Analyses", 
+        value: totalInspections.toString(), 
+        change: "All time",
+        icon: <CheckCircle className="w-5 h-5 text-orange-500" /> 
+      },
+      { 
+        label: "Avg. Brood Coverage", 
+        value: avgBroodCoverage > 0 ? `${avgBroodCoverage}%` : "--", 
+        change: avgBroodCoverage >= 80 ? "Very healthy" : avgBroodCoverage >= 60 ? "Healthy" : avgBroodCoverage > 0 ? "Monitor" : "No data",
+        icon: <CheckCircle className="w-5 h-5 text-amber-600" /> 
+      },
+      { 
+        label: "Queen Cells Detected", 
+        value: totalQueenCells.toString(), 
+        change: "Total",
+        icon: <Calendar className="w-5 h-5 text-orange-500" /> 
+      },
+    ])
+
+    // Generate health trend data from brood analyses
+    const healthData = broodAnalyses.slice(0, 10).reverse().map((analysis, index) => ({
+      date: new Date(analysis.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      healthScore: analysis.healthScore || 0,
+      broodCoverage: analysis.broodCoverage || 0
+    }))
+    setHealthTrendData(healthData.length > 0 ? healthData : [])
+
+    // Generate queen cell data from queen analyses
+    const queenData = queenAnalyses.slice(0, 10).reverse().map((analysis, index) => {
+      const dist = analysis.maturityDistribution || {}
+      return {
+        date: new Date(analysis.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        mature: dist.mature || 0,
+        semiMature: dist['semi-mature'] || 0,
+        capped: dist.capped || 0,
+        open: dist.open || 0
+      }
+    })
+    setQueenCellData(queenData.length > 0 ? queenData : [])
+  }
+
+  // Bee-themed chart colors
   const chartColors = {
-    primary: "#FFB3B3", // Pastel Red
-    secondary: "#ADD8E6", // Pastel Blue
-    accent: "#FFCC99", // Pastel Orange
-    muted: "#FFD9B3", // Light Pastel Orange
-    success: "#B3E5FC", // Pastel Light Blue
+    primary: "#F59E0B",
+    secondary: "#A67C52",
+    accent: "#DC2626",
+    muted: "#FCD34D",
+    success: "#D97706",
+    brown: "#6F4E37",
   }
 
   return (
@@ -73,101 +179,119 @@ export default function OverallTrends() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-surface rounded-lg border border-border p-6">
+          <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-sm text-muted">{stat.label}</h3>
+              <h3 className="font-semibold text-sm text-amber-700">{stat.label}</h3>
               {stat.icon}
             </div>
-            <p className="text-3xl font-bold text-text-primary mb-2">{stat.value}</p>
-            <p className="text-xs text-muted">{stat.change}</p>
+            <p className="text-3xl font-bold text-amber-900 mb-2">{stat.value}</p>
+            <p className="text-xs text-amber-600">{stat.change}</p>
           </div>
         ))}
       </div>
 
       {/* Health Score Trend */}
-      <div className="bg-surface rounded-lg border border-border p-6">
-        <h3 className="font-heading font-semibold text-lg mb-6">Health Score & Brood Coverage Trend</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={healthTrendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0E8D8" />
-            <XAxis dataKey="date" stroke="#666666" style={{ fontSize: "12px" }} />
-            <YAxis stroke="#666666" style={{ fontSize: "12px" }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#FFFEF0",
-                border: "1px solid #F0E8D8",
-                borderRadius: "8px",
-              }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="healthScore"
-              stroke={chartColors.primary}
-              strokeWidth={2}
-              dot={{ fill: chartColors.primary, r: 5 }}
-              activeDot={{ r: 7 }}
-              name="Health Score"
-            />
-            <Line
-              type="monotone"
-              dataKey="broodCoverage"
-              stroke={chartColors.secondary}
-              strokeWidth={2}
-              dot={{ fill: chartColors.secondary, r: 5 }}
-              activeDot={{ r: 7 }}
-              name="Brood Coverage %"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm">
+        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Health Score & Brood Coverage Trend</h3>
+        {healthTrendData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={healthTrendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
+              <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
+              <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#FFFBEB",
+                  border: "1px solid #FCD34D",
+                  borderRadius: "12px",
+                }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="healthScore"
+                stroke={chartColors.primary}
+                strokeWidth={3}
+                dot={{ fill: chartColors.primary, r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Health Score"
+              />
+              <Line
+                type="monotone"
+                dataKey="broodCoverage"
+                stroke={chartColors.secondary}
+                strokeWidth={3}
+                dot={{ fill: chartColors.secondary, r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Brood Coverage %"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-amber-600/70 bg-amber-50/50 rounded-xl">
+            <div className="text-center">
+              <p className="font-medium">No brood analysis data yet</p>
+              <p className="text-sm mt-1">Perform brood pattern analyses to see trends</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Queen Cell Trend */}
-      <div className="bg-surface rounded-lg border border-border p-6">
-        <h3 className="font-heading font-semibold text-lg mb-6">Queen Cell Development Over Time</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={queenCellData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0E8D8" />
-            <XAxis dataKey="date" stroke="#666666" style={{ fontSize: "12px" }} />
-            <YAxis stroke="#666666" style={{ fontSize: "12px" }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#FFFEF0",
-                border: "1px solid #F0E8D8",
-                borderRadius: "8px",
-              }}
-            />
-            <Legend />
-            <Bar dataKey="mature" stackId="a" fill={chartColors.primary} name="Mature" />
-            <Bar dataKey="semiMature" stackId="a" fill={chartColors.accent} name="Semi-Mature" />
-            <Bar dataKey="capped" stackId="a" fill={chartColors.secondary} name="Capped" />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm">
+        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Queen Cell Development Over Time</h3>
+        {queenCellData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={queenCellData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
+              <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
+              <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#FFFBEB",
+                  border: "1px solid #FCD34D",
+                  borderRadius: "12px",
+                }}
+              />
+              <Legend />
+              <Bar dataKey="mature" stackId="a" fill={chartColors.accent} name="Mature" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="semiMature" stackId="a" fill={chartColors.primary} name="Semi-Mature" />
+              <Bar dataKey="capped" stackId="a" fill={chartColors.muted} name="Capped" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-amber-600/70 bg-amber-50/50 rounded-xl">
+            <div className="text-center">
+              <p className="font-medium">No queen cell analysis data yet</p>
+              <p className="text-sm mt-1">Perform queen cell analyses to see trends</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Alerts & Recommendations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-6">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-300 p-6 shadow-sm">
           <div className="flex items-start gap-3 mb-4">
-            <AlertCircle className="w-6 h-6 text-warning flex-shrink-0 mt-1" />
-            <h3 className="font-heading font-semibold text-text-primary">Active Alerts</h3>
+            <AlertCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+            <h3 className="font-heading font-semibold text-amber-900">Alerts & Notes</h3>
           </div>
           <ul className="space-y-2">
-            <li className="text-sm text-text-primary">• Monitor brood pattern - slight decrease detected</li>
-            <li className="text-sm text-text-primary">• 2 mature queen cells detected - plan management</li>
-            <li className="text-sm text-text-primary">• Dead cells slightly elevated - ensure ventilation</li>
+            {alerts.map((alert, index) => (
+              <li key={index} className="text-sm text-amber-800">• {alert}</li>
+            ))}
           </ul>
         </div>
 
-        <div className="bg-green-50 rounded-lg border border-green-200 p-6">
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-300 p-6 shadow-sm">
           <div className="flex items-start gap-3 mb-4">
-            <CheckCircle className="w-6 h-6 text-success flex-shrink-0 mt-1" />
-            <h3 className="font-heading font-semibold text-text-primary">Positive Indicators</h3>
+            <CheckCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+            <h3 className="font-heading font-semibold text-amber-900">Positive Indicators</h3>
           </div>
           <ul className="space-y-2">
-            <li className="text-sm text-text-primary">• Brood coverage stable and healthy</li>
-            <li className="text-sm text-text-primary">• Consistent egg laying pattern</li>
-            <li className="text-sm text-text-primary">• No disease signs detected</li>
+            {positives.map((positive, index) => (
+              <li key={index} className="text-sm text-amber-800">• {positive}</li>
+            ))}
           </ul>
         </div>
       </div>

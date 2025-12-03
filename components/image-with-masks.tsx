@@ -8,8 +8,11 @@ interface Detection {
   bbox: [number, number, number, number]
   confidence: number
   mask?: {
-    data: string
-    shape: [number, number]
+    type?: string
+    points?: number[][]
+    data?: string
+    shape?: [number, number]
+    imageShape?: [number, number]
   }
 }
 
@@ -21,7 +24,8 @@ interface ImageWithMasksProps {
 export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
-  const [showMasks, setShowMasks] = useState(false)
+  const [showMasks, setShowMasks] = useState(true) // Default to showing masks
+  const [showLabels, setShowLabels] = useState(false) // Default to hiding labels (less clutter)
 
   const getColor = (type: string) => {
     // Updated to match the correct class names
@@ -108,7 +112,7 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
               ctx.closePath()
 
               // Fill with semi-transparent color
-              ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.4)`
+              ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.5)`
               ctx.fill()
               
               // Draw outline
@@ -123,32 +127,35 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
           }
         }
 
-        // Draw bounding box
+        // Draw bounding box - always visible
         ctx.strokeStyle = color
-        ctx.lineWidth = showMasks ? 3 : 2
+        ctx.lineWidth = showMasks ? 2 : 2
         ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight)
 
-        // Only fill bounding box if mask wasn't rendered and masks are enabled
+        // Fill bounding box if mask wasn't rendered but masks are enabled
         if (showMasks && !maskRendered) {
-          ctx.fillStyle = color
-          ctx.globalAlpha = 0.25
+          const r = parseInt(color.slice(1, 3), 16)
+          const g = parseInt(color.slice(3, 5), 16)
+          const b = parseInt(color.slice(5, 7), 16)
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.5)`
           ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight)
-          ctx.globalAlpha = 1.0
         }
 
-        // Draw label with Space Grotesk font
-        const label = `${detection.type} ${detection.confidence}%`
-        ctx.font = 'bold 16px "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-        const textWidth = ctx.measureText(label).width
+        // Only draw labels if showLabels is enabled
+        if (showLabels) {
+          const label = `${detection.type} ${detection.confidence}%`
+          ctx.font = 'bold 14px "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+          const textWidth = ctx.measureText(label).width
 
-        // Label background
-        ctx.fillStyle = color
-        ctx.fillRect(scaledX, scaledY - 34, textWidth + 24, 30)
+          // Label background - positioned above the box
+          ctx.fillStyle = color
+          ctx.fillRect(scaledX, scaledY - 28, textWidth + 16, 24)
 
-        // Label text
-        ctx.fillStyle = 'white'
-        ctx.textBaseline = 'top'
-        ctx.fillText(label, scaledX + 12, scaledY - 30)
+          // Label text
+          ctx.fillStyle = 'white'
+          ctx.textBaseline = 'top'
+          ctx.fillText(label, scaledX + 8, scaledY - 24)
+        }
       })
     }
 
@@ -157,23 +164,33 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
     } else {
       img.onload = draw
     }
-  }, [detections, imageUrl, showMasks])
+  }, [detections, imageUrl, showMasks, showLabels])
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setShowMasks(!showMasks)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             showMasks 
-              ? 'bg-yellow-500 text-white' 
+              ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
           {showMasks ? 'Hide Masks' : 'Show Masks'}
         </button>
-        <span className="text-sm text-gray-600">
-          {showMasks ? 'Segmentation overlay - colored masks show exact queen cell boundaries' : 'Standard bounding boxes - outline detection areas'}
+        <button
+          onClick={() => setShowLabels(!showLabels)}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            showLabels 
+              ? 'bg-purple-500 text-white hover:bg-purple-600' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {showLabels ? 'Hide Labels' : 'Show Labels'}
+        </button>
+        <span className="text-sm text-gray-500 ml-2">
+          Toggle masks and labels for cleaner view
         </span>
       </div>
       
