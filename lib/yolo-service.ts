@@ -67,28 +67,18 @@ export class YOLOQueenCellService {
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`📡 Calling HuggingFace API (attempt ${attempt})...`)
-        
-        // Convert base64 to blob for FormData
-        const base64Data = imageData.split(',')[1]
-        const byteCharacters = atob(base64Data)
-        const byteNumbers = new Array(byteCharacters.length)
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i)
-        }
-        const byteArray = new Uint8Array(byteNumbers)
-        const blob = new Blob([byteArray], { type: 'image/jpeg' })
-        
-        // Create FormData
-        const formData = new FormData()
-        formData.append('file', blob, 'queen_cell_image.jpg')
+        console.log(`📡 Calling HuggingFace API /analyze endpoint (attempt ${attempt})...`)
         
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000)
         
-        const response = await fetch(`${HF_API_URL}/queen_detect`, {
+        // Use /analyze endpoint - it expects JSON with base64 image and returns full analysis
+        const response = await fetch(`${HF_API_URL}/analyze`, {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: imageData }),
           signal: controller.signal
         })
         
@@ -96,18 +86,18 @@ export class YOLOQueenCellService {
         
         if (response.ok) {
           const result = await response.json()
-          console.log('✅ HuggingFace API Results:', result)
+          console.log('✅ HuggingFace /analyze Results:', result)
           
-          // Transform the response to match expected format
+          // /analyze endpoint returns the correct format directly
           return {
-            totalQueenCells: result.total_detections || result.totalQueenCells || 0,
-            cells: result.cells || result.detections || [],
-            maturityDistribution: result.maturity_distribution || result.maturityDistribution || {
+            totalQueenCells: result.totalQueenCells || 0,
+            cells: result.cells || [],
+            maturityDistribution: result.maturityDistribution || {
               open: 0, capped: 0, mature: 0, semiMature: 0, failed: 0
             },
             recommendations: result.recommendations || [],
-            imagePreview: imageData,
-            annotatedImage: result.annotated_image || result.annotatedImage || null
+            imagePreview: result.imagePreview || imageData,
+            annotatedImage: result.annotated_image || null
           }
         } else {
           const errorText = await response.text()
