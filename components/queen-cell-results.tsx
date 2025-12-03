@@ -87,8 +87,7 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
     <div className="space-y-8">
       {/* Image Preview with Bounding Boxes */}
       <div className="bg-surface rounded-lg border border-border p-4">
-        <div className="relative">
-          <ImageWithMasks 
+        <ImageWithMasks 
             imageUrl={results.imagePreview || "/placeholder.svg"}
             detections={results.cells.map(cell => ({
               id: cell.id,
@@ -97,11 +96,8 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
               confidence: cell.confidence,
               mask: cell.mask
             }))}
+            totalCount={results.totalQueenCells}
           />
-          <div className="absolute top-2 right-2 bg-accent text-white px-3 py-1 rounded-md text-sm font-semibold shadow-lg">
-            {results.totalQueenCells} Cells Detected
-          </div>
-        </div>
       </div>
 
       {/* Summary Stats */}

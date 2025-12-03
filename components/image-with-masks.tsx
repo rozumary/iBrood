@@ -19,9 +19,10 @@ interface Detection {
 interface ImageWithMasksProps {
   imageUrl: string
   detections: Detection[]
+  totalCount?: number
 }
 
-export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksProps) {
+export default function ImageWithMasks({ imageUrl, detections, totalCount }: ImageWithMasksProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const [showMasks, setShowMasks] = useState(true) // Default to showing masks
@@ -189,10 +190,15 @@ export default function ImageWithMasks({ imageUrl, detections }: ImageWithMasksP
         >
           {showLabels ? 'Hide Labels' : 'Show Labels'}
         </button>
-        <span className="text-sm text-gray-500 ml-2">
-          Toggle masks and labels for cleaner view
-        </span>
+        {totalCount !== undefined && (
+          <span className="bg-accent text-white px-3 py-2 rounded-lg text-sm font-semibold">
+            {totalCount} Cells Detected
+          </span>
+        )}
       </div>
+      <p className="text-sm text-gray-500">
+        Toggle masks and labels for cleaner view
+      </p>
       
       <div className="relative">
         <img
