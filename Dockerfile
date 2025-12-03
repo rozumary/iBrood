@@ -37,8 +37,8 @@ RUN npm run build
 # Set environment variables
 ENV FLASK_ENV=production
 ENV NODE_ENV=production
-ENV API_URL=http://localhost:5000
-ENV NEXT_PUBLIC_API_URL=http://localhost:5000
+ENV API_URL=https://rozu1726-ibrood-app.hf.space
+ENV NEXT_PUBLIC_API_URL=https://rozu1726-ibrood-app.hf.space
 ENV PORT=3000
 
 # Expose ports

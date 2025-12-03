@@ -11,7 +11,9 @@ services:
       - key: FLASK_ENV
         value: production
       - key: API_URL
-        value: https://ibrood.onrender.com
+        value: https://rozu1726-ibrood-app.hf.space
+      - key: NEXT_PUBLIC_API_URL
+        value: https://rozu1726-ibrood-app.hf.space
       - key: HUGGINGFACE_HUB_CACHE
         value: /tmp/hf_cache
       - key: RENDER_CACHE_DIR
