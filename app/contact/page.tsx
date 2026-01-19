@@ -20,7 +20,9 @@ export default function ContactPage() {
       : 'iBrood Support Request'
     const bodyText = `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     
-    window.location.href = `mailto:rosedecastromontesa@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`
+    // Open Gmail compose window directly
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=rosedecastromontesa@gmail.com&su=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`
+    window.open(gmailUrl, '_blank')
   }
 
   return (
@@ -99,7 +101,7 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm">
             <h2 className="text-xl font-heading font-bold text-amber-900 mb-6">Send a Message</h2>
-            <form onSubmit={handleSendEmail} className="space-y-4">
+            <form className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-amber-800 mb-2">Name</label>
                 <input
@@ -145,7 +147,8 @@ export default function ContactPage() {
                 />
               </div>
               <button
-                type="submit"
+                type="button"
+                onClick={handleSendEmail}
                 className="w-full px-6 py-3.5 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
               >
                 Send Message
