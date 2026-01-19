@@ -1,0 +1,17 @@
+# Ignore Python API folders (deployed separately on HuggingFace)
+api/
+huggingface-deploy/
+database/
+
+# Ignore model files
+*.pt
+*.pth
+*.onnx
+
+# Ignore output/build folders
+out/
+.next/
+
+# Python files
+__pycache__/
+*.pyc
