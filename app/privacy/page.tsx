@@ -121,7 +121,7 @@ export default function PrivacyPage() {
           {/* Contact */}
           <div className="bg-gradient-to-br from-amber-100/50 to-orange-100/50 rounded-2xl border border-amber-200/50 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl">
+              <div className="p-2 bg-[#FFA95C] rounded-xl">
                 <Mail className="w-5 h-5 text-white" />
               </div>
               <h2 className="text-xl font-heading font-bold text-amber-900">Questions?</h2>

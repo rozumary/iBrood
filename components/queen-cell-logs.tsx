@@ -184,7 +184,7 @@ function AddLogModal({
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg mt-2"
+            className="w-full py-3 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all shadow-md hover:shadow-lg mt-2"
           >
             Add Entry
           </button>
@@ -286,7 +286,7 @@ export default function QueenCellLogs() {
       <div className="flex justify-end">
         <button 
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg text-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#FFA95C] text-white rounded-xl font-medium hover:bg-[#ff9b40] transition-all shadow-md hover:shadow-lg text-sm"
         >
           <Plus size={18} />
           Add Queen Log

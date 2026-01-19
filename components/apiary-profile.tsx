@@ -40,7 +40,7 @@ export default function ApiaryProfile() {
       {/* Header Card */}
       <div className="bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl border border-amber-200 dark:border-amber-700/50 p-6 shadow-sm">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="p-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-lg">
+          <div className="p-4 bg-[#FFA95C] rounded-2xl shadow-lg">
             <Home className="w-8 h-8 text-white" />
           </div>
           <div className="flex-1 min-w-[200px]">
@@ -176,7 +176,7 @@ export default function ApiaryProfile() {
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
               isSaved
                 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-400 dark:text-amber-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg"
+                : "bg-[#FFA95C] text-white hover:bg-[#ff9b40] shadow-md hover:shadow-lg"
             }`}
           >
             <Save size={18} />

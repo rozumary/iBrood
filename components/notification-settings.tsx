@@ -36,7 +36,7 @@ export default function NotificationSettings() {
       <div className="bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl border border-amber-200 dark:border-amber-700/50 p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-md">
+            <div className="p-3 bg-[#FFA95C] rounded-xl shadow-md">
               <Bell className="w-6 h-6 text-white" />
             </div>
             <div>

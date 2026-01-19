@@ -12,7 +12,7 @@ export default function LandingPage() {
       <header className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 border-b border-amber-200/50 dark:border-amber-700/30 backdrop-blur-sm">
         <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-md">
+            <div className="p-2 bg-[#FFA95C] rounded-xl shadow-md">
               <img src="/IMG_3630.png" alt="iBrood" className="w-7 h-7" />
             </div>
             <span className="font-heading font-bold text-xl bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">iBrood</span>

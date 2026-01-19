@@ -39,7 +39,7 @@ export default function HiveHealthCard() {
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'bg-gradient-to-br from-sky-400 to-blue-600'
-    if (score >= 60) return 'bg-gradient-to-br from-amber-400 to-orange-500'
+    if (score >= 60) return 'bg-[#FFA95C]'
     if (score >= 40) return 'bg-gradient-to-br from-amber-500 to-amber-600'
     return 'bg-gradient-to-br from-orange-500 to-orange-600'
   }

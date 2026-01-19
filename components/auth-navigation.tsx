@@ -19,7 +19,7 @@ export default function AuthNavigation() {
       <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+            <div className="p-1.5 sm:p-2 bg-[#FFA95C] rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
               <Image
                 src="/IMG_3630.png"
                 alt="iBrood Logo"

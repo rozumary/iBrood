@@ -69,7 +69,7 @@ export default function AboutPage() {
               key={index} 
               className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center"
             >
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-20 h-20 bg-[#FFA95C] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
                 {researcher.name.split(' ').map(n => n[0]).join('')}
               </div>
               <h3 className="font-heading font-bold text-lg text-amber-900 mb-1">{researcher.name}</h3>

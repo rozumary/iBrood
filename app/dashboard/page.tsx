@@ -5,7 +5,7 @@ import Link from "next/link"
 import { 
   Beef as Bee, Grid3X3, Calendar, 
   Clock, AlertTriangle, CheckCircle, ArrowRight, 
-  Sparkles, Lightbulb, Database
+  Sparkles, Lightbulb, Database, Hexagon
 } from "lucide-react"
 import Navigation from "@/components/navigation"
 import HiveHealthCard from "@/components/hive-health-card"
@@ -119,8 +119,8 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-lg">
-                <Sparkles className="w-7 h-7 text-white" />
+              <div className="p-2.5 bg-[#FFA95C] rounded-xl shadow-lg">
+                <Hexagon className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-heading font-bold text-amber-900 dark:text-amber-100">
@@ -141,7 +141,7 @@ export default function Dashboard() {
         <div className="mb-6 p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 dark:border-amber-700/50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl">
+              <div className="p-2 bg-[#FFA95C] rounded-xl">
                 <Database className="w-5 h-5 text-white" />
               </div>
               <div>

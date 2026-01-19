@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="text-center sm:text-left">
             <div className="flex items-center gap-2 mb-3 justify-center sm:justify-start">
-              <div className="p-1.5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg">
+              <div className="p-1.5 bg-[#FFA95C] rounded-lg">
                 <Bee className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-heading font-bold text-xl bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">iBrood</h3>
