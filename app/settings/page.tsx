@@ -31,11 +31,11 @@ export default function SettingsPage() {
 
         <Tabs defaultValue="apiary" className="w-full">
           <TabsList className="flex w-full overflow-x-auto mb-6 bg-amber-100/50 dark:bg-amber-900/30 p-1 rounded-xl gap-1">
-            <TabsTrigger value="apiary" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.apiary')}</TabsTrigger>
-            <TabsTrigger value="notifications" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.alerts')}</TabsTrigger>
-            <TabsTrigger value="data" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.data')}</TabsTrigger>
-            <TabsTrigger value="preferences" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.preferences')}</TabsTrigger>
-            <TabsTrigger value="help" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.help')}</TabsTrigger>
+            <TabsTrigger value="apiary" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.apiary')}</TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.alerts')}</TabsTrigger>
+            <TabsTrigger value="data" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.data')}</TabsTrigger>
+            <TabsTrigger value="preferences" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.preferences')}</TabsTrigger>
+            <TabsTrigger value="help" className="flex-shrink-0 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">{t('settings.help')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="apiary">

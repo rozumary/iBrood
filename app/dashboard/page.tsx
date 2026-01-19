@@ -137,39 +137,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Storage Overview - Compact */}
-        <div className="mb-6 p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 dark:border-amber-700/50">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#FFA95C] rounded-xl">
-                <Database className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-heading font-bold text-sm sm:text-base text-amber-900 dark:text-amber-100">{t('dashboard.storageOverview')}</h3>
-                <p className="text-xs text-amber-600 dark:text-amber-400">{storageStats.totalItems} {t('dashboard.totalRecords')}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-3">
-              <div className="text-center px-2 sm:px-4 py-2 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                <p className="text-base sm:text-lg font-bold text-amber-700 dark:text-amber-300">{storageStats.queenAnalyses}</p>
-                <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400">{t('dashboard.queenAI')}</p>
-              </div>
-              <div className="text-center px-2 sm:px-4 py-2 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                <p className="text-base sm:text-lg font-bold text-amber-700 dark:text-amber-300">{storageStats.broodAnalyses}</p>
-                <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400">{t('dashboard.broodAI')}</p>
-              </div>
-              <div className="text-center px-2 sm:px-4 py-2 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                <p className="text-base sm:text-lg font-bold text-amber-700 dark:text-amber-300">{storageStats.queenLogs}</p>
-                <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400">{t('dashboard.qLogs')}</p>
-              </div>
-              <div className="text-center px-2 sm:px-4 py-2 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                <p className="text-base sm:text-lg font-bold text-amber-700 dark:text-amber-300">{storageStats.broodLogs}</p>
-                <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400">{t('dashboard.bLogs')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Main Actions - Big Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
           <Link

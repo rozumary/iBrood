@@ -75,8 +75,8 @@ export default function QueenCellPage() {
 
         <Tabs defaultValue="analyze" className="w-full">
           <TabsList className="flex w-full max-w-md overflow-x-auto mb-6 sm:mb-8 bg-amber-100/50 dark:bg-amber-900/30 p-1 rounded-xl gap-1">
-            <TabsTrigger value="analyze" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Analyze</TabsTrigger>
-            <TabsTrigger value="logs" className="flex-1 px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Logs</TabsTrigger>
+            <TabsTrigger value="analyze" className="flex-1 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Analyze</TabsTrigger>
+            <TabsTrigger value="logs" className="flex-1 px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-sm text-amber-800 dark:text-amber-200">Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analyze" className="space-y-6">

@@ -28,9 +28,9 @@ export default function AnalyticsPage() {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="flex w-full max-w-md overflow-x-auto mb-6 bg-amber-100/50 dark:bg-amber-900/30 p-1 rounded-xl gap-1">
-            <TabsTrigger value="overview" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Overview</TabsTrigger>
-            <TabsTrigger value="queen" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Queen</TabsTrigger>
-            <TabsTrigger value="brood" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Brood</TabsTrigger>
+            <TabsTrigger value="overview" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Overview</TabsTrigger>
+            <TabsTrigger value="queen" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Queen</TabsTrigger>
+            <TabsTrigger value="brood" className="flex-shrink-0 px-3 sm:px-4 py-2 data-[state=active]:bg-[#FFA95C] data-[state=active]:text-white rounded-lg font-semibold text-xs sm:text-sm text-amber-800 dark:text-amber-200">Brood</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">

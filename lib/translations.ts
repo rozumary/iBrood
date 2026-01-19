@@ -56,7 +56,7 @@ export const translations = {
     "dashboard.getInsightsDesc": "Review results and recommendations",
     "dashboard.tipTitle": "Beekeeping Tip of the Day",
     "dashboard.tipContent": "For best results, analyze your hive frames every 7-10 days during active season. Take clear, well-lit photos with the entire frame visible for accurate AI detection.",
-    "dashboard.assistant": "Your intelligent beekeeping assistant is ready to help monitor your hives.",
+    "dashboard.assistant": "Your intelligent beekeeping system powered by computer vision.",
     
     // Queen Cell
     "queenCell.title": "Queen Cell Detection",
