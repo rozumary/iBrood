@@ -40,7 +40,7 @@ export default function LandingPage() {
             <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">with iBrood</span>
           </h1>
           <p className="text-base sm:text-xl text-amber-700/80 dark:text-amber-300/80 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-4">
-            AI-powered analysis for queen cell development and brood patterns. Monitor your hive health with intelligent insights and real-time recommendations.
+            Analyze queen cell development and brood patterns using computer vision technology, and keep your hive healthy with actionable insights and timely recommendations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
             <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
@@ -70,7 +70,7 @@ export default function LandingPage() {
                   <Grid3X3 className="w-8 sm:w-10 h-8 sm:h-10 text-amber-600" />
                 </div>
                 <h3 className="font-heading font-semibold text-lg sm:text-xl mb-3 text-amber-900 dark:text-amber-100">Brood Pattern Analysis</h3>
-                <p className="text-amber-700/70 dark:text-amber-300/70 leading-relaxed text-sm sm:text-base">Monitor brood health through egg, larva, and pupa proportions to detect early signs of colony collapse.</p>
+                <p className="text-amber-700/70 dark:text-amber-300/70 leading-relaxed text-sm sm:text-base">Monitor brood health through counts of egg, larva, and pupa proportions to detect early signs of colony collapse.</p>
               </div>
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200/50 dark:border-amber-700/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
                 <div className="p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-2xl w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
@@ -147,7 +147,7 @@ export default function LandingPage() {
             Join thousands of beekeepers using iBrood for smarter hive management and healthier colonies.
           </p>
           <Link href="/signup" className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
-            Start Your Free Trial
+            Try this Model by Signing Up
           </Link>
         </section>
       </main>

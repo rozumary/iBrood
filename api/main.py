@@ -63,7 +63,7 @@ templates = Jinja2Templates(directory=templates_path)
 # Load the local model
 logger.info("Using Hugging Face API for inference...")
 # model = YOLO('best-seg.pt')
-# logger.info("✅ Using local YOLO model for inference")
+# logger.info("Using local YOLO model for inference")
 
 # ==================== QUEEN CELL CLASSES - ONLY 5 CLASSES ====================
 # CORRECTED CLASS MAPPING - BASED ON YOUR MODEL OUTPUTS
@@ -186,7 +186,7 @@ async def detect_queen(file: UploadFile = File(...)):
     Returns: Maturity breakdown percentages, hatching timeline, and annotated image
     """
     try:
-        logger.info("🔍 STARTING QUEEN CELL DETECTION...")
+        logger.info("STARTING QUEEN CELL DETECTION...")
 
         # Read file content
         file_content = await file.read()
@@ -234,7 +234,7 @@ async def detect_queen(file: UploadFile = File(...)):
         return {"image_base64": img_str, "summary": summary, "cells": data.get("detections", [])}
 
     except Exception as e:
-        logger.error(f"❌ Error in queen detection: {str(e)}")
+        logger.error(f"Error in queen detection: {str(e)}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
@@ -247,7 +247,7 @@ async def analyze_image(request: Request):
     Compatibility endpoint for frontend - expects JSON with base64 image
     """
     try:
-        logger.info("🔍 STARTING ANALYSIS FROM FRONTEND...")
+        logger.info("STARTING ANALYSIS FROM FRONTEND...")
         
         data = await request.json()
         image_data = data.get('image', '')
@@ -384,7 +384,7 @@ async def analyze_image(request: Request):
         return JSONResponse(content=result)
         
     except Exception as e:
-        logger.error(f"❌ Error in analysis: {str(e)}")
+        logger.error(f"Error in analysis: {str(e)}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
@@ -398,7 +398,7 @@ async def detect_brood(file: UploadFile = File(...)):
     Returns: Percentage breakdown and hive health status
     """
     try:
-        logger.info("🔍 STARTING BROOD STATUS DETECTION...")
+        logger.info("STARTING BROOD STATUS DETECTION...")
 
         # Read file content
         file_content = await file.read()
@@ -431,7 +431,7 @@ async def detect_brood(file: UploadFile = File(...)):
             return JSONResponse(content=result)
             
     except Exception as e:
-        logger.error(f"❌ Error in brood detection: {str(e)}")
+        logger.error(f"Error in brood detection: {str(e)}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500

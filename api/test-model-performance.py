@@ -23,24 +23,24 @@ def load_model():
         if os.path.exists(path):
             try:
                 model = YOLO(path)
-                print(f"✅ Loaded local model: {path}")
+                print(f"Loaded local model: {path}")
                 return model
             except Exception as e:
-                print(f"❌ Local model failed: {e}")
+                print(f"Local model failed: {e}")
     
     # Try HuggingFace
     try:
-        print("🤖 Loading from HuggingFace...")
+        print("Loading from HuggingFace...")
         model_path = hf_hub_download(
             repo_id="Rozu1726/ibrood-api", 
             filename="best-seg.pt",
             force_download=False
         )
         model = YOLO(model_path)
-        print(f"✅ Loaded HF model: {model_path}")
+        print(f"Loaded HF model: {model_path}")
         return model
     except Exception as e:
-        print(f"❌ HuggingFace failed: {e}")
+        print(f"HuggingFace failed: {e}")
     
     return None
 
@@ -78,7 +78,7 @@ def test_model_settings(model, test_image):
         {'conf': 0.5, 'iou': 0.5, 'name': 'Very Conservative'},
     ]
     
-    print("\n🧪 Testing different detection settings:")
+    print("\n Testing different detection settings:")
     print("-" * 60)
     
     for setting in settings:
@@ -120,28 +120,28 @@ def test_with_real_image():
             if image.mode != 'RGB':
                 image = image.convert('RGB')
             
-            print(f"✅ Loaded user image: {image.size}")
+            print(f"Loaded user image: {image.size}")
             return image
     except Exception as e:
-        print(f"❌ Failed to load user image: {e}")
+        print(f"Failed to load user image: {e}")
     
     return None
 
 def main():
-    print("🐝 iBrood Model Performance Diagnostic")
+    print("iBrood Model Performance Diagnostic")
     print("=" * 50)
     
     # Load model
     model = load_model()
     if not model:
-        print("❌ Could not load model!")
+        print("Could not load model!")
         return
     
     # Test with synthetic image
-    print("\n🎨 Creating test image...")
+    print("\nCreating test image...")
     test_img = create_test_image()
     test_img.save('test_image.jpg')
-    print("✅ Test image saved as 'test_image.jpg'")
+    print("Test image saved as 'test_image.jpg'")
     
     # Test different settings
     test_model_settings(model, test_img)
@@ -149,10 +149,10 @@ def main():
     # Test with user image
     user_img = test_with_real_image()
     if user_img:
-        print("\n🔍 Testing with your image:")
+        print("\nTesting with your image:")
         test_model_settings(model, user_img)
     
-    print("\n💡 Recommendations:")
+    print("\nRecommendations:")
     print("- If you see 0 detections everywhere, your model might need retraining")
     print("- If 'Very Aggressive' shows detections but others don't, lower the confidence threshold")
     print("- If you get too many false positives, increase the confidence threshold")

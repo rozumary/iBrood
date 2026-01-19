@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState({ type: 'success', message: '' })
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const showToastMessage = (type: 'success' | 'error', message: string) => {
@@ -22,34 +23,48 @@ export default function LoginPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) {
       showToastMessage('error', 'Please fill in all fields')
       return
     }
     
-    // Check if user exists (mock auth)
-    const users = JSON.parse(localStorage.getItem('ibrood_users') || '[]')
-    const user = users.find((u: any) => u.email === email && u.password === password)
-    
-    if (!user) {
-      // For demo purposes, allow any login but show different message for new users
-      const existingEmail = users.find((u: any) => u.email === email)
-      if (existingEmail) {
-        showToastMessage('error', 'Incorrect password')
+    setIsLoading(true)
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_DATABASE_API_URL || 'http://localhost:8001'
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        showToastMessage('error', data.detail || 'Login failed')
         return
       }
-      // Allow demo login for any email/password
+      
+      // Save session to localStorage for frontend state
+      localStorage.setItem('ibrood_current_user', JSON.stringify({
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        session_token: data.session_token
+      }))
+      
+      showToastMessage('success', 'Login successful!')
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 1500)
+    } catch (error) {
+      showToastMessage('error', 'Unable to connect to server. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-    
-    // Save current user session
-    localStorage.setItem('ibrood_current_user', JSON.stringify({ email, name: user?.name || 'Beekeeper' }))
-    
-    showToastMessage('success', 'Login successful!')
-    setTimeout(() => {
-      router.push("/dashboard")
-    }, 1500)
   }
   // Using inline styles for reliable sticky footer behavior
   return (
@@ -93,9 +108,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full px-4 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-lg"
+              disabled={isLoading}
+              className="w-full px-4 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Log In
+              {isLoading ? 'Logging in...' : 'Log In'}
             </button>
           </form>
 

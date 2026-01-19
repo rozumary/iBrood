@@ -20,7 +20,7 @@ export default function BroodPatternPage() {
   const handleImageCapture = async (imageData: string) => {
     try {
       setIsLoading(true)
-      console.log('🔄 Starting brood pattern analysis...')
+      console.log('Starting brood pattern analysis...')
       
       // Convert base64 to blob for FormData
       const base64Data = imageData.split(',')[1]
@@ -54,18 +54,25 @@ export default function BroodPatternPage() {
       }
       
       const result = await response.json()
-      console.log('✅ Brood detection result:', result)
+      console.log('Brood detection result:', result)
       
       // Transform API results to match UI format - ONLY 3 CLASSES
       const counts = result.counts || { egg: 0, larva: 0, pupa: 0 }
       const health = result.health || { status: 'UNKNOWN', score: 0, total_brood: 0, total_cells: 0 }
       const totalCells = health.total_cells || (counts.egg + counts.larva + counts.pupa)
       
+      // Calculate brood coverage from API response
+      // If health object has brood coverage data, use it; otherwise calculate from counts
+      const totalBrood = health.total_brood || (counts.egg + counts.larva + counts.pupa)
+      const broodCoverageValue = health.total_cells > 0 
+        ? Math.round((totalBrood / health.total_cells) * 100) 
+        : (totalCells > 0 ? Math.round((totalBrood / totalCells) * 100) : 0)
+      
       const transformedResults = {
         hiveHealthScore: health.score,
         healthStatus: health.status,
         riskLevel: health.status === 'EXCELLENT' ? 'Low' : health.status === 'GOOD' ? 'Low' : health.status === 'FAIR' ? 'Medium' : 'High',
-        broodCoverage: 100, // All detected cells are brood
+        broodCoverage: broodCoverageValue,
         totalDetections: result.count || 0,
         counts: counts,
         cellBreakdown: [
@@ -100,12 +107,12 @@ export default function BroodPatternPage() {
         detections: result.detections || []
       }
       
-      console.log('✅ Analysis complete:', transformedResults)
+      console.log('Analysis complete:', transformedResults)
       setAnalysisResults(transformedResults)
       setShowResults(true)
       
     } catch (error: any) {
-      console.error('❌ Analysis error:', error)
+      console.error('Analysis error:', error)
       alert(`Analysis failed: ${error.message}. Please try again.`)
     } finally {
       setIsLoading(false)

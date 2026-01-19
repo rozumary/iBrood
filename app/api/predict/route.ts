@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    console.log('🚀 Calling FastAPI API...')
+    console.log('Calling FastAPI API...')
     
     const API_URL = process.env.API_URL || 'http://localhost:8000'
     
@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
         signal: AbortSignal.timeout(5000)
       })
       if (!healthCheck.ok) {
-        console.log('⚠️ FastAPI health check failed')
+        console.log('FastAPI health check failed')
       }
     } catch (healthError) {
-      console.log('⚠️ FastAPI not responding to health check:', healthError)
+      console.log('FastAPI not responding to health check:', healthError)
     }
     
     const response = await fetch(`${API_URL}/analyze`, {
@@ -38,16 +38,16 @@ export async function POST(request: NextRequest) {
     
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('❌ API error response:', errorText)
+      console.error('API error response:', errorText)
       throw new Error(`API failed with status: ${response.status} - ${errorText}`)
     }
     
     const result = await response.json()
-    console.log('✅ FastAPI API success')
+    console.log('FastAPI API success')
     return NextResponse.json({ data: [null, result] })
     
   } catch (error) {
-    console.error('❌ API Error:', error)
+    console.error('API Error:', error)
     return NextResponse.json(
       { error: 'Analysis failed. Please try again.' },
       { status: 500 }

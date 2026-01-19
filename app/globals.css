@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* 🐝 BEE THEME - Warm honeycomb inspired design */
+  /* BEE THEME - Warm honeycomb inspired design */
   --background: oklch(0.995 0.008 85);
   --foreground: oklch(0.15 0.02 50);
   --card: oklch(0.99 0.012 80);
@@ -46,7 +46,7 @@
 }
 
 .dark {
-  /* 🐝 BEE THEME DARK MODE - Rich amber tones */
+  /* BEE THEME DARK MODE - Rich amber tones */
   --background: oklch(0.16 0.02 50);
   --foreground: oklch(0.96 0.01 80);
   --card: oklch(0.2 0.025 50);

@@ -46,7 +46,7 @@ export class YOLOQueenCellService {
   }
 
   async analyzeImage(imageData: string): Promise<QueenCellAnalysis> {
-    console.log('🔍 Starting YOLO analysis...')
+    console.log('Starting YOLO analysis...')
     
     // Validate image data format
     if (!imageData || !imageData.includes('data:image')) {
@@ -86,7 +86,7 @@ export class YOLOQueenCellService {
         
         if (response.ok) {
           const result = await response.json()
-          console.log('✅ HuggingFace /analyze Results:', result)
+          console.log('HuggingFace /analyze Results:', result)
           
           // /analyze endpoint returns the correct format directly
           return {

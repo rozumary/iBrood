@@ -174,38 +174,38 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
           <Link
             href="/queen-cell"
-            className="group p-6 sm:p-8 bg-[#fce588] dark:bg-[#e8d06a] backdrop-blur-sm rounded-2xl border-2 border-[#f5da6a] dark:border-[#c9b454] hover:border-white/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
+            className="group p-6 sm:p-8 bg-[#FFA95C] dark:bg-[#e99548] backdrop-blur-sm rounded-2xl border-2 border-[#ffbe7a]/50 dark:border-[#d08540]/50 hover:border-white/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
           >
             <div className="flex items-center gap-4 mb-5">
-              <div className="p-4 bg-white/40 dark:bg-white/25 rounded-2xl">
-                <Bee className="w-8 h-8 text-amber-700 dark:text-amber-900" />
+              <div className="p-4 bg-white/30 dark:bg-white/20 rounded-2xl">
+                <Bee className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="font-heading font-bold text-xl text-amber-800 dark:text-amber-900">{t('queenCell.title')}</h2>
-                <p className="text-sm text-amber-700/80 dark:text-amber-800/80">{t('dashboard.aiPoweredDetection')}</p>
+                <h2 className="font-heading font-bold text-xl text-white">{t('queenCell.title')}</h2>
+                <p className="text-sm text-white/80">{t('dashboard.aiPoweredDetection')}</p>
               </div>
             </div>
-            <p className="text-amber-700/90 dark:text-amber-800/90 mb-4">{t('dashboard.queenCellDesc')}</p>
-            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-900 font-semibold">
+            <p className="text-white/90 mb-4">{t('dashboard.queenCellDesc')}</p>
+            <div className="flex items-center gap-2 text-white font-semibold">
               {t('dashboard.startAnalysis')} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/brood-pattern"
-            className="group p-6 sm:p-8 bg-[#fce588] dark:bg-[#e8d06a] backdrop-blur-sm rounded-2xl border-2 border-[#f5da6a] dark:border-[#c9b454] hover:border-white/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
+            className="group p-6 sm:p-8 bg-[#FFA95C] dark:bg-[#e99548] backdrop-blur-sm rounded-2xl border-2 border-[#ffbe7a]/50 dark:border-[#d08540]/50 hover:border-white/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
           >
             <div className="flex items-center gap-4 mb-5">
-              <div className="p-4 bg-white/40 dark:bg-white/25 rounded-2xl">
-                <Grid3X3 className="w-8 h-8 text-amber-700 dark:text-amber-900" />
+              <div className="p-4 bg-white/30 dark:bg-white/20 rounded-2xl">
+                <Grid3X3 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="font-heading font-bold text-xl text-amber-800 dark:text-amber-900">{t('brood.title')}</h2>
-                <p className="text-sm text-amber-700/80 dark:text-amber-800/80">{t('dashboard.healthAssessment')}</p>
+                <h2 className="font-heading font-bold text-xl text-white">{t('brood.title')}</h2>
+                <p className="text-sm text-white/80">{t('dashboard.healthAssessment')}</p>
               </div>
             </div>
-            <p className="text-amber-700/90 dark:text-amber-800/90 mb-4">{t('dashboard.broodPatternDesc')}</p>
-            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-900 font-semibold">
+            <p className="text-white/90 mb-4">{t('dashboard.broodPatternDesc')}</p>
+            <div className="flex items-center gap-2 text-white font-semibold">
               {t('dashboard.startAnalysis')} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>

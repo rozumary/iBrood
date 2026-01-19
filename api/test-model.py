@@ -18,4 +18,4 @@ for result in results:
         
         # Flag potential misclassifications for semi-mature cells
         if class_name == 'Matured Cell' and conf < 0.8:
-            print(f'⚠️  Low confidence mature detection - possibly semi-mature')
+            print(f'Low confidence mature detection - possibly semi-mature')

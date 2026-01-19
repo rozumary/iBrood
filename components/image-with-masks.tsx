@@ -124,7 +124,7 @@ export default function ImageWithMasks({ imageUrl, detections, totalCount }: Ima
               maskRendered = true
             }
           } catch (error) {
-            console.warn(`⚠️ Mask failed:`, error)
+            console.warn(`Mask failed:`, error)
           }
         }
 

@@ -51,7 +51,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
       hasAutoSaved.current = true
       saveBroodAnalysis(results)
       window.dispatchEvent(new Event('analysisUpdated'))
-      console.log('✅ Brood analysis auto-saved to storage')
+      console.log('Brood analysis auto-saved to storage')
     }
   }, [results])
   
@@ -211,15 +211,6 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
           <p className={`text-xl font-bold px-3 py-1 rounded-full w-fit capitalize ${getRiskColor(results.riskLevel)}`}>
             {results.riskLevel || 'Unknown'}
           </p>
-        </div>
-
-        <div className="bg-surface rounded-lg border border-border p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart3 className="w-5 h-5 text-accent" />
-            <h3 className="font-semibold text-sm text-muted">Brood Coverage</h3>
-          </div>
-          <p className="text-4xl font-bold text-text-primary">{results.broodCoverage || 0}%</p>
-          <p className="text-xs text-muted mt-2">Active brood cells</p>
         </div>
 
         <div className="bg-surface rounded-lg border border-border p-6">

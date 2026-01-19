@@ -37,7 +37,7 @@ export const translations = {
     "dashboard.aiPoweredDetection": "AI-powered detection",
     "dashboard.healthAssessment": "Health assessment",
     "dashboard.queenCellDesc": "Detect queen cells, predict hatching time, and track development stages.",
-    "dashboard.broodPatternDesc": "Analyze egg, larva, and pupa distribution for colony health insights.",
+    "dashboard.broodPatternDesc": "Analyze egg, larva, and pupa distribution for colony health.",
     "dashboard.latestQueenDetection": "Latest Queen Cell Detection",
     "dashboard.latestBroodDetection": "Latest Brood Detection",
     "dashboard.cellsFound": "cells found",

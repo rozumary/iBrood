@@ -8,8 +8,8 @@ const researchers = [
   {
     name: "Rosemarie Montesa",
     age: 22,
-    location: "Santa Rosa, Laguna",
-    role: "Lead Developer"
+    location: "Mandaluyong City, Metro Manila",
+    role: "Full Stack Engineer"
   },
   {
     name: "Renalyn Pino",
@@ -41,7 +41,7 @@ export default function AboutPage() {
             About Us
           </h1>
           <p className="text-lg text-amber-700/80 max-w-2xl mx-auto">
-            We are passionate researchers from BSCS 4A dedicated to revolutionizing beekeeping through AI-powered technology.
+            We're BSCS 4A students who love bees and tech, building tools to help beekeepers care for their hives smarter.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-heading font-bold text-amber-900">Our Research</h2>
           </div>
           <p className="text-amber-700/80 leading-relaxed">
-            iBrood is a capstone project developed by Bachelor of Science in Computer Science (BSCS) 4A students. 
+            iBrood is an undergraduate thesis project developed by Bachelor of Science in Computer Science (BSCS) 4A students. 
             Our goal is to assist beekeepers in monitoring queen cell development and brood patterns using 
             advanced AI-powered image segmentation and object detection models. We trained our YOLOv11-Medium 
             segmentation model to achieve 95.6% precision and 98.5% mAP50 for accurate queen cell analysis.

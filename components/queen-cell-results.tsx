@@ -41,7 +41,7 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
       hasAutoSaved.current = true
       saveAnalysis(results)
       window.dispatchEvent(new Event('analysisUpdated'))
-      console.log('✅ Queen cell analysis auto-saved to storage')
+      console.log('Queen cell analysis auto-saved to storage')
     }
   }, [results])
   

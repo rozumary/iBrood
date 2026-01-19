@@ -10,6 +10,10 @@ import os
 import asyncpg
 import hashlib
 import secrets
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI(title="iBrood Database API", version="1.0.0")
 
@@ -361,3 +365,8 @@ async def health_check(db=Depends(get_db)):
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
