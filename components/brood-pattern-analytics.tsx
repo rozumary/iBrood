@@ -35,7 +35,7 @@ export default function BroodPatternAnalytics() {
 
   // Bee-themed chart colors
   const chartColors = {
-    larvae: "#F59E0B",
+    larvae: "#FFB300", // Amber (more distinct from egg)
     pupae: "#A67C52",
     eggs: "#FBBF24",
     empty: "#FCD34D",
@@ -143,7 +143,7 @@ export default function BroodPatternAnalytics() {
   return (
     <div className="space-y-8">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
           <h3 className="text-sm text-amber-700 mb-2">Avg. Health Score</h3>
           <p className="text-3xl font-bold text-amber-900">{stats.avgHealthScore || '--'}</p>
