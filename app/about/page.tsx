@@ -83,7 +83,13 @@ export default function AboutPage() {
                   {researcher.name.split(' ').map(n => n[0]).join('')}
                 </div>
               )}
-              <h3 className="font-heading font-bold text-lg text-amber-900 mb-1">{researcher.name}</h3>
+              {researcher.name === "Rosemarie Montesa" ? (
+                <h3 className="font-heading font-bold text-lg text-amber-900 mb-1">
+                  <a href="https://rozumary.me" target="_blank" rel="noopener noreferrer" className="underline hover:text-orange-600 transition-colors">{researcher.name}</a>
+                </h3>
+              ) : (
+                <h3 className="font-heading font-bold text-lg text-amber-900 mb-1">{researcher.name}</h3>
+              )}
               <p className="text-sm text-amber-600 font-medium mb-2">{researcher.role}</p>
               <p className="text-sm text-amber-700/70 mb-1">{researcher.age} years old</p>
               <div className="flex items-center justify-center gap-1 text-sm text-amber-700/70">
