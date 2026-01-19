@@ -293,8 +293,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
             <h3 className="font-heading font-semibold text-text-primary mb-4">Management Recommendations</h3>
             <ul className="space-y-2">
               {results.recommendations.map((rec, index) => (
-                <li key={index} className="text-sm text-text-primary flex items-start gap-2">
-                  <span className="text-accent font-bold mt-1">•</span>
+                <li key={index} className="text-sm text-text-primary">
                   {rec}
                 </li>
               ))}
