@@ -147,7 +147,7 @@ export default function LandingPage() {
             Join thousands of beekeepers using iBrood for smarter hive management and healthier colonies.
           </p>
           <Link href="/signup" className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-[#FFA95C] text-white rounded-2xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
-            Try this Model by Signing Up
+            Try this Model
           </Link>
         </section>
       </main>
