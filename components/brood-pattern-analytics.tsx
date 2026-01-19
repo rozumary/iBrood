@@ -150,11 +150,6 @@ export default function BroodPatternAnalytics() {
           <p className="text-xs text-amber-600 mt-2">{stats.totalAnalyses > 0 ? `${stats.totalAnalyses} analysis` : 'No data'}</p>
         </div>
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-sm text-amber-700 mb-2">Avg. Brood Coverage</h3>
-          <p className="text-3xl font-bold text-amber-600">{stats.avgBroodCoverage > 0 ? `${stats.avgBroodCoverage}%` : '--'}</p>
-          <p className="text-xs text-amber-600 mt-2">{stats.avgBroodCoverage >= 80 ? 'Very healthy' : stats.avgBroodCoverage >= 60 ? 'Healthy' : 'Monitor'}</p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
           <h3 className="text-sm text-amber-700 mb-2">Total Cells Detected</h3>
           <p className="text-3xl font-bold text-orange-500">{stats.totalEggs + stats.totalLarvae + stats.totalPupae}</p>
           <p className="text-xs text-amber-600 mt-2">Eggs, Larvae, Pupae</p>
