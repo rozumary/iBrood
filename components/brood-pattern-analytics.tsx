@@ -35,7 +35,7 @@ export default function BroodPatternAnalytics() {
 
   // Bee-themed chart colors
   const chartColors = {
-    larvae: "#FFB300", // Amber (more distinct from egg)
+    larvae: "tomato", // Changed to tomato for better distinction
     pupae: "#A67C52",
     eggs: "#FBBF24",
     empty: "#FCD34D",

@@ -136,27 +136,17 @@ export default function OverallTrends() {
       },
     ])
 
-    // Generate health trend data from brood analyses
-    const healthData = broodAnalyses.slice(0, 10).reverse().map((analysis, index) => ({
-      date: new Date(analysis.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      healthScore: analysis.healthScore || 0,
-      broodCoverage: analysis.broodCoverage || 0
-    }))
-    console.log('Health Trend Data:', healthData)
-    setHealthTrendData(healthData.length > 0 ? healthData : [])
-
-    // Generate queen cell data from queen analyses
-    const queenData = queenAnalyses.slice(0, 10).reverse().map((analysis, index) => {
-      const dist = analysis.maturityDistribution || {}
+    // Prepare health trend data with brood counts (eggs + larvae + pupae)
+    const healthDataRaw = broodAnalyses.slice(0, 10).reverse().map((analysis, index) => {
+      const counts = analysis.counts || {}
+      const broodCount = (counts.egg || 0) + (counts.larva || 0) + (counts.pupa || 0)
       return {
         date: new Date(analysis.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        mature: dist.mature || 0,
-        semiMature: dist['semi-mature'] || 0,
-        capped: dist.capped || 0,
-        open: dist.open || 0
+        healthScore: analysis.healthScore || 0,
+        broodCount: broodCount
       }
     })
-    setQueenCellData(queenData.length > 0 ? queenData : [])
+    setHealthTrendData(healthDataRaw.length > 0 ? healthDataRaw : [])
   }
 
   // Bee-themed chart colors
@@ -185,51 +175,42 @@ export default function OverallTrends() {
         ))}
       </div>
 
-      {/* Health Score Trend */}
+      {/* Health Score & Queen Cells Trend */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm">
-        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Health Score & Brood Coverage Trend</h3>
-        {healthTrendData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={healthTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
-              <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
-              <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#FFFBEB",
-                  border: "1px solid #FCD34D",
-                  borderRadius: "12px",
-                }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="healthScore"
-                stroke={chartColors.primary}
-                strokeWidth={3}
-                dot={{ fill: chartColors.primary, r: 5 }}
-                activeDot={{ r: 7 }}
-                name="Health Score"
-              />
-              <Line
-                type="monotone"
-                dataKey="broodCoverage"
-                stroke={chartColors.secondary}
-                strokeWidth={3}
-                dot={{ fill: chartColors.secondary, r: 5 }}
-                activeDot={{ r: 7 }}
-                name="Brood Coverage %"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="h-[300px] flex items-center justify-center text-amber-600/70 bg-amber-50/50 rounded-xl">
-            <div className="text-center">
-              <p className="font-medium">No brood analysis data yet</p>
-              <p className="text-sm mt-1">Perform brood pattern analyses to see trends</p>
-            </div>
-          </div>
-        )}
+        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Health Score & Queen Cells Trend</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={healthTrendData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
+            <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
+            <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#FFFBEB",
+                border: "1px solid #FCD34D",
+                borderRadius: "12px",
+              }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="healthScore"
+              stroke={chartColors.primary}
+              strokeWidth={3}
+              dot={{ fill: chartColors.primary, r: 5 }}
+              activeDot={{ r: 7 }}
+              name="Health Score"
+            />
+            <Line
+              type="monotone"
+              dataKey="broodCount"
+              stroke={chartColors.accent}
+              strokeWidth={3}
+              dot={{ fill: chartColors.accent, r: 5 }}
+              activeDot={{ r: 7 }}
+              name="Brood Count"
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Queen Cell Trend */}

@@ -201,26 +201,14 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
           </p>
         </div>
 
-        {/* Only show Brood Coverage if health.total_cells is present and greater than sum of brood cells */}
-        {(results.totalDetections && results.broodCoverage !== undefined && results.broodCoverage !== null && results.broodCoverage !== 100) ? (
-          <div className="bg-surface rounded-lg border border-border p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-accent" />
-              <h3 className="font-semibold text-sm text-muted">Avg. Brood Coverage</h3>
-            </div>
-            <p className="text-4xl font-bold text-text-primary">{results.broodCoverage}%</p>
-            <p className="text-xs text-muted mt-2">Very healthy</p>
+        <div className="bg-surface rounded-lg border border-border p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-5 h-5 text-accent" />
+            <h3 className="font-semibold text-sm text-muted">Total Detected</h3>
           </div>
-        ) : (
-          <div className="bg-surface rounded-lg border border-border p-6 opacity-50">
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-accent" />
-              <h3 className="font-semibold text-sm text-muted">Avg. Brood Coverage</h3>
-            </div>
-            <p className="text-4xl font-bold text-text-primary">—</p>
-            <p className="text-xs text-muted mt-2">Data unavailable</p>
-          </div>
-        )}
+          <p className="text-4xl font-bold text-text-primary">{results.totalDetections || 0}</p>
+          <p className="text-xs text-muted mt-2">Cells analyzed</p>
+        </div>
       </div>
 
       {/* Individual Counts - ONLY 3 CLASSES */}
