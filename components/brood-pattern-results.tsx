@@ -1,6 +1,6 @@
 "use client"
 
-import { AlertCircle, TrendingUp, BarChart3, Heart, Activity, Check } from "lucide-react"
+import { AlertCircle, TrendingUp, BarChart3, Heart, Activity } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import ImageWithBboxesCanvas from "./image-with-bboxes-canvas"
 import { saveBroodAnalysis } from "@/lib/storage"
@@ -40,7 +40,6 @@ interface BroodPatternResultsProps {
 
 export default function BroodPatternResults({ results }: BroodPatternResultsProps) {
   const { t } = useTranslation()
-  const [showToast, setShowToast] = useState(false)
   const [showAnnotated, setShowAnnotated] = useState(true)
   const [showLabels, setShowLabels] = useState(false)
   const hasAutoSaved = useRef(false)
@@ -63,17 +62,6 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
   }, [])
   
   if (!results) return null
-
-  const handleSave = () => {
-    // Save brood analysis to storage
-    saveBroodAnalysis(results)
-    
-    // Dispatch custom event to notify dashboard
-    window.dispatchEvent(new Event('analysisUpdated'))
-    
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
-  }
 
   const getRiskColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -314,22 +302,6 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
           </div>
         </div>
       </div>
-
-      {/* Save Analysis Button */}
-      <button 
-        onClick={handleSave}
-        className="w-full px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-secondary transition-colors"
-      >
-        Save This Analysis
-      </button>
-
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed bottom-8 right-8 bg-sky-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
-          <Check className="w-5 h-5" />
-          <span className="font-medium">Analysis saved successfully!</span>
-        </div>
-      )}
     </div>
   )
 }

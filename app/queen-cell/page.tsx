@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Crown, AlertTriangle } from "lucide-react"
+import { Crown, AlertTriangle, AlertCircle, X } from "lucide-react"
 import Navigation from "@/components/navigation"
 import ImageUploader from "@/components/image-uploader"
 import QueenCellResults from "@/components/queen-cell-results"
@@ -9,12 +9,18 @@ import QueenCellLogs from "@/components/queen-cell-logs"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Footer from "@/components/footer"
 import { yoloService } from "@/lib/yolo-service"
-import { saveAnalysis } from "@/lib/storage"
 
 export default function QueenCellPage() {
   const [analysisResults, setAnalysisResults] = useState<any>(null)
   const [showResults, setShowResults] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogContent, setDialogContent] = useState({ title: '', message: '', tips: [] as string[] })
+
+  const showDialog = (title: string, message: string, tips: string[] = []) => {
+    setDialogContent({ title, message, tips })
+    setDialogOpen(true)
+  }
 
   const handleImageCapture = async (imageData: string) => {
     setIsAnalyzing(true)
@@ -22,12 +28,16 @@ export default function QueenCellPage() {
       const results = await yoloService.analyzeImage(imageData)
       
       if (results.totalQueenCells === 0) {
-        alert('No queen cells detected!\n\nTips for better detection:\n• Ensure good lighting\n• Avoid blurry or dark images\n• Make sure queen cells are clearly visible\n• Try a different angle or closer shot')
+        showDialog('No queen cells detected!', 'Tips for better detection:', [
+          'Ensure good lighting',
+          'Avoid blurry or dark images',
+          'Make sure queen cells are clearly visible',
+          'Try a different angle or closer shot'
+        ])
         setIsAnalyzing(false)
         return
       }
       
-      saveAnalysis(results)
       setAnalysisResults(results)
       setShowResults(true)
     } catch (error) {
@@ -49,7 +59,7 @@ export default function QueenCellPage() {
         }
       }
       
-      alert(errorMessage)
+      showDialog('Error', errorMessage)
     } finally {
       setIsAnalyzing(false)
     }
@@ -95,7 +105,7 @@ export default function QueenCellPage() {
                   <>
                     <ImageUploader onImageCapture={handleImageCapture} />
                     <button
-                      onClick={() => { localStorage.clear(); alert('Storage cleared!') }}
+                      onClick={() => { localStorage.clear(); showDialog('Success', 'Storage cleared!') }}
                       className="mt-4 px-4 py-2 text-sm text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-300 rounded-lg transition-all duration-300"
                     >
                       Clear Storage
@@ -122,6 +132,42 @@ export default function QueenCellPage() {
         </Tabs>
       </main>
       <Footer />
+
+      {/* Custom Dialog Modal */}
+      {dialogOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setDialogOpen(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-xl border border-amber-200 dark:border-amber-700/50" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-full">
+                  <AlertCircle className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="font-heading font-semibold text-lg text-amber-900 dark:text-amber-100">{dialogContent.title}</h3>
+              </div>
+              <button onClick={() => setDialogOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-amber-800 dark:text-amber-200 mb-4">{dialogContent.message}</p>
+            {dialogContent.tips.length > 0 && (
+              <ul className="space-y-2 mb-6">
+                {dialogContent.tips.map((tip, index) => (
+                  <li key={index} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5">•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              onClick={() => setDialogOpen(false)}
+              className="w-full px-4 py-2.5 bg-[#FFA95C] hover:bg-[#FF9A3C] text-white rounded-xl font-semibold transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { Trash2, Plus, Calendar, X, MapPin, Clock, ClipboardList } from "lucide-react"
+import { Trash2, Plus, Calendar, X, MapPin, Clock, ClipboardList, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 
@@ -53,9 +53,12 @@ function AddLogModal({
     }
   }, [isOpen])
 
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
   const handleSubmit = () => {
     if (!newLog.hiveId.trim()) {
-      alert('Please enter a Hive ID / Palatandaan')
+      setErrorMsg('Please enter a Hive ID / Palatandaan')
+      setTimeout(() => setErrorMsg(null), 3000)
       return
     }
     onAdd(newLog)
@@ -92,6 +95,14 @@ function AddLogModal({
         </div>
 
         <div className="space-y-4">
+          {/* Error Message */}
+          {errorMsg && (
+            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm">
+              <AlertCircle size={16} />
+              {errorMsg}
+            </div>
+          )}
+          
           {/* Hive ID / Palatandaan */}
           <div>
             <label className="block text-sm font-medium text-amber-800 dark:text-amber-200 mb-1.5">

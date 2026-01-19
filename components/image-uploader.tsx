@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Camera, Upload, X, Search } from "lucide-react"
+import { Camera, Upload, X, Search, AlertCircle } from "lucide-react"
 
 interface ImageUploaderProps {
   onImageCapture: (imageData: string) => void
@@ -12,9 +12,15 @@ interface ImageUploaderProps {
 export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  const showError = (message: string) => {
+    setErrorMessage(message)
+    setTimeout(() => setErrorMessage(null), 5000)
+  }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -22,13 +28,13 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
       // Validate file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
       if (!validTypes.includes(file.type)) {
-        alert('Please select a valid image file (JPEG, PNG, or WebP)')
+        showError('Please select a valid image file (JPEG, PNG, or WebP)')
         return
       }
       
       // Check file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert('Image too large. Please select an image smaller than 10MB.')
+        showError('Image too large. Please select an image smaller than 10MB.')
         return
       }
       
@@ -42,13 +48,13 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
       // Validate file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
       if (!validTypes.includes(file.type)) {
-        alert('Please select a valid image file (JPEG, PNG, or WebP)')
+        showError('Please select a valid image file (JPEG, PNG, or WebP)')
         return
       }
       
       // Check file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert('Image too large. Please select an image smaller than 10MB.')
+        showError('Image too large. Please select an image smaller than 10MB.')
         return
       }
       
@@ -98,7 +104,7 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
     }
     
     img.onerror = () => {
-      alert('Failed to process image. Please try a different image.')
+      showError('Failed to process image. Please try a different image.')
     }
     
     // Load the image
@@ -116,6 +122,16 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   if (preview) {
     return (
       <div className="space-y-6">
+        {/* Error Toast */}
+        {errorMessage && (
+          <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5" />
+            <span>{errorMessage}</span>
+            <button onClick={() => setErrorMessage(null)} className="ml-2 hover:bg-red-600 rounded p-1">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm">
           <div className="relative">
             <img
@@ -151,47 +167,60 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      {/* Upload Card */}
-      <div
-        className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
-            <Upload className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
-          </div>
-          <div className="text-center">
-            <h3 className="font-semibold text-amber-900 mb-2 text-lg">Upload Image</h3>
-            <p className="text-sm text-amber-700/70">Click to select an image from your device</p>
+    <>
+      {/* Error Toast */}
+      {errorMessage && (
+        <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-in slide-in-from-top-2">
+          <AlertCircle className="w-5 h-5" />
+          <span>{errorMessage}</span>
+          <button onClick={() => setErrorMessage(null)} className="ml-2 hover:bg-red-600 rounded p-1">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Upload Card */}
+        <div
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
+              <Upload className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-amber-900 mb-2 text-lg">Upload Image</h3>
+              <p className="text-sm text-amber-700/70">Click to select an image from your device</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Camera Card */}
-      <div
-        className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
-        onClick={() => cameraInputRef.current?.click()}
-      >
-        <input
-          ref={cameraInputRef}
-          type="file"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          capture="environment"
-          onChange={handleCameraCapture}
-          className="hidden"
-        />
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
-            <Camera className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
-          </div>
-          <div className="text-center">
-            <h3 className="font-semibold text-amber-900 mb-2 text-lg">Take Photo</h3>
-            <p className="text-sm text-amber-700/70">Use your device camera to capture</p>
+        {/* Camera Card */}
+        <div
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-dashed border-amber-200 p-8 cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg"
+          onClick={() => cameraInputRef.current?.click()}
+        >
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            capture="environment"
+            onChange={handleCameraCapture}
+            className="hidden"
+          />
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="p-5 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl group-hover:from-amber-500 group-hover:to-orange-500 transition-all duration-300">
+              <Camera className="w-10 h-10 text-amber-600 group-hover:text-white transition-colors" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-amber-900 mb-2 text-lg">Take Photo</h3>
+              <p className="text-sm text-amber-700/70">Use your device camera to capture</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

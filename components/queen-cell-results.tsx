@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { CheckCircle, AlertCircle, Clock, TrendingUp, Check } from "lucide-react"
+import { useEffect, useRef } from "react"
+import { CheckCircle, AlertCircle, Clock, TrendingUp } from "lucide-react"
 import ImageWithMasks from "./image-with-masks"
 import { saveAnalysis } from "@/lib/storage"
 
@@ -32,7 +32,6 @@ interface QueenCellResultsProps {
 }
 
 export default function QueenCellResults({ results }: QueenCellResultsProps) {
-  const [showToast, setShowToast] = useState(false)
   const hasAutoSaved = useRef(false)
   
   // Auto-save analysis when results are displayed
@@ -53,17 +52,6 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
   }, [])
   
   if (!results) return null
-  
-  const handleSave = () => {
-    // Save queen cell analysis to storage
-    saveAnalysis(results)
-    
-    // Dispatch custom event to notify dashboard
-    window.dispatchEvent(new Event('analysisUpdated'))
-    
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
-  }
 
   const getCellColor = (type: string) => {
     // Updated to match the correct class names and hex colors
@@ -211,22 +199,6 @@ export default function QueenCellResults({ results }: QueenCellResultsProps) {
           </div>
         </div>
       </div>
-
-      {/* Save Analysis Button */}
-      <button 
-        onClick={handleSave}
-        className="w-full px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-secondary transition-colors cursor-pointer"
-      >
-        Save This Analysis
-      </button>
-      
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed bottom-8 right-8 bg-yellow-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
-          <Check className="w-5 h-5" />
-          <span className="font-medium">Analysis saved successfully!</span>
-        </div>
-      )}
     </div>
   )
 }

@@ -110,9 +110,7 @@ export default function HiveHealthCard() {
             : 'bg-amber-50/50 border-amber-200/50 dark:bg-amber-900/10 dark:border-amber-700/30'
         }`}>
           {healthData.hasData ? (
-            healthData.healthScore >= 80 
-              ? <CheckCircle className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
-              : <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
           ) : (
             <Activity className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
           )}

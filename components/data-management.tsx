@@ -1,12 +1,13 @@
 "use client"
 
-import { Download, Upload, RotateCcw, Trash2, AlertTriangle, Database, CheckCircle, FileJson, HardDrive, X } from "lucide-react"
+import { Download, Upload, RotateCcw, Trash2, AlertTriangle, Database, CheckCircle, FileJson, HardDrive, X, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { getAnalyses, getBroodAnalyses, getTotalInspections } from "@/lib/storage"
 
 export default function DataManagement() {
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(true)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [storageStats, setStorageStats] = useState({
     queenAnalyses: 0,
     broodAnalyses: 0,
@@ -14,6 +15,11 @@ export default function DataManagement() {
     broodLogs: 0,
     totalItems: 0
   })
+
+  const showToast = (type: 'success' | 'error', text: string) => {
+    setToastMessage({ type, text })
+    setTimeout(() => setToastMessage(null), 3000)
+  }
 
   useEffect(() => {
     loadStorageStats()
@@ -85,9 +91,9 @@ export default function DataManagement() {
 
         loadStorageStats()
         window.dispatchEvent(new Event('analysisUpdated'))
-        alert('Data imported successfully!')
+        showToast('success', 'Data imported successfully!')
       } catch {
-        alert('Error importing data. Please check the file format.')
+        showToast('error', 'Error importing data. Please check the file format.')
       }
     }
     reader.readAsText(file)
@@ -109,6 +115,21 @@ export default function DataManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={`fixed top-4 right-4 px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-in slide-in-from-top-2 ${
+          toastMessage.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          {toastMessage.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+          <span>{toastMessage.text}</span>
+          <button onClick={() => setToastMessage(null)} className="ml-2 hover:opacity-80">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Storage Overview */}
       <div className="bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl border border-amber-200 dark:border-amber-700/50 p-6 shadow-sm">
         <div className="flex items-center gap-4 mb-4">

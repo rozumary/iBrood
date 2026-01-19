@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Grid3X3 } from "lucide-react"
+import { Grid3X3, AlertCircle, X } from "lucide-react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import ImageUploader from "@/components/image-uploader"
@@ -16,6 +16,13 @@ export default function BroodPatternPage() {
   const [analysisResults, setAnalysisResults] = useState(null)
   const [showResults, setShowResults] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogContent, setDialogContent] = useState({ title: '', message: '' })
+
+  const showDialog = (title: string, message: string) => {
+    setDialogContent({ title, message })
+    setDialogOpen(true)
+  }
 
   const handleImageCapture = async (imageData: string) => {
     try {
@@ -113,7 +120,7 @@ export default function BroodPatternPage() {
       
     } catch (error: any) {
       console.error('Analysis error:', error)
-      alert(`Analysis failed: ${error.message}. Please try again.`)
+      showDialog('Analysis Failed', `${error.message}. Please try again.`)
     } finally {
       setIsLoading(false)
     }
@@ -149,8 +156,9 @@ export default function BroodPatternPage() {
                   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl p-8 sm:p-10 flex flex-col items-center gap-5 shadow-xl border border-amber-200 dark:border-amber-700/50 mx-4">
                       <div className="w-12 h-12 sm:w-14 sm:h-14 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-lg sm:text-xl font-semibold text-amber-900 dark:text-amber-100">Analyzing brood pattern...</p>
-                      <p className="text-amber-700/70 dark:text-amber-300/70 text-sm sm:text-base">This may take a few seconds</p>
+                      <p className="text-lg sm:text-xl font-semibold text-amber-900 dark:text-amber-100">Analyzing Brood Pattern...</p>
+                      <p className="text-amber-700/70 dark:text-amber-300/70 text-sm sm:text-base text-center">Processing image and running AI detection</p>
+                      <p className="text-amber-600/60 dark:text-amber-400/60 text-xs sm:text-sm">This may take a few seconds</p>
                     </div>
                   </div>
                 )}
@@ -176,6 +184,32 @@ export default function BroodPatternPage() {
       </main>
 
       <Footer />
+
+      {/* Custom Dialog Modal */}
+      {dialogOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setDialogOpen(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-xl border border-amber-200 dark:border-amber-700/50" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-full">
+                  <AlertCircle className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="font-heading font-semibold text-lg text-amber-900 dark:text-amber-100">{dialogContent.title}</h3>
+              </div>
+              <button onClick={() => setDialogOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-amber-800 dark:text-amber-200 mb-6">{dialogContent.message}</p>
+            <button
+              onClick={() => setDialogOpen(false)}
+              className="w-full px-4 py-2.5 bg-[#FFA95C] hover:bg-[#FF9A3C] text-white rounded-xl font-semibold transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
