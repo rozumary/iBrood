@@ -147,6 +147,21 @@ export default function OverallTrends() {
       }
     })
     setHealthTrendData(healthDataRaw.length > 0 ? healthDataRaw : [])
+
+    // Prepare queen cell data for chart (fallback to totalQueenCells if no maturityDistribution)
+    const queenCellDataRaw = queenAnalyses.slice(0, 10).reverse().map((analysis) => {
+      const dist = analysis.maturityDistribution || {}
+      // If no maturityDistribution, fallback to totalQueenCells as 'mature'
+      const hasDist = Object.keys(dist).length > 0
+      return {
+        date: new Date(analysis.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        mature: hasDist ? (dist.mature || 0) : (analysis.totalQueenCells || 0),
+        semiMature: hasDist ? (dist['semi-mature'] || 0) : 0,
+        capped: hasDist ? (dist.capped || 0) : 0,
+        open: hasDist ? (dist.open || 0) : 0
+      }
+    })
+    setQueenCellData(queenCellDataRaw.length > 0 ? queenCellDataRaw : [])
   }
 
   // Bee-themed chart colors
@@ -237,9 +252,16 @@ export default function OverallTrends() {
           </ResponsiveContainer>
         ) : (
           <div className="h-[300px] flex items-center justify-center text-amber-600/70 bg-amber-50/50 rounded-xl">
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center justify-center">
+              <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mx-auto mb-3">
+                <ellipse cx="32" cy="32" rx="28" ry="18" fill="#FDE68A" />
+                <ellipse cx="32" cy="32" rx="18" ry="10" fill="#F59E0B" fillOpacity="0.5" />
+                <ellipse cx="32" cy="32" rx="8" ry="4" fill="#F59E0B" fillOpacity="0.8" />
+                <circle cx="32" cy="32" r="3" fill="#fff" />
+              </svg>
               <p className="font-medium">No queen cell analysis data yet</p>
               <p className="text-sm mt-1">Perform queen cell analyses to see trends</p>
+              <p className="text-xs mt-2 text-amber-500">Tip: Upload a hive frame image for queen cell detection!</p>
             </div>
           </div>
         )}

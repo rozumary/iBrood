@@ -78,7 +78,7 @@ export default function HiveHealthCard() {
         </div>
 
         {/* Status Indicators */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl border border-amber-200/50 dark:border-amber-700/50">
             <CheckCircle className={`w-6 h-6 ${healthData.queenCellInfo.count > 0 ? 'text-sky-500' : 'text-amber-400'}`} />
             <div>
@@ -87,15 +87,6 @@ export default function HiveHealthCard() {
                 {healthData.queenCellInfo.count > 0 
                   ? `${healthData.queenCellInfo.mature > 0 ? healthData.queenCellInfo.mature + ' Mature' : healthData.queenCellInfo.count + ' Detected'}`
                   : 'No data'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl border border-amber-200/50 dark:border-amber-700/50">
-            <Zap className={`w-6 h-6 ${healthData.broodCoverage > 0 ? 'text-amber-500' : 'text-amber-400'}`} />
-            <div>
-              <p className="text-xs text-amber-700/70 dark:text-amber-400/70">Brood Coverage</p>
-              <p className="font-semibold text-amber-900 dark:text-amber-100">
-                {healthData.broodCoverage > 0 ? `${healthData.broodCoverage}%` : 'No data'}
               </p>
             </div>
           </div>
