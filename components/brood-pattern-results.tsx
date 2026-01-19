@@ -226,15 +226,15 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
       {/* Individual Counts - ONLY 3 CLASSES */}
       {results.counts && (
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-orange-100 rounded-lg border border-orange-300 p-4 text-center">
+          <div className="bg-orange-100 rounded-xl border border-orange-300 p-6 text-center flex flex-col items-center justify-center min-h-[100px]">
             <p className="text-3xl font-bold text-orange-600">{results.counts.egg}</p>
             <p className="text-sm text-orange-700 font-medium">Eggs</p>
           </div>
-          <div className="bg-cyan-100 rounded-lg border border-cyan-300 p-4 text-center">
+          <div className="bg-cyan-100 rounded-xl border border-cyan-300 p-6 text-center flex flex-col items-center justify-center min-h-[100px]">
             <p className="text-3xl font-bold text-cyan-600">{results.counts.larva}</p>
             <p className="text-sm text-cyan-700 font-medium">Larvae</p>
           </div>
-          <div className="bg-fuchsia-100 rounded-lg border border-fuchsia-300 p-4 text-center">
+          <div className="bg-fuchsia-100 rounded-xl border border-fuchsia-300 p-6 text-center flex flex-col items-center justify-center min-h-[100px]">
             <p className="text-3xl font-bold text-fuchsia-600">{results.counts.pupa}</p>
             <p className="text-sm text-fuchsia-700 font-medium">Pupae</p>
           </div>

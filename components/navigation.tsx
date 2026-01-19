@@ -38,7 +38,7 @@ export default function Navigation() {
 
   return (
     <nav className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 border-b border-amber-200/50 dark:border-amber-700/30 sticky top-0 z-50 backdrop-blur-sm">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+      <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
             <div className="p-1.5 sm:p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
@@ -61,7 +61,7 @@ export default function Navigation() {
                 href={link.href}
                 className={`px-4 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm ${
                   pathname === link.href 
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md" 
+                    ? "bg-[#FFA95C] text-white shadow-md" 
                     : "text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:-translate-y-0.5"
                 }`}
               >
@@ -120,7 +120,7 @@ export default function Navigation() {
                 onClick={() => setMobileOpen(false)}
                 className={`px-4 py-3 rounded-xl transition-all duration-300 font-medium ${
                   pathname === link.href 
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md" 
+                    ? "bg-[#FFA95C] text-white shadow-md" 
                     : "text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
                 }`}
               >
@@ -142,7 +142,7 @@ export default function Navigation() {
       
       {/* Logout Toast Notification */}
       {showLogoutToast && (
-        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
+        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-[#FFA95C] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
           <Check className="w-5 h-5" />
           <span className="font-medium text-sm sm:text-base">Logged out successfully!</span>
         </div>

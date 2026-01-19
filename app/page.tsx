@@ -10,7 +10,7 @@ export default function LandingPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <header className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 border-b border-amber-200/50 dark:border-amber-700/30 backdrop-blur-sm">
-        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-md">
               <img src="/IMG_3630.png" alt="iBrood" className="w-7 h-7" />
@@ -21,7 +21,7 @@ export default function LandingPage() {
             <Link href="/login" className="px-3 sm:px-5 py-2 sm:py-2.5 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-all duration-300 font-medium hover:-translate-y-0.5 text-sm sm:text-base">
               Log In
             </Link>
-            <Link href="/signup" className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 rounded-xl transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm sm:text-base">
+            <Link href="/signup" className="px-3 sm:px-5 py-2 sm:py-2.5 bg-[#FFA95C] text-white hover:bg-[#ff9b40] rounded-xl transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm sm:text-base">
               Sign Up
             </Link>
           </div>
@@ -30,20 +30,20 @@ export default function LandingPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24 text-center">
+        <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full text-amber-700 dark:text-amber-300 text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             AI-Powered Beekeeping Analysis
           </div>
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-amber-900 dark:text-amber-100 mb-6 leading-tight">
             Intelligent Beekeeping<br />
-            <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">with iBrood</span>
+            <span className="text-[#FFA95C]">with iBrood</span>
           </h1>
           <p className="text-base sm:text-xl text-amber-700/80 dark:text-amber-300/80 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-4">
             Analyze queen cell development and brood patterns using computer vision technology, and keep your hive healthy with actionable insights and timely recommendations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
-            <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
+            <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-[#FFA95C] text-white rounded-2xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
               <Bee className="w-5 h-5" /> Get Started Free
             </Link>
             <Link href="/login" className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-amber-300 dark:border-amber-600 bg-white/80 dark:bg-gray-800/80 rounded-2xl font-semibold hover:bg-amber-50 dark:hover:bg-gray-700/80 hover:border-amber-400 transition-all duration-300 text-base sm:text-lg text-amber-700 dark:text-amber-300">
@@ -54,7 +54,7 @@ export default function LandingPage() {
 
         {/* Features Section */}
         <section className="bg-gradient-to-b from-amber-100/50 to-orange-100/50 dark:from-gray-800/50 dark:to-gray-900/50 py-16 sm:py-24">
-          <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl sm:text-4xl font-heading font-bold text-center mb-4 text-amber-900 dark:text-amber-100">Why Choose iBrood?</h2>
             <p className="text-center text-amber-700/70 dark:text-amber-300/70 mb-12 sm:mb-16 max-w-2xl mx-auto px-4">Advanced AI technology designed specifically for beekeepers who want the best for their colonies.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
@@ -84,7 +84,7 @@ export default function LandingPage() {
         </section>
 
         {/* Accuracy Section */}
-        <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+        <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
           <div className="bg-gradient-to-br from-white to-amber-50/50 dark:from-gray-800 dark:to-gray-900/50 rounded-3xl p-6 sm:p-10 border border-amber-200/50 dark:border-amber-700/30 shadow-sm">
             <div className="flex items-center justify-center gap-2 mb-4">
               <BarChart3 className="w-6 sm:w-8 h-6 sm:h-8 text-amber-600" />
@@ -136,7 +136,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
+        <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
           <div className="p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-2xl w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-6 flex items-center justify-center">
             <Hexagon className="w-8 sm:w-10 h-8 sm:h-10 text-amber-600" />
           </div>
@@ -146,7 +146,7 @@ export default function LandingPage() {
           <p className="text-base sm:text-lg text-amber-700/80 dark:text-amber-300/80 mb-8 sm:mb-10 max-w-2xl mx-auto px-4">
             Join thousands of beekeepers using iBrood for smarter hive management and healthier colonies.
           </p>
-          <Link href="/signup" className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
+          <Link href="/signup" className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-[#FFA95C] text-white rounded-2xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 text-base sm:text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
             Try this Model by Signing Up
           </Link>
         </section>

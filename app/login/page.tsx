@@ -92,7 +92,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full px-4 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-lg"
+              className="w-full px-4 py-4 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-lg"
             >
               Log In
             </button>
@@ -113,7 +113,7 @@ export default function LoginPage() {
       
       {/* Toast Notification */}
       {showToast && (
-        <div className={`fixed bottom-8 right-8 ${toastMessage.type === 'success' ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-red-500 to-red-600'} text-white px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50`}>
+        <div className={`fixed bottom-8 right-8 ${toastMessage.type === 'success' ? 'bg-[#FFA95C]' : 'bg-red-500'} text-white px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50`}>
           {toastMessage.type === 'success' ? <Check className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
           <span className="font-medium">{toastMessage.message}</span>
         </div>

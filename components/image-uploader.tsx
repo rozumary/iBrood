@@ -135,7 +135,7 @@ export default function ImageUploader({ onImageCapture }: ImageUploaderProps) {
         <div className="flex gap-4">
           <button
             onClick={handleAnalyze}
-            className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-4 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 inline-flex items-center justify-center gap-2"
           >
             <Search className="w-5 h-5" /> Analyze Image
           </button>

@@ -9,7 +9,7 @@ export default function ContactPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30">
       <Navigation />
 
-      <main style={{ flex: '1' }} className="max-w-4xl mx-auto px-6 py-12 w-full">
+      <main style={{ flex: '1' }} className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full text-amber-700 text-sm font-medium mb-4">
@@ -122,7 +122,7 @@ export default function ContactPage() {
                   e.preventDefault()
                   window.location.href = 'mailto:rosedecastromontesa@gmail.com'
                 }}
-                className="w-full px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                className="w-full px-6 py-3.5 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
               >
                 Send Message
               </button>

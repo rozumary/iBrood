@@ -16,7 +16,7 @@ export default function AuthNavigation() {
 
   return (
     <nav className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 border-b border-amber-200/50 dark:border-amber-700/30 backdrop-blur-sm">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
             <div className="p-1.5 sm:p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
@@ -50,7 +50,7 @@ export default function AuthNavigation() {
             </Link>
             <Link
               href="/signup"
-              className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 rounded-xl transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm sm:text-base"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 bg-[#FFA95C] text-white hover:bg-[#ff9b40] rounded-xl transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm sm:text-base"
             >
               Sign Up
             </Link>
