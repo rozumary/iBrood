@@ -129,12 +129,6 @@ export default function OverallTrends() {
         icon: <CheckCircle className="w-5 h-5 text-orange-500" /> 
       },
       { 
-        label: "Avg. Brood Coverage", 
-        value: avgBroodCoverage > 0 ? `${avgBroodCoverage}%` : "--", 
-        change: avgBroodCoverage >= 80 ? "Very healthy" : avgBroodCoverage >= 60 ? "Healthy" : avgBroodCoverage > 0 ? "Monitor" : "No data",
-        icon: <CheckCircle className="w-5 h-5 text-amber-600" /> 
-      },
-      { 
         label: "Queen Cells Detected", 
         value: totalQueenCells.toString(), 
         change: "Total",
@@ -177,7 +171,7 @@ export default function OverallTrends() {
   return (
     <div className="space-y-8">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
