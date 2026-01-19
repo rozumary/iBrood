@@ -179,7 +179,7 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
       </div>
 
       {/* Health Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface rounded-lg border border-border p-6">
           <div className="flex items-center gap-2 mb-3">
             <Heart className="w-5 h-5 text-accent" />
