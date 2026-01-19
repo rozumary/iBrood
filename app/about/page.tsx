@@ -44,7 +44,7 @@ export default function AboutPage() {
             About Us
           </h1>
           <p className="text-lg text-amber-700/80 max-w-2xl mx-auto">
-            We're BSCS 4A students who love bees and tech, building tools to help beekeepers care for their hives smarter.
+            We’re BSCS 4AIS students who love bees and tech, building smart tools to help beekeepers care for their hives in a smarter way.
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export default function AboutPage() {
         <div className="bg-gradient-to-br from-amber-100/50 to-orange-100/50 rounded-2xl border border-amber-200/50 p-8 text-center">
           <h2 className="text-2xl font-heading font-bold text-amber-900 mb-4">Our Mission</h2>
           <p className="text-amber-700/80 leading-relaxed max-w-3xl mx-auto">
-            The goal is to provide beekeepers with smart, easy-to-use tools that, by using Artificial Intelligence and Computer Vision Technology, will assess hive health, forecast the growth of queen cells, and maintain the colonies of bees.
+            The goal is to provide beekeepers with smart, easy-to-use tools that use Artificial Intelligence and Computer Vision technology to assess hive health, forecast queen cell growth, and maintain healthy bee colonies.
           </p>
         </div>
       </main>
