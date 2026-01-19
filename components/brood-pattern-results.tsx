@@ -196,19 +196,31 @@ export default function BroodPatternResults({ results }: BroodPatternResultsProp
             <Activity className="w-5 h-5 text-accent" />
             <h3 className="font-semibold text-sm text-muted">Risk Level</h3>
           </div>
-          <p className={`text-xl font-bold px-3 py-1 rounded-full w-fit capitalize ${getRiskColor(results.riskLevel)}`}>
+          <p className={`text-xl font-bold px-3 py-1 rounded-full w-fit capitalize ${getRiskColor(results.riskLevel)}`}> 
             {results.riskLevel || 'Unknown'}
           </p>
         </div>
 
-        <div className="bg-surface rounded-lg border border-border p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-5 h-5 text-accent" />
-            <h3 className="font-semibold text-sm text-muted">Total Detected</h3>
+        {/* Only show Brood Coverage if health.total_cells is present and greater than sum of brood cells */}
+        {(results.totalDetections && results.broodCoverage !== undefined && results.broodCoverage !== null && results.broodCoverage !== 100) ? (
+          <div className="bg-surface rounded-lg border border-border p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-5 h-5 text-accent" />
+              <h3 className="font-semibold text-sm text-muted">Avg. Brood Coverage</h3>
+            </div>
+            <p className="text-4xl font-bold text-text-primary">{results.broodCoverage}%</p>
+            <p className="text-xs text-muted mt-2">Very healthy</p>
           </div>
-          <p className="text-4xl font-bold text-text-primary">{totalDetected}</p>
-          <p className="text-xs text-muted mt-2">Cells analyzed</p>
-        </div>
+        ) : (
+          <div className="bg-surface rounded-lg border border-border p-6 opacity-50">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-5 h-5 text-accent" />
+              <h3 className="font-semibold text-sm text-muted">Avg. Brood Coverage</h3>
+            </div>
+            <p className="text-4xl font-bold text-text-primary">—</p>
+            <p className="text-xs text-muted mt-2">Data unavailable</p>
+          </div>
+        )}
       </div>
 
       {/* Individual Counts - ONLY 3 CLASSES */}
