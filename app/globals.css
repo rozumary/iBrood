@@ -158,6 +158,15 @@
   .text-info {
     @apply text-sky-600;
   }
+
+  /* Remove any checkmark, icon, or custom list-style from recommendations list */
+  .recommendations-list {
+    list-style: none !important;
+  }
+  .recommendations-list li::before {
+    content: none !important;
+    display: none !important;
+  }
   .bg-info {
     @apply bg-sky-600;
   }

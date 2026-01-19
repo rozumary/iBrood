@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-amber-200/50 dark:border-amber-700/30 pt-6 text-center text-xs text-amber-600/60 dark:text-amber-400/60">
-          <p>© 2026 iBrood. All rights reserved. | BSCS 4A Thesis Project</p>
+          <p>© 2026 iBrood. All rights reserved. | BSCS 4AIS Thesis Project</p>
         </div>
       </div>
     </footer>
