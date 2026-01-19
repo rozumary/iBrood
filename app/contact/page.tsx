@@ -1,10 +1,28 @@
 "use client"
 
+import { useState } from "react"
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  })
+
+  const handleSendEmail = (e: React.FormEvent) => {
+    e.preventDefault()
+    const subjectText = formData.subject 
+      ? `iBrood - ${formData.subject}` 
+      : 'iBrood Support Request'
+    const bodyText = `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+    
+    window.location.href = `mailto:rosedecastromontesa@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30">
       <Navigation />
@@ -64,7 +82,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-sm text-amber-600 font-medium">Location</p>
-                    <p className="text-amber-900">Santa Rosa, Laguna, Philippines</p>
+                    <p className="text-amber-900">Mandaluyong City, Metro Manila</p>
                   </div>
                 </div>
               </div>
@@ -81,11 +99,13 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm">
             <h2 className="text-xl font-heading font-bold text-amber-900 mb-6">Send a Message</h2>
-            <form className="space-y-4">
+            <form onSubmit={handleSendEmail} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-amber-800 mb-2">Name</label>
                 <input
                   type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full px-4 py-3 border-2 border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 text-amber-900 placeholder-amber-400"
                   placeholder="Your name"
                 />
@@ -94,34 +114,38 @@ export default function ContactPage() {
                 <label className="block text-sm font-semibold text-amber-800 mb-2">Email</label>
                 <input
                   type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   className="w-full px-4 py-3 border-2 border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 text-amber-900 placeholder-amber-400"
                   placeholder="your@email.com"
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-amber-800 mb-2">Subject</label>
-                <select className="w-full px-4 py-3 border-2 border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 text-amber-900">
+                <select 
+                  value={formData.subject}
+                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                  className="w-full px-4 py-3 border-2 border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 text-amber-900"
+                >
                   <option value="">Select a topic</option>
-                  <option value="bug">Bug Report</option>
-                  <option value="feature">Feature Request</option>
-                  <option value="question">General Question</option>
-                  <option value="other">Other</option>
+                  <option value="Bug Report">Bug Report</option>
+                  <option value="Feature Request">Feature Request</option>
+                  <option value="General Question">General Question</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-amber-800 mb-2">Message</label>
                 <textarea
                   rows={4}
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
                   className="w-full px-4 py-3 border-2 border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 text-amber-900 placeholder-amber-400 resize-none"
                   placeholder="Describe your issue or question..."
                 />
               </div>
               <button
                 type="submit"
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.location.href = 'mailto:rosedecastromontesa@gmail.com'
-                }}
                 className="w-full px-6 py-3.5 bg-[#FFA95C] text-white rounded-xl font-semibold hover:bg-[#ff9b40] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
               >
                 Send Message

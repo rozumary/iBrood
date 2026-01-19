@@ -9,19 +9,22 @@ const researchers = [
     name: "Rosemarie Montesa",
     age: 22,
     location: "Mandaluyong City, Metro Manila",
-    role: "Full Stack Engineer"
+    role: "Full Stack Engineer",
+    image: "/rose.jpg"
   },
   {
     name: "Renalyn Pino",
     age: 21,
     location: "Calauan, Laguna",
-    role: "Researcher"
+    role: "Researcher",
+    image: "/renalyn.jpg"
   },
   {
     name: "Betina Grace Lat",
     age: 23,
     location: "Pila, Laguna",
-    role: "Researcher"
+    role: "Researcher",
+    image: "/betina.jpg"
   }
 ]
 
@@ -69,9 +72,17 @@ export default function AboutPage() {
               key={index} 
               className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center"
             >
-              <div className="w-20 h-20 bg-[#FFA95C] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                {researcher.name.split(' ').map(n => n[0]).join('')}
-              </div>
+              {researcher.image ? (
+                <img 
+                  src={researcher.image} 
+                  alt={researcher.name}
+                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-amber-200"
+                />
+              ) : (
+                <div className="w-20 h-20 bg-[#FFA95C] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+                  {researcher.name.split(' ').map(n => n[0]).join('')}
+                </div>
+              )}
               <h3 className="font-heading font-bold text-lg text-amber-900 mb-1">{researcher.name}</h3>
               <p className="text-sm text-amber-600 font-medium mb-2">{researcher.role}</p>
               <p className="text-sm text-amber-700/70 mb-1">{researcher.age} years old</p>
