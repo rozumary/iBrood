@@ -142,6 +142,7 @@ export default function OverallTrends() {
       healthScore: analysis.healthScore || 0,
       broodCoverage: analysis.broodCoverage || 0
     }))
+    console.log('Health Trend Data:', healthData)
     setHealthTrendData(healthData.length > 0 ? healthData : [])
 
     // Generate queen cell data from queen analyses
@@ -171,7 +172,7 @@ export default function OverallTrends() {
   return (
     <div className="space-y-8">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
