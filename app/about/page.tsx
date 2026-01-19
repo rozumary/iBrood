@@ -98,9 +98,7 @@ export default function AboutPage() {
         <div className="bg-gradient-to-br from-amber-100/50 to-orange-100/50 rounded-2xl border border-amber-200/50 p-8 text-center">
           <h2 className="text-2xl font-heading font-bold text-amber-900 mb-4">Our Mission</h2>
           <p className="text-amber-700/80 leading-relaxed max-w-3xl mx-auto">
-            To empower beekeepers with intelligent, accessible tools that help monitor hive health, 
-            predict queen cell development, and ensure thriving bee colonies through the power of 
-            artificial intelligence and computer vision technology.
+            The goal is to provide beekeepers with smart, easy-to-use tools that, by using Artificial Intelligence and Computer Vision Technology, will assess hive health, forecast the growth of queen cells, and maintain the colonies of bees.
           </p>
         </div>
       </main>
