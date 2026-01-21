@@ -519,6 +519,14 @@ def process_brood_detection_optimized(results, original_image, optimized_image, 
     font_scale = 0.35
     font_thickness = 1
     
+    # Estimate total detectable cells using grid approach
+    img_height, img_width = img_array.shape[:2]
+    # Assume average cell size ~40x40 pixels (adjust based on your images)
+    avg_cell_size = 40
+    grid_cols = img_width // avg_cell_size
+    grid_rows = img_height // avg_cell_size
+    estimated_total_cells = grid_cols * grid_rows
+    
     for result in results:
         if result.boxes is not None:
             for idx, box in enumerate(result.boxes):
@@ -570,36 +578,65 @@ def process_brood_detection_optimized(results, original_image, optimized_image, 
     Image.fromarray(img_with_labels).save(buf2, format="PNG", optimize=True)
     img_with_labels_b64 = base64.b64encode(buf2.getvalue()).decode()
     
-    # Health assessment
+    # Health assessment with DATA-DRIVEN brood coverage
     total_brood = sum(counts.values())
-    health_status, health_score, recommendations = "UNKNOWN", 0, []
+    health_status, health_score, brood_coverage, recommendations = "UNKNOWN", 0, 0, []
     
     if total_brood > 0:
+        # DATA-DRIVEN: Brood Coverage = (Detected Brood / Estimated Total Cells) × 100
+        brood_coverage = min(100, round((total_brood / estimated_total_cells) * 100, 1))
+        
         egg_r = counts["egg"] / total_brood
         larva_r = counts["larva"] / total_brood
         pupa_r = counts["pupa"] / total_brood
         
-        if egg_r > 0.1 and larva_r > 0.2 and pupa_r > 0.2:
-            health_status, health_score = "EXCELLENT", 95
+        # Base score for having brood present (30 points)
+        base_score = 30
+        
+        # Score for total brood count (max 25 points)
+        count_score = min(25, int(total_brood * 0.8))
+        
+        # Score for brood coverage (max 20 points)
+        coverage_score = min(20, int(brood_coverage * 2))
+        
+        # Score for balanced distribution (max 25 points)
+        ideal = 1/3
+        balance_penalty = abs(egg_r - ideal) + abs(larva_r - ideal) + abs(pupa_r - ideal)
+        balance_score = max(0, 25 - int(balance_penalty * 40))
+        
+        # Penalty for missing stages (only if NO eggs at all - critical issue)
+        missing_penalty = 15 if counts["egg"] == 0 else 0
+        
+        health_score = max(0, min(100, base_score + count_score + coverage_score + balance_score - missing_penalty))
+        
+        # Assign status based on score
+        if health_score >= 85:
+            health_status = "EXCELLENT"
             recommendations.append("Colony is thriving with excellent brood pattern")
-        elif (egg_r > 0 or larva_r > 0.3) and pupa_r > 0.1:
-            health_status, health_score = "GOOD", 80
+        elif health_score >= 70:
+            health_status = "GOOD"
             recommendations.append("Healthy brood pattern - continue regular monitoring")
-        elif total_brood > 10:
-            health_status, health_score = "FAIR", 60
+        elif health_score >= 50:
+            health_status = "FAIR"
             recommendations.append("Moderate brood presence - check queen activity")
         else:
-            health_status, health_score = "POOR", 30
-            recommendations.append("Low brood count - inspect for queen issues")
+            health_status = "POOR"
+            recommendations.append("Try capturing the whole frame to detect more cells or ensure image is clear")
         
+        # Additional recommendations
         if counts["egg"] == 0 and total_brood > 0:
             recommendations.append("No eggs detected - verify queen is laying")
+        if counts["larva"] > counts["pupa"] * 3 and counts["pupa"] > 0:
+            recommendations.append("High larva count - ensure adequate food supply")
+        if counts["pupa"] == 0 and counts["larva"] > 0:
+            recommendations.append("No pupae detected - monitor for development issues")
     
     return {
         "detections": detections,
         "count": len(detections),
         "counts": counts,
-        "health": {"status": health_status, "score": health_score, "total_brood": total_brood, "total_cells": total_brood},
+        "health": {"status": health_status, "score": health_score, "total_brood": total_brood, "total_cells": estimated_total_cells},
+        "broodCoverage": brood_coverage,
         "recommendations": recommendations or ["Continue regular monitoring"],
         "annotated_image": f"data:image/png;base64,{img_no_labels_b64}",
         "annotated_image_with_labels": f"data:image/png;base64,{img_with_labels_b64}"

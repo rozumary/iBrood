@@ -41,6 +41,11 @@ export default function TryModelPage() {
       return
     }
     
+    if ((role === 'researcher' || role === 'student') && !alias.trim()) {
+      setDuplicateWarning("Please enter your display name.")
+      return
+    }
+    
     if (role === 'student' && !studentId.trim()) {
       setDuplicateWarning("Please enter your Student ID.")
       return
@@ -106,18 +111,18 @@ export default function TryModelPage() {
         </div>
       )}
       
-      <div className="bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-12 max-w-xl w-full text-center scale-110">
-        <h1 className="text-3xl font-bold mb-3 text-amber-900 dark:text-amber-100">Explore Model</h1>
-        <p className="mb-7 text-amber-700/80 dark:text-amber-300/80 text-lg">Initialize your session to explore the model. No account or sign-up required.</p>
+      <div className="bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-8 md:p-10 max-w-lg w-full text-center">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-amber-900 dark:text-amber-100">Explore Model</h1>
+        <p className="mb-6 text-amber-700/80 dark:text-amber-300/80 text-base md:text-lg">Initialize your session to explore the model. No account or sign-up required.</p>
         {duplicateWarning && (
           <div className="mb-4 p-3 bg-amber-100 text-amber-800 rounded-lg border border-amber-300 text-sm text-left">
             {duplicateWarning}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-7 text-left">
+        <form onSubmit={handleSubmit} className="space-y-5 text-left">
           {role === 'beekeeper' && (
             <div>
-              <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-lg">
+              <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-base md:text-lg">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -125,25 +130,27 @@ export default function TryModelPage() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="e.g. Juan Dela Cruz"
-                className="w-full px-5 py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-lg"
+                className="w-full px-4 py-2.5 md:px-5 md:py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-base md:text-lg"
                 required
               />
             </div>
           )}
           <div>
-            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-lg">
+            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-base md:text-lg">
               {role === 'beekeeper' ? 'Bee Farm Name' : 'Display Name'}
+              {(role === 'researcher' || role === 'student') && <span className="text-red-500"> *</span>}
             </label>
             <input
               type="text"
               value={alias}
               onChange={e => setAlias(e.target.value)}
               placeholder={role === 'beekeeper' ? 'e.g. Lucido Bee Farm' : 'e.g. Juan Dela Cruz'}
-              className="w-full px-5 py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-lg"
+              className="w-full px-4 py-2.5 md:px-5 md:py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-base md:text-lg"
+              required={role === 'researcher' || role === 'student'}
             />
           </div>
           <div>
-            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-lg">Role</label>
+            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-base md:text-lg">Role</label>
             <select
               value={role}
               onChange={e => {
@@ -156,7 +163,7 @@ export default function TryModelPage() {
                   setPurpose('testing')
                 }
               }}
-              className="w-full px-5 py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-lg"
+              className="w-full px-4 py-2.5 md:px-5 md:py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-base md:text-lg"
             >
               {roles.map(r => (
                 <option key={r.value} value={r.value}>{r.label}</option>
@@ -165,7 +172,7 @@ export default function TryModelPage() {
           </div>
           {(role === 'researcher' || role === 'student') && (
             <div>
-              <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-lg">
+              <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-base md:text-lg">
                 {role === 'student' ? 'Student ID' : 'Researcher ID'} 
                 {role === 'student' && <span className="text-red-500"> *</span>}
                 {role === 'researcher' && <span className="text-amber-400 text-xs"> (optional)</span>}
@@ -175,24 +182,24 @@ export default function TryModelPage() {
                 value={studentId}
                 onChange={e => setStudentId(e.target.value)}
                 placeholder={role === 'student' ? 'e.g. 2021-12345' : 'e.g. RES-2024-001'}
-                className="w-full px-5 py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-lg"
+                className="w-full px-4 py-2.5 md:px-5 md:py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-base md:text-lg"
                 required={role === 'student'}
               />
             </div>
           )}
           <div>
-            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-lg">Purpose</label>
+            <label className="block text-amber-900 dark:text-amber-100 font-medium mb-1 text-base md:text-lg">Purpose</label>
             <select
               value={purpose}
               onChange={e => setPurpose(e.target.value)}
-              className="w-full px-5 py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-lg"
+              className="w-full px-4 py-2.5 md:px-5 md:py-3 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-100 text-base md:text-lg"
             >
               {availablePurposes.map(p => (
                 <option key={p.value} value={p.value}>{p.label}</option>
               ))}
             </select>
           </div>
-          <button type="submit" className="w-full bg-[#FFA95C] text-white font-semibold py-3 rounded-xl hover:bg-[#FFA95C]/80 transition-all text-lg shadow-lg">Explore Model</button>
+          <button type="submit" className="w-full bg-[#FFA95C] text-white font-semibold py-2.5 md:py-3 rounded-xl hover:bg-[#FFA95C]/80 transition-all text-base md:text-lg shadow-lg">Explore Model</button>
         </form>
       </div>
     </div>

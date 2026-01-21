@@ -14,11 +14,17 @@ export default function ModelExperimentationPage() {
     // Fetch the list of folders from the API route
     fetch("/api/models")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch model folders")
+        if (!res.ok) {
+          setError("Failed to fetch model folders")
+          return { folders: [] }
+        }
         return res.json()
       })
-      .then((data) => setFolders(data.folders))
-      .catch((err) => setError(err.message))
+      .then((data) => setFolders(data.folders || []))
+      .catch((err) => {
+        console.error(err)
+        setError("Failed to fetch model folders")
+      })
   }, [])
 
   const handleFolderClick = (folderName: string) => {

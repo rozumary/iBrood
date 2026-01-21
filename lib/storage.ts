@@ -275,13 +275,13 @@ export const getOverallHealthData = () => {
   const latestQueen = getLatestAnalysis()
   const latestBrood = getLatestBroodAnalysis()
   
-  // Calculate combined health score
   let healthScore = 0
   let healthStatus = 'Unknown'
   let queenCellInfo = { count: 0, mature: 0 }
   let broodCoverage = 0
   let alert = { title: 'No Recent Data', message: 'Perform an analysis to see health overview' }
   
+  // Extract queen cell info
   if (latestQueen) {
     const dist = latestQueen.maturityDistribution || {}
     queenCellInfo = {
@@ -290,27 +290,84 @@ export const getOverallHealthData = () => {
     }
   }
   
-  if (latestBrood) {
+  // Calculate combined health score from both analyses
+  if (latestBrood && latestQueen) {
+    // Both analyses available - weighted average (70% brood, 30% queen)
+    const broodScore = latestBrood.healthScore || 0
+    
+    // Queen score based on maturity distribution
+    let queenScore = 0
+    const dist = latestQueen.maturityDistribution || {}
+    const total = latestQueen.totalQueenCells || 0
+    const failed = dist.failed || 0
+    const mature = dist.mature || 0
+    
+    if (total > 0) {
+      const failureRate = failed / total
+      const maturityRate = mature / total
+      
+      if (failureRate > 0.5) queenScore = 40 // High failure
+      else if (failureRate > 0.3) queenScore = 60 // Moderate failure
+      else if (mature > 3) queenScore = 70 // Too many mature (swarm risk)
+      else if (maturityRate > 0.3 && maturityRate < 0.7) queenScore = 90 // Good balance
+      else queenScore = 80 // Normal
+    } else {
+      queenScore = 85 // No queen cells is usually good
+    }
+    
+    healthScore = Math.round(broodScore * 0.7 + queenScore * 0.3)
+    healthStatus = latestBrood.healthStatus || 'Unknown'
+    broodCoverage = latestBrood.broodCoverage || 0
+    
+    alert = {
+      title: healthScore >= 80 ? 'Colony Thriving' : healthScore >= 60 ? 'Monitor Closely' : 'Action Needed',
+      message: latestBrood.recommendations?.[0] || latestQueen.recommendations?.[0] || 'Continue monitoring'
+    }
+  } else if (latestBrood) {
+    // Only brood data
     healthScore = latestBrood.healthScore || 0
     healthStatus = latestBrood.healthStatus || 'Unknown'
     broodCoverage = latestBrood.broodCoverage || 0
     
-    if (latestBrood.recommendations && latestBrood.recommendations.length > 0) {
-      alert = {
-        title: healthStatus === 'EXCELLENT' ? 'Colony Thriving' : 'Monitor Closely',
-        message: latestBrood.recommendations[0]
-      }
+    alert = {
+      title: healthScore >= 80 ? 'Colony Thriving' : 'Monitor Closely',
+      message: latestBrood.recommendations?.[0] || 'Continue monitoring'
     }
   } else if (latestQueen) {
-    // Estimate from queen data if no brood data
-    healthScore = latestQueen.totalQueenCells > 0 ? 70 : 50
-    healthStatus = latestQueen.totalQueenCells > 0 ? 'Good' : 'Fair'
+    // Only queen data - calculate score from queen cells
+    const dist = latestQueen.maturityDistribution || {}
+    const total = latestQueen.totalQueenCells || 0
+    const failed = dist.failed || 0
+    const mature = dist.mature || 0
     
-    if (latestQueen.recommendations && latestQueen.recommendations.length > 0) {
-      alert = {
-        title: 'Queen Cell Activity',
-        message: latestQueen.recommendations[0]
+    if (total === 0) {
+      healthScore = 85
+      healthStatus = 'GOOD'
+    } else {
+      const failureRate = failed / total
+      const maturityRate = mature / total
+      
+      if (failureRate > 0.5) {
+        healthScore = 45
+        healthStatus = 'POOR'
+      } else if (failureRate > 0.3) {
+        healthScore = 65
+        healthStatus = 'FAIR'
+      } else if (mature > 3) {
+        healthScore = 70
+        healthStatus = 'FAIR'
+      } else if (maturityRate > 0.3 && maturityRate < 0.7) {
+        healthScore = 88
+        healthStatus = 'EXCELLENT'
+      } else {
+        healthScore = 78
+        healthStatus = 'GOOD'
       }
+    }
+    
+    alert = {
+      title: 'Queen Cell Activity',
+      message: latestQueen.recommendations?.[0] || 'Continue monitoring'
     }
   }
   

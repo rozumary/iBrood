@@ -105,7 +105,13 @@ export default function Navigation() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="p-2 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-300"
             >
-              {mobileOpen ? <X size={24} className="text-amber-700 dark:text-amber-300" /> : <Menu size={24} className="text-amber-700 dark:text-amber-300" />}
+              {mobileOpen ? (
+                <X size={24} className="text-amber-700 dark:text-amber-300" />
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-700 dark:text-amber-300">
+                  <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              )}
             </button>
           </div>
         </div>

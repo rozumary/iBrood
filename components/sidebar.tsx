@@ -51,6 +51,7 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
   const pathname = usePathname();
   const { name, menu } = menuConfig[mode];
   const [open, setOpen] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   // Sidebar content
   const sidebarContent = (
@@ -58,10 +59,10 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
       style={{ background: sidebarColor }}
       className="flex flex-col h-full text-white w-auto transition-all duration-300 shadow-xl m-0 p-0"
     >
-      <div className="mb-8 flex items-center justify-center pt-6 gap-3">
-        <img src="/IMG_3630.png" alt="Logo" className="w-10 h-10 rounded-lg bg-[#FFA95C]" />
+      <div className="mb-8 flex items-center justify-center pt-6 gap-3 px-2">
+        <img src="/IMG_3630.png" alt="Logo" className="w-10 h-10 rounded-lg bg-[#FFA95C] flex-shrink-0" />
         <span
-          className="font-heading font-bold text-3xl tracking-tight"
+          className="font-heading font-bold text-2xl md:text-3xl tracking-tight"
           style={{ color: amber }}
         >
           {name}
@@ -89,12 +90,15 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
       </nav>
       {showExitSession && (
         <button
-          className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium transition-colors duration-200 text-lg bg-[#FFA95C] hover:bg-[#FFA95C]/80 text-white mb-4 mx-2"
+          className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium transition-colors duration-200 text-base md:text-lg bg-[#FFA95C] hover:bg-[#FFA95C]/80 text-white mb-4 mx-2 mt-auto"
           onClick={() => {
-            window.location.href = "/";
+            setIsExiting(true);
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1000);
           }}
         >
-          <LogOut className="w-6 h-6" />
+          <LogOut className="w-5 h-5 md:w-6 md:h-6" />
           Exit Session
         </button>
       )}
@@ -103,13 +107,23 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
 
   return (
     <>
+      {isExiting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-500 mx-auto mb-4"></div>
+            <p className="text-amber-900 dark:text-amber-100 font-semibold">Exiting session...</p>
+          </div>
+        </div>
+      )}
       {/* Mobile toggle button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-[#FFA95C] text-white rounded-full p-2 shadow-lg focus:outline-none"
+        className="md:hidden fixed top-[30px] right-4 z-50 bg-amber-100 dark:bg-amber-900/50 p-2 rounded-lg focus:outline-none"
         onClick={() => setOpen((v) => !v)}
         aria-label="Open sidebar"
       >
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><rect y="4" width="24" height="2" rx="1" fill="currentColor"/><rect y="11" width="24" height="2" rx="1" fill="currentColor"/><rect y="18" width="24" height="2" rx="1" fill="currentColor"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="#FFA95C" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
       </button>
       {/* Sidebar overlay for mobile */}
       <div

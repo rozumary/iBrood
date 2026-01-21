@@ -113,29 +113,31 @@ export default function Dashboard() {
     <div style={{ flex: '1' }} className="w-full px-4 sm:px-6 py-4 sm:py-8 flex-grow">
       <main>
         {/* Welcome Header */}
-        <div className="mb-8">
+        <div className="mb-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-[#FFA95C] rounded-xl shadow-lg">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="p-2.5 bg-[#FFA95C] rounded-xl shadow-lg flex-shrink-0">
                 <Hexagon className="w-7 h-7 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-heading font-bold text-amber-900 dark:text-amber-100">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-amber-900 dark:text-amber-100 break-words">
                   {getGreeting()}, {currentUser}!
                 </h1>
-                <p className="text-sm text-amber-600/70 dark:text-amber-400/70 flex items-center gap-1.5 mt-0.5">
-                  <Calendar className="w-4 h-4" /> {today}
+                <p className="text-xs sm:text-sm text-amber-600/70 dark:text-amber-400/70 flex items-center gap-1.5 mt-0.5">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" /> {today}
                 </p>
               </div>
             </div>
           </div>
-          <p className="text-amber-700/80 dark:text-amber-300/80 ml-14 hidden sm:block">
+          <p className="text-amber-700/80 dark:text-amber-300/80 ml-0 sm:ml-14 text-sm">
             {t('dashboard.assistant')}
           </p>
         </div>
 
+        <hr className="border-amber-300 dark:border-amber-700 mb-6" />
+
         {/* Main Actions - Big Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-2 sm:gap-2 mb-8">
           <Link
             href="/queen-cell"
             className="group p-6 sm:p-8 bg-[#FFA95C] dark:bg-[#e99548] backdrop-blur-sm rounded-2xl border-2 border-[#ffbe7a]/50 dark:border-[#d08540]/50 hover:border-white/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"

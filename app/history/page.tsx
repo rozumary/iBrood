@@ -122,7 +122,11 @@ export default function HistoryPage() {
                         </span>
                         <button 
                           type="button"
-                          onClick={() => deleteQueenAnalysis(analysis.id)} 
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            deleteQueenAnalysis(analysis.id)
+                          }} 
                           className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -184,7 +188,11 @@ export default function HistoryPage() {
                         </span>
                         <button 
                           type="button"
-                          onClick={() => deleteBroodAnalysis(analysis.id)} 
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            deleteBroodAnalysis(analysis.id)
+                          }} 
                           className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
