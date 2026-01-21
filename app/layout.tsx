@@ -1,10 +1,12 @@
 import type React from "react"
+
 import type { Metadata, Viewport } from "next"
 import { Space_Grotesk, Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TranslationProvider } from "@/lib/translation-context"
 import FontSizeInitializer from "@/components/font-size-initializer"
+import LayoutComponent from "@/components/layout-component";
 
 const _spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-heading" })
 const _spaceGroteskBody = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" })
@@ -51,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ margin: 0, padding: 0, height: '100%', width: '100%' }}>
       <head>
         <link rel="icon" href="/IMG_3630.png" type="image/png" />
         <link rel="icon" href="/IMG_3630.png" sizes="any" />
@@ -63,7 +65,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="192x192" href="/IMG_3630.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/IMG_3630.png" />
       </head>
-      <body className={`${_spaceGrotesk.variable} ${_spaceGroteskBody.variable} font-body bg-background text-foreground`}>
+      <body className={`${_spaceGrotesk.variable} ${_spaceGroteskBody.variable} font-body bg-background text-foreground`} style={{ margin: 0, padding: 0, minHeight: '100vh', width: '100vw', overflow: 'hidden' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -72,7 +74,9 @@ export default function RootLayout({
         >
           <TranslationProvider>
             <FontSizeInitializer />
-            {children}
+            <div className="flex min-h-screen h-screen w-screen overflow-hidden">
+              <LayoutComponent>{children}</LayoutComponent>
+            </div>
           </TranslationProvider>
         </ThemeProvider>
       </body>

@@ -343,7 +343,7 @@ def process_queen_detection(results, original_image):
 def process_brood_detection(results, original_image, show_labels=True):
     """Process YOLO results for Brood detection with health assessment"""
     detections = []
-    counts = {"egg": 0, "larva": 0, "pupa": 0}
+    counts = {"egg": 0, "larva": 0, "pupa": 0, "empty_comb": 0}
     
     img_array = np.array(original_image)
     if len(img_array.shape) == 3:
@@ -364,7 +364,7 @@ def process_brood_detection(results, original_image, show_labels=True):
                 x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
                 
                 class_name = BROOD_CLASS_NAMES.get(cls, 'unknown')
-                
+
                 detection = {
                     "confidence": conf,
                     "class": cls,
@@ -372,12 +372,14 @@ def process_brood_detection(results, original_image, show_labels=True):
                     "bbox": [x1, y1, x2, y2],
                     "attributes": BROOD_CLASS_ATTRIBUTES.get(class_name, {})
                 }
-                
+
                 detections.append(detection)
-                
+
                 # Update counts
                 if class_name in counts:
                     counts[class_name] += 1
+                elif class_name == "empty_comb":
+                    counts["empty_comb"] += 1
                 
                 # Draw THIN bounding box - clean modern style
                 color = BROOD_COLORS.get(cls, (255, 255, 255))
@@ -401,36 +403,55 @@ def process_brood_detection(results, original_image, show_labels=True):
     
     # Calculate health assessment
     total_brood = counts["egg"] + counts["larva"] + counts["pupa"]
+    # Try to get empty cells if available, otherwise fallback to only brood
     total_cells = total_brood
+    if "empty_comb" in counts:
+        total_cells += counts["empty_comb"]
     
     health_status = "UNKNOWN"
     health_score = 0
     recommendations = []
     
     if total_cells > 0:
-        # Calculate health based on brood distribution
-        egg_ratio = counts["egg"] / total_cells if total_cells > 0 else 0
-        larva_ratio = counts["larva"] / total_cells if total_cells > 0 else 0
-        pupa_ratio = counts["pupa"] / total_cells if total_cells > 0 else 0
-        
-        # Good brood pattern has balanced stages
-        if egg_ratio > 0.1 and larva_ratio > 0.2 and pupa_ratio > 0.2:
+        # Calculate brood coverage as a percentage
+        brood_coverage = (total_brood / total_cells) * 100
+
+        # Calculate health based on brood distribution (actual computation)
+        egg_ratio = counts["egg"] / total_brood if total_brood > 0 else 0
+        larva_ratio = counts["larva"] / total_brood if total_brood > 0 else 0
+        pupa_ratio = counts["pupa"] / total_brood if total_brood > 0 else 0
+
+        # Score for balanced distribution (max 60)
+        ideal = 1/3
+        balance_penalty = (
+            abs(egg_ratio - ideal) + abs(larva_ratio - ideal) + abs(pupa_ratio - ideal)
+        )
+        balance_score = max(0, 60 - int(balance_penalty * 90))
+
+        # Score for brood coverage (max 40 for 100% coverage)
+        brood_score = min(40, int(brood_coverage * 0.4))
+
+        # Penalty for missing any stage
+        missing_penalty = 0
+        if counts["egg"] == 0 or counts["larva"] == 0 or counts["pupa"] == 0:
+            missing_penalty = 15
+
+        health_score = max(0, balance_score + brood_score - missing_penalty)
+
+        # Assign status
+        if health_score >= 85:
             health_status = "EXCELLENT"
-            health_score = 95
             recommendations.append("Colony is thriving with excellent brood pattern")
-        elif (egg_ratio > 0 or larva_ratio > 0.3) and pupa_ratio > 0.1:
+        elif health_score >= 70:
             health_status = "GOOD"
-            health_score = 80
             recommendations.append("Healthy brood pattern - continue regular monitoring")
-        elif total_brood > 10:
+        elif health_score >= 50:
             health_status = "FAIR"
-            health_score = 60
             recommendations.append("Moderate brood presence - check queen activity")
         else:
             health_status = "POOR"
-            health_score = 30
             recommendations.append("Low brood count - inspect for queen issues")
-        
+
         # Additional recommendations based on counts
         if counts["egg"] == 0 and total_brood > 0:
             recommendations.append("No eggs detected - verify queen is laying")

@@ -52,10 +52,10 @@ export default function HelpSupport() {
             <strong className="text-amber-900 dark:text-amber-100">Version:</strong> 1.0.0
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong className="text-amber-900 dark:text-amber-100">Last Updated:</strong> Jan 19, 2026
+            <strong className="text-amber-900 dark:text-amber-100">Last Updated:</strong> Jan 21, 2026
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong className="text-amber-900 dark:text-amber-100">Build:</strong> PWA v1
+            <strong className="text-amber-900 dark:text-amber-100">Build:</strong> PWA v2.0
           </p>
         </div>
       </div>

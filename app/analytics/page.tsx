@@ -11,9 +11,8 @@ import OverallTrends from "@/components/overall-trends"
 export default function AnalyticsPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Navigation />
 
-      <main style={{ flex: '1' }} className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main style={{ flex: '1' }} className="w-full max-w-[1500px] px-6 py-8 mx-0">
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-xl">

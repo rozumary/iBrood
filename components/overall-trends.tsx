@@ -129,6 +129,12 @@ export default function OverallTrends() {
         icon: <CheckCircle className="w-5 h-5 text-orange-500" /> 
       },
       { 
+        label: "Avg. Brood Coverage", 
+        value: avgBroodCoverage > 0 ? `${avgBroodCoverage}%` : "--", 
+        change: avgBroodCoverage >= 80 ? "Excellent" : avgBroodCoverage >= 60 ? "Good" : avgBroodCoverage > 0 ? "Fair" : "No data",
+        icon: <CheckCircle className="w-5 h-5 text-amber-600" /> 
+      },
+      { 
         label: "Queen Cells Detected", 
         value: totalQueenCells.toString(), 
         change: "Total",
@@ -177,7 +183,7 @@ export default function OverallTrends() {
   return (
     <div className="space-y-8">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
@@ -192,40 +198,56 @@ export default function OverallTrends() {
 
       {/* Health Score & Queen Cells Trend */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-amber-200 p-6 shadow-sm">
-        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Health Score & Queen Cells Trend</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={healthTrendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
-            <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
-            <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#FFFBEB",
-                border: "1px solid #FCD34D",
-                borderRadius: "12px",
-              }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="healthScore"
-              stroke={chartColors.primary}
-              strokeWidth={3}
-              dot={{ fill: chartColors.primary, r: 5 }}
-              activeDot={{ r: 7 }}
-              name="Health Score"
-            />
-            <Line
-              type="monotone"
-              dataKey="broodCount"
-              stroke={chartColors.accent}
-              strokeWidth={3}
-              dot={{ fill: chartColors.accent, r: 5 }}
-              activeDot={{ r: 7 }}
-              name="Brood Count"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <h3 className="font-heading font-semibold text-lg text-amber-900 mb-6">Health Score & Brood Count Trend</h3>
+        {healthTrendData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={healthTrendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" />
+              <XAxis dataKey="date" stroke="#92400E" style={{ fontSize: "12px" }} />
+              <YAxis stroke="#92400E" style={{ fontSize: "12px" }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#FFFBEB",
+                  border: "1px solid #FCD34D",
+                  borderRadius: "12px",
+                }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="healthScore"
+                stroke={chartColors.primary}
+                strokeWidth={3}
+                dot={{ fill: chartColors.primary, r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Health Score"
+              />
+              <Line
+                type="monotone"
+                dataKey="broodCount"
+                stroke={chartColors.accent}
+                strokeWidth={3}
+                dot={{ fill: chartColors.accent, r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Brood Count"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-amber-600/70 bg-amber-50/50 rounded-xl">
+            <div className="text-center flex flex-col items-center justify-center">
+              <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mx-auto mb-3">
+                <ellipse cx="32" cy="32" rx="28" ry="18" fill="#FDE68A" />
+                <ellipse cx="32" cy="32" rx="18" ry="10" fill="#F59E0B" fillOpacity="0.5" />
+                <ellipse cx="32" cy="32" rx="8" ry="4" fill="#F59E0B" fillOpacity="0.8" />
+                <circle cx="32" cy="32" r="3" fill="#fff" />
+              </svg>
+              <p className="font-medium">No brood pattern analysis data yet</p>
+              <p className="text-sm mt-1">Perform brood pattern analyses to see trends</p>
+              <p className="text-xs mt-2 text-amber-500">Tip: Upload a hive frame image for brood pattern detection!</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Queen Cell Trend */}

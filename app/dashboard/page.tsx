@@ -7,7 +7,6 @@ import {
   Clock, AlertTriangle, CheckCircle, ArrowRight, 
   Sparkles, Lightbulb, Database, Hexagon
 } from "lucide-react"
-import Navigation from "@/components/navigation"
 import HiveHealthCard from "@/components/hive-health-card"
 import Footer from "@/components/footer"
 import { getLatestActivity, getTotalInspections, getAnalyses, getBroodAnalyses } from "@/lib/storage"
@@ -111,10 +110,8 @@ export default function Dashboard() {
   })
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-800">
-      <Navigation />
-
-      <main style={{ flex: '1' }} className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div style={{ flex: '1' }} className="w-full px-4 sm:px-6 py-4 sm:py-8 flex-grow">
+      <main>
         {/* Welcome Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
@@ -307,7 +304,6 @@ export default function Dashboard() {
           </p>
         </div>
       </main>
-      
       <Footer />
     </div>
   )

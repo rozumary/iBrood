@@ -20,8 +20,16 @@ export default function ApiaryProfile() {
   // Load profile from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(APIARY_STORAGE_KEY)
+    const currentUser = localStorage.getItem('ibrood_current_user')
+    
     if (saved) {
       setProfile(JSON.parse(saved))
+    } else if (currentUser) {
+      // Initialize with farm name from user session if available
+      const user = JSON.parse(currentUser)
+      if (user.farmName) {
+        setProfile(prev => ({ ...prev, apiaryName: user.farmName }))
+      }
     }
   }, [])
 

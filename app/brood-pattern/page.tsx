@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Grid3X3, AlertCircle, X } from "lucide-react"
 import Navigation from "@/components/navigation"
+import NavigationResearch from "@/components/navigation-research"
+import { useEffect, useState as useStateLocal } from "react"
 import Footer from "@/components/footer"
 import ImageUploader from "@/components/image-uploader"
 import BroodPatternResults from "@/components/brood-pattern-results"
@@ -12,8 +14,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 // API URL - use HuggingFace directly or local API
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://rozu1726-ibrood-app.hf.space"
 
+interface AnalysisResult {
+  hiveHealthScore: number;
+  healthStatus: string;
+  riskLevel: string;
+  broodCoverage: number;
+  totalDetections: number;
+  counts: { egg: number; larva: number; pupa: number };
+  cellBreakdown: {
+    type: string;
+    percentage: number;
+    count: number;
+    description: string;
+    color: string;
+  }[];
+  recommendations: string[];
+  imagePreview: string;
+  annotatedImage: string | null;
+  annotatedImageWithLabels: string | null;
+  originalImage: string;
+  detections: any[];
+}
+
 export default function BroodPatternPage() {
-  const [analysisResults, setAnalysisResults] = useState(null)
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResult | null>(null)
   const [showResults, setShowResults] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -126,17 +150,38 @@ export default function BroodPatternPage() {
     }
   }
 
+  const [isResearchMode, setIsResearchMode] = useStateLocal(false)
+  useEffect(() => {
+    try {
+      const user = localStorage.getItem('ibrood_current_user')
+      if (user) {
+        const parsed = JSON.parse(user)
+        if (parsed.role === 'researcher' || parsed.role === 'student') {
+          setIsResearchMode(true)
+        }
+      }
+    } catch {}
+  }, [])
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }} className="bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-800">
-      <Navigation />
+      {/* Removed navigation bar to match requested layout */}
 
-      <main style={{ flex: '1' }} className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <main style={{ flex: '1' }} className="w-full px-4 sm:px-6 py-4 sm:py-8 flex-grow">
         <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-xl">
-              <Grid3X3 className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 rounded-xl">
+                <Grid3X3 className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+              </div>
+              <h1 className="text-2xl sm:text-4xl font-heading font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Brood Pattern</h1>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-heading font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Brood Pattern</h1>
+            {/* Inline Back Button next to heading */}
+            <a href={isResearchMode ? "/research-mode/playground" : "/dashboard"} title="Back" className="flex items-center gap-1 px-3 py-2 bg-white/90 dark:bg-gray-900/80 rounded-xl shadow hover:bg-amber-100 dark:hover:bg-amber-800/80 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-medium transition-all ml-4">
+              Back
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </a>
           </div>
           <p className="text-amber-700/70 dark:text-amber-300/70 ml-12 sm:ml-14 text-sm sm:text-base">
             Upload or capture an image to assess brood health

@@ -26,8 +26,22 @@ interface BroodAnalysis {
 type Analysis = QueenCellAnalysis | BroodAnalysis
 
 // ==================== STORAGE KEYS ====================
-const QUEEN_STORAGE_KEY = 'ibrood_queen_cell_analyses'
-const BROOD_STORAGE_KEY = 'ibrood_brood_analyses'
+const getSessionKey = (base: string) => {
+  if (typeof window === 'undefined') return base
+  const userRaw = localStorage.getItem('ibrood_current_user')
+  if (!userRaw) return base
+  try {
+    const user = JSON.parse(userRaw)
+    // Use userId (persistent) if available, otherwise fall back to name-based key
+    const userId = user.userId || `${user.name?.trim() || user.role?.trim() || 'default'}`
+    const safe = userId.replace(/[^a-zA-Z0-9_-]/g, '_')
+    return `${base}_${safe}`
+  } catch {
+    return base
+  }
+}
+const QUEEN_STORAGE_KEY = getSessionKey('ibrood_queen_cell_analyses')
+const BROOD_STORAGE_KEY = getSessionKey('ibrood_brood_analyses')
 const MOCK_DATA_INITIALIZED = 'ibrood_mock_data_initialized'
 
 // ==================== MOCK DATA INITIALIZATION ====================
@@ -146,8 +160,21 @@ export const initializeMockData = () => {
 // ==================== QUEEN CELL FUNCTIONS ====================
 export const saveAnalysis = (analysis: any) => {
   try {
+    const key = getSessionKey('ibrood_queen_cell_analyses')
     const analyses = getAnalyses()
     const { imagePreview, ...analysisWithoutImage } = analysis
+    
+    // Check if this exact analysis already exists (prevent duplicates)
+    const exists = analyses.some(a => 
+      a.totalQueenCells === analysis.totalQueenCells &&
+      JSON.stringify(a.maturityDistribution) === JSON.stringify(analysis.maturityDistribution) &&
+      Math.abs(a.timestamp - Date.now()) < 5000
+    )
+    if (exists) {
+      console.log('Duplicate queen analysis prevented')
+      return analyses[0]
+    }
+    
     const newAnalysis: QueenCellAnalysis = {
       id: Date.now().toString(),
       timestamp: Date.now(),
@@ -156,18 +183,20 @@ export const saveAnalysis = (analysis: any) => {
       imagePreview: ''
     }
     analyses.unshift(newAnalysis)
-    localStorage.setItem(QUEEN_STORAGE_KEY, JSON.stringify(analyses.slice(0, 20)))
+    localStorage.setItem(key, JSON.stringify(analyses.slice(0, 20)))
     return newAnalysis
   } catch (error) {
+    const key = getSessionKey('ibrood_queen_cell_analyses')
     console.warn('Storage quota exceeded, clearing old data')
-    localStorage.removeItem(QUEEN_STORAGE_KEY)
+    localStorage.removeItem(key)
     return { id: Date.now().toString(), timestamp: Date.now(), type: 'queen', ...analysis, imagePreview: '' }
   }
 }
 
 export const getAnalyses = (): QueenCellAnalysis[] => {
   if (typeof window === 'undefined') return []
-  const data = localStorage.getItem(QUEEN_STORAGE_KEY)
+  const key = getSessionKey('ibrood_queen_cell_analyses')
+  const data = localStorage.getItem(key)
   return data ? JSON.parse(data) : []
 }
 
@@ -179,8 +208,22 @@ export const getLatestAnalysis = (): QueenCellAnalysis | null => {
 // ==================== BROOD ANALYSIS FUNCTIONS ====================
 export const saveBroodAnalysis = (analysis: any) => {
   try {
+    const key = getSessionKey('ibrood_brood_analyses')
     const analyses = getBroodAnalyses()
     const { imagePreview, annotatedImage, annotatedImageWithLabels, originalImage, ...analysisWithoutImage } = analysis
+    
+    // Check if this exact analysis already exists (prevent duplicates)
+    const exists = analyses.some(a => 
+      a.totalDetections === (analysis.totalDetections || 0) &&
+      a.healthScore === (analysis.hiveHealthScore || analysis.health?.score || 0) &&
+      JSON.stringify(a.counts) === JSON.stringify(analysis.counts || { egg: 0, larva: 0, pupa: 0 }) &&
+      Math.abs(a.timestamp - Date.now()) < 5000
+    )
+    if (exists) {
+      console.log('Duplicate brood analysis prevented')
+      return analyses[0]
+    }
+    
     const newAnalysis: BroodAnalysis = {
       id: Date.now().toString(),
       timestamp: Date.now(),
@@ -194,18 +237,20 @@ export const saveBroodAnalysis = (analysis: any) => {
       imagePreview: ''
     }
     analyses.unshift(newAnalysis)
-    localStorage.setItem(BROOD_STORAGE_KEY, JSON.stringify(analyses.slice(0, 20)))
+    localStorage.setItem(key, JSON.stringify(analyses.slice(0, 20)))
     return newAnalysis
   } catch (error) {
+    const key = getSessionKey('ibrood_brood_analyses')
     console.warn('Storage quota exceeded, clearing old data')
-    localStorage.removeItem(BROOD_STORAGE_KEY)
+    localStorage.removeItem(key)
     return { id: Date.now().toString(), timestamp: Date.now(), type: 'brood', ...analysis, imagePreview: '' }
   }
 }
 
 export const getBroodAnalyses = (): BroodAnalysis[] => {
   if (typeof window === 'undefined') return []
-  const data = localStorage.getItem(BROOD_STORAGE_KEY)
+  const key = getSessionKey('ibrood_brood_analyses')
+  const data = localStorage.getItem(key)
   return data ? JSON.parse(data) : []
 }
 
