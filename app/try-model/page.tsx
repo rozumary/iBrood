@@ -111,7 +111,7 @@ export default function TryModelPage() {
         </div>
       )}
       
-          <div className="bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-8 md:p-10 max-w-xs md:max-w-lg w-full text-center mx-auto mt-40 md:mt-0">
+          <div className="bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-8 md:p-10 max-w-xs md:max-w-lg w-full text-center mx-auto mt-36 md:mt-0">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-amber-900 dark:text-amber-100">Explore Model</h1>
         <p className="mb-6 text-amber-700/80 dark:text-amber-300/80 text-base md:text-lg">Initialize your session to explore the model. No account or sign-up required.</p>
         {duplicateWarning && (
