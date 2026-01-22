@@ -9,7 +9,7 @@ const researchers = [
     name: "Rosemarie Montesa",
     age: 22,
     location: "Mandaluyong City, Metro Manila",
-    role: "Researcher | Model Trainer | Full Stack Engineer",
+    role: "Full Stack Engineer | Model Trainer",
     image: "/rose.jpg"
   },
   {
