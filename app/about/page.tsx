@@ -16,14 +16,14 @@ const researchers = [
     name: "Renalyn Pino",
     age: 21,
     location: "Calauan, Laguna",
-    role: "Researcher | Data Annotator | Organizer",
+    role: "Data Annotator | Organizer | Tester",
     image: "/renalyn.jpg"
   },
   {
     name: "Betina Grace Lat",
     age: 23,
     location: "Pila, Laguna",
-    role: "Researcher | Data Annotator | Organizer",
+    role: "Data Annotator | Organizer | Tester",
     image: "/betina.jpg"
   }
 ]
