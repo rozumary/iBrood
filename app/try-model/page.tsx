@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const roles = [
   { value: "beekeeper", label: "Beekeeper" },
@@ -31,10 +31,9 @@ export default function TryModelPage() {
   const [showReminder, setShowReminder] = useState(false)
   const [isFormReady, setIsFormReady] = useState(false)
 
-  // Delay showing form to prevent flash
-  useState(() => {
+  useEffect(() => {
     setTimeout(() => setIsFormReady(true), 100)
-  })
+  }, [])
 
   const availablePurposes = purposes.filter(p => p.roles.includes(role))
 
