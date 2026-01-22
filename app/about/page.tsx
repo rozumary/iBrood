@@ -9,21 +9,21 @@ const researchers = [
     name: "Rosemarie Montesa",
     age: 22,
     location: "Mandaluyong City, Metro Manila",
-    role: "Full Stack Engineer",
+    role: "Researcher | Model Trainer | Full Stack Engineer",
     image: "/rose.jpg"
   },
   {
     name: "Renalyn Pino",
     age: 21,
     location: "Calauan, Laguna",
-    role: "Researcher | Data Labeler & Annotator",
+    role: "Researcher | Data Annotator | Organizer",
     image: "/renalyn.jpg"
   },
   {
     name: "Betina Grace Lat",
     age: 23,
     location: "Pila, Laguna",
-    role: "Researcher | Data Labeler & Annotator",
+    role: "Researcher | Data Annotator | Organizer",
     image: "/betina.jpg"
   }
 ]
