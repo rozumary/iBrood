@@ -44,6 +44,30 @@ export default function FolderContentView() {
         { name: "INTERPRETATION", isDirectory: true, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION" },
         { name: "best-od.pt", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/best-od.pt" }
       ],
+      "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION": [
+        { name: "args.yaml", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/args.yaml" },
+        { name: "BoxF1_curve.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/BoxF1_curve.png" },
+        { name: "BoxPR_curve.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/BoxPR_curve.png" },
+        { name: "BoxR_curve.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/BoxR_curve.png" },
+        { name: "confusion_matrix_normalized.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/confusion_matrix_normalized.png" },
+        { name: "confusion_matrix.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/confusion_matrix.png" },
+        { name: "labels.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/labels.jpg" },
+        { name: "results.csv", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/results.csv" },
+        { name: "results.png", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/results.png" },
+        { name: "train_batch0.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch0.jpg" },
+        { name: "train_batch1.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch1.jpg" },
+        { name: "train_batch2.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch2.jpg" },
+        { name: "train_batch29150.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch29150.jpg" },
+        { name: "train_batch29151.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch29151.jpg" },
+        { name: "train_batch29152.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/train_batch29152.jpg" },
+        { name: "val_batch0_labels.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch0_labels.jpg" },
+        { name: "val_batch0_pred.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch0_pred.jpg" },
+        { name: "val_batch1_labels.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch1_labels.jpg" },
+        { name: "val_batch1_pred.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch1_pred.jpg" },
+        { name: "val_batch2_labels.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch2_labels.jpg" },
+        { name: "val_batch2_pred.jpg", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/val_batch2_pred.jpg" },
+        { name: "yolo-11m-object-detection (1).ipynb", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION/yolo-11m-object-detection (1).ipynb" }
+      ],
       "SEGMENTATION MODELS": [
         { name: "FASTER R CNN", isDirectory: true, path: "SEGMENTATION MODELS/FASTER R CNN" },
         { name: "MASK R CNN 6000 ITER", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER" },
@@ -57,6 +81,16 @@ export default function FolderContentView() {
       "SEGMENTATION MODELS/MASK R CNN 6000 ITER": [
         { name: "RUN 1 FAIL", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL" },
         { name: "RUN 2 SUCCESS", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 2 SUCCESS" }
+      ],
+      "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL": [
+        { name: "Mask_RCNN_FINAL VERDICT.ipynb", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL/Mask_RCNN_FINAL VERDICT.ipynb" },
+        { name: "model_final (1).pth", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL/model_final (1).pth" },
+        { name: "model_final (2).pth", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL/model_final (2).pth" },
+        { name: "model_final.pth", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL/model_final.pth" }
+      ],
+      "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 2 SUCCESS": [
+        { name: "Mask_RCNN_success.ipynb", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 2 SUCCESS/Mask_RCNN_success.ipynb" },
+        { name: "model_final (3).pth", isDirectory: false, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 2 SUCCESS/model_final (3).pth" }
       ],
       "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS": [
         { name: "best (8).pt", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS/best (8).pt" },
