@@ -11,17 +11,23 @@ export default function ModelExperimentationPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Hardcoded folders as fallback for static deployment
     const staticFolders = [
-      "OBJECT DETECTION MODELS",
-      "SEGMENTATION MODELS"
+      "object-detection-models",
+      "segmentation-models"
     ];
     setFolders(staticFolders);
   }, [])
 
-  const handleFolderClick = (folderName: string) => {
-    // Navigate to the folder content page
-    router.push(`/research-mode/experimentation/${encodeURIComponent(folderName)}`);
+  const getFolderDisplayName = (slug: string) => {
+    const names: Record<string, string> = {
+      "object-detection-models": "OBJECT DETECTION MODELS",
+      "segmentation-models": "SEGMENTATION MODELS"
+    };
+    return names[slug] || slug;
+  }
+
+  const handleFolderClick = (folderSlug: string) => {
+    router.push(`/research-mode/experimentation/${folderSlug}`);
   }
 
   return (
@@ -41,7 +47,7 @@ export default function ModelExperimentationPage() {
                   onClick={() => handleFolderClick(folder)}
                 >
                   <Folder className="w-6 h-6 text-amber-500 flex-shrink-0" />
-                  <span className="font-medium text-lg text-amber-900 dark:text-amber-100 break-all">{folder}</span>
+                  <span className="font-medium text-lg text-amber-900 dark:text-amber-100 break-all">{getFolderDisplayName(folder)}</span>
                 </li>
               ))}
             </ul>

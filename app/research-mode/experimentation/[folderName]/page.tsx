@@ -21,43 +21,33 @@ export default function FolderContentView() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerFile, setViewerFile] = useState<{ name: string; type: string; url: string } | null>(null);
 
+  const getActualFolderName = (slug: string): string => {
+    const mapping: Record<string, string> = {
+      "object-detection-models": "OBJECT DETECTION MODELS",
+      "segmentation-models": "SEGMENTATION MODELS"
+    };
+    return mapping[slug] || slug;
+  };
+
   useEffect(() => {
     if (!folderName) return;
 
-    const fetchFolderContents = async () => {
-      try {
-        setLoading(true);
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        
-        const response = await fetch(`/api/models/${folderName}`, {
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Failed to fetch contents: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setContents(data.contents || []);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching folder contents:", err);
-        if (err instanceof Error && err.name === 'AbortError') {
-          setError("Request timed out. The folder might be too large.");
-        } else {
-          setError(err instanceof Error ? err.message : "An unknown error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
+    const actualFolderName = getActualFolderName(folderName);
+    const staticContents: Record<string, FileSystemEntry[]> = {
+      "OBJECT DETECTION MODELS": [
+        { name: "YOLO v11 MEDIUM 120 EPOCHS", isDirectory: true, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS" }
+      ],
+      "SEGMENTATION MODELS": [
+        { name: "FASTER R CNN", isDirectory: true, path: "SEGMENTATION MODELS/FASTER R CNN" },
+        { name: "MASK R CNN 6000 ITER", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER" },
+        { name: "YOLO v11 LARGE 50 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS" },
+        { name: "YOLO v11 MEDIUM 50 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS" },
+        { name: "YOLO V11 MEDIUM 60 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO V11 MEDIUM 60 EPOCHS" }
+      ]
     };
 
-    fetchFolderContents();
+    setContents(staticContents[actualFolderName] || []);
+    setLoading(false);
   }, [folderName]);
 
   const handleBack = () => {
@@ -245,7 +235,7 @@ export default function FolderContentView() {
               <ChevronLeft className="w-4 h-4" />
             </button>
             <h1 className="text-xl md:text-2xl font-bold text-amber-900 dark:text-amber-100 px-16 text-center break-words">
-              {decodeURIComponent(folderName)}
+              {getActualFolderName(folderName)}
             </h1>
           </div>
           
