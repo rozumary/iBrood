@@ -13,8 +13,8 @@ interface FileSystemEntry {
 }
 
 export default function FolderContentView() {
-  const params = useParams<{ folderName: string }>();
-  const folderName = params?.folderName;
+  const params = useParams<{ folderName: string[] }>();
+  const folderPath = params?.folderName ? (Array.isArray(params.folderName) ? params.folderName.join('/') : params.folderName) : '';
   const [contents, setContents] = useState<FileSystemEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +30,9 @@ export default function FolderContentView() {
   };
 
   useEffect(() => {
-    if (!folderName) return;
+    if (!folderPath) return;
 
-    const decodedPath = decodeURIComponent(folderName);
+    const decodedPath = decodeURIComponent(folderPath);
     const actualFolderName = getActualFolderName(decodedPath.split('/')[0]);
     const fullPath = decodedPath.includes('/') ? decodedPath.replace(decodedPath.split('/')[0], actualFolderName) : actualFolderName;
     
@@ -108,7 +108,7 @@ export default function FolderContentView() {
 
     setContents(staticContents[fullPath] || []);
     setLoading(false);
-  }, [folderName]);
+  }, [folderPath]);
 
   const handleBack = () => {
     window.history.back();
@@ -245,7 +245,7 @@ const closeViewer = () => {
     );
   }
 
-  if (!folderName) {
+  if (!folderPath) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-900">
         <div className="flex-grow flex flex-col items-center justify-center">
@@ -276,7 +276,7 @@ const closeViewer = () => {
               <ChevronLeft className="w-4 h-4" />
             </button>
             <h1 className="text-xl md:text-2xl font-bold text-amber-900 dark:text-amber-100 px-16 text-center break-words">
-              {decodeURIComponent(folderName).split('/').pop()}
+              {decodeURIComponent(folderPath).split('/').pop()}
             </h1>
           </div>
           
