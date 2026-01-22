@@ -94,7 +94,7 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
           onClick={() => {
             setIsExiting(true);
             setTimeout(() => {
-              window.location.href = "/";
+              window.location.href = "/try-model";
             }, 1000);
           }}
         >

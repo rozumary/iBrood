@@ -207,7 +207,6 @@ export default function FolderContentView() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400 text-white rounded-lg hover:bg-amber-500 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Back to Folders
             </button>
           </div>
         </div>
@@ -227,7 +226,6 @@ export default function FolderContentView() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400 text-white rounded-lg hover:bg-amber-500 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Back to Folders
             </button>
           </div>
         </div>
@@ -239,18 +237,16 @@ export default function FolderContentView() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-900">
       <div className="flex-grow flex flex-col p-4">
         <div className="bg-white/90 dark:bg-gray-900/80 rounded-2xl shadow-xl p-10 w-full h-full border-2 border-amber-300">
-          <div className="flex items-center justify-between mb-6">
+          <div className="relative flex items-center justify-center mb-6">
             <button 
               onClick={handleBack}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-gray-800 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-gray-700 transition-colors"
+              className="absolute left-0 inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-gray-800 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-gray-700 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Back to Folders
             </button>
-            <h1 className="text-2xl font-bold text-amber-900 dark:text-amber-100 text-center flex-1">
+            <h1 className="text-xl md:text-2xl font-bold text-amber-900 dark:text-amber-100 px-16 text-center break-words">
               {decodeURIComponent(folderName)}
             </h1>
-            <div className="w-28"></div> {/* Spacer to center the header */}
           </div>
           
           <p className="text-amber-700/80 dark:text-amber-300/80 mb-6 text-center">
