@@ -49,10 +49,10 @@ export default function HelpSupport() {
         </p>
         <div className="space-y-2">
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong className="text-amber-900 dark:text-amber-100">Version:</strong> 1.0.0
+            <strong className="text-amber-900 dark:text-amber-100">Version:</strong> Jan 22, 2026 Update
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong className="text-amber-900 dark:text-amber-100">Last Updated:</strong> Jan 21, 2026
+            <strong className="text-amber-900 dark:text-amber-100">Last Updated:</strong> Jan 22, 2026
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-300">
             <strong className="text-amber-900 dark:text-amber-100">Build:</strong> PWA v2.0
