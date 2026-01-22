@@ -29,6 +29,12 @@ export default function TryModelPage() {
   const [duplicateWarning, setDuplicateWarning] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showReminder, setShowReminder] = useState(false)
+  const [isFormReady, setIsFormReady] = useState(false)
+
+  // Delay showing form to prevent flash
+  useState(() => {
+    setTimeout(() => setIsFormReady(true), 100)
+  })
 
   const availablePurposes = purposes.filter(p => p.roles.includes(role))
 
@@ -81,6 +87,9 @@ export default function TryModelPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center md:justify-center bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-900">
+      {!isFormReady && (
+        <div className="fixed inset-0 bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-900 z-40" />
+      )}
       {showReminder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-300">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 shadow-2xl animate-in zoom-in duration-300">
@@ -111,7 +120,7 @@ export default function TryModelPage() {
         </div>
       )}
       
-          <div className="bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-8 md:p-10 max-w-xs md:max-w-lg w-full text-center mx-auto mt-16 md:mt-0">
+      <div className={`bg-white/90 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-8 md:p-10 max-w-xs md:max-w-lg w-full text-center mx-auto mt-16 md:mt-0 transition-opacity duration-300 ${isFormReady ? 'opacity-100' : 'opacity-0'}`}>
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-amber-900 dark:text-amber-100">Explore Model</h1>
         <p className="mb-6 text-amber-700/80 dark:text-amber-300/80 text-base md:text-lg">Initialize your session to explore the model. No account or sign-up required.</p>
         {duplicateWarning && (

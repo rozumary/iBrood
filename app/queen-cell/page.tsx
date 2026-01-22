@@ -94,10 +94,9 @@ export default function QueenCellPage() {
               <h1 className="text-2xl sm:text-4xl font-heading font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Queen Cell</h1>
             </div>
             {/* Inline Back Button next to heading */}
-            <a href={isResearchMode ? "/research-mode/playground" : "/dashboard"} title="Back" className="flex items-center gap-1 px-3 py-2 bg-white/90 dark:bg-gray-900/80 rounded-xl shadow hover:bg-amber-100 dark:hover:bg-amber-800/80 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-medium transition-all ml-4">
-              Back
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            <a href={isResearchMode ? "/research-mode/playground" : "/dashboard"} title="Back" className="flex items-center justify-center p-2 bg-white/90 dark:bg-gray-900/80 rounded-xl shadow hover:bg-amber-100 dark:hover:bg-amber-800/80 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
             </a>
           </div>
