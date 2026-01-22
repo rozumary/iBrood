@@ -115,16 +115,12 @@ export default function Sidebar({ mode, showExitSession }: SidebarProps) {
           </div>
         </div>
       )}
-      {/* Mobile toggle button */}
+      {/* Mobile toggle - small vertical line */}
       <button
-        className="md:hidden fixed top-[30px] right-4 z-50 bg-amber-100 dark:bg-amber-900/50 p-2 rounded-lg focus:outline-none"
+        className="md:hidden fixed left-2 top-[80px] h-12 w-1 z-40 bg-amber-500 rounded-full hover:w-1.5 hover:h-16 transition-all focus:outline-none"
         onClick={() => setOpen((v) => !v)}
         aria-label="Open sidebar"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M3 6h18M3 12h18M3 18h18" stroke="#FFA95C" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      </button>
+      />
       {/* Sidebar overlay for mobile */}
       <div
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 md:hidden ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
