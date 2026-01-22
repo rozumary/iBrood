@@ -11,20 +11,12 @@ export default function ModelExperimentationPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch the list of folders from the API route
-    fetch("/api/models")
-      .then((res) => {
-        if (!res.ok) {
-          setError("Failed to fetch model folders")
-          return { folders: [] }
-        }
-        return res.json()
-      })
-      .then((data) => setFolders(data.folders || []))
-      .catch((err) => {
-        console.error(err)
-        setError("Failed to fetch model folders")
-      })
+    // Hardcoded folders as fallback for static deployment
+    const staticFolders = [
+      "OBJECT DETECTION MODELS",
+      "SEGMENTATION MODELS"
+    ];
+    setFolders(staticFolders);
   }, [])
 
   const handleFolderClick = (folderName: string) => {
