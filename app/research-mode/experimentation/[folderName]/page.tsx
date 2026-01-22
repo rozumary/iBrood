@@ -32,10 +32,17 @@ export default function FolderContentView() {
   useEffect(() => {
     if (!folderName) return;
 
-    const actualFolderName = getActualFolderName(folderName);
+    const decodedPath = decodeURIComponent(folderName);
+    const actualFolderName = getActualFolderName(decodedPath.split('/')[0]);
+    const fullPath = decodedPath.includes('/') ? decodedPath.replace(decodedPath.split('/')[0], actualFolderName) : actualFolderName;
+    
     const staticContents: Record<string, FileSystemEntry[]> = {
       "OBJECT DETECTION MODELS": [
         { name: "YOLO v11 MEDIUM 120 EPOCHS", isDirectory: true, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS" }
+      ],
+      "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS": [
+        { name: "INTERPRETATION", isDirectory: true, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/INTERPRETATION" },
+        { name: "best-od.pt", isDirectory: false, path: "OBJECT DETECTION MODELS/YOLO v11 MEDIUM 120 EPOCHS/best-od.pt" }
       ],
       "SEGMENTATION MODELS": [
         { name: "FASTER R CNN", isDirectory: true, path: "SEGMENTATION MODELS/FASTER R CNN" },
@@ -43,10 +50,29 @@ export default function FolderContentView() {
         { name: "YOLO v11 LARGE 50 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS" },
         { name: "YOLO v11 MEDIUM 50 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS" },
         { name: "YOLO V11 MEDIUM 60 EPOCHS", isDirectory: true, path: "SEGMENTATION MODELS/YOLO V11 MEDIUM 60 EPOCHS" }
+      ],
+      "SEGMENTATION MODELS/FASTER R CNN": [
+        { name: "Faster_RCNN.ipynb", isDirectory: false, path: "SEGMENTATION MODELS/FASTER R CNN/Faster_RCNN.ipynb" }
+      ],
+      "SEGMENTATION MODELS/MASK R CNN 6000 ITER": [
+        { name: "RUN 1 FAIL", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 1 FAIL" },
+        { name: "RUN 2 SUCCESS", isDirectory: true, path: "SEGMENTATION MODELS/MASK R CNN 6000 ITER/RUN 2 SUCCESS" }
+      ],
+      "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS": [
+        { name: "best (8).pt", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS/best (8).pt" },
+        { name: "YOLO_v11_LargeSegmentModel.ipynb", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 LARGE 50 EPOCHS/YOLO_v11_LargeSegmentModel.ipynb" }
+      ],
+      "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS": [
+        { name: "best (9).onnx", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS/best (9).onnx" },
+        { name: "best-seg.pt", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS/best-seg.pt" },
+        { name: "YOLO_v11_MedSegmentModel.ipynb", isDirectory: false, path: "SEGMENTATION MODELS/YOLO v11 MEDIUM 50 EPOCHS/YOLO_v11_MedSegmentModel.ipynb" }
+      ],
+      "SEGMENTATION MODELS/YOLO V11 MEDIUM 60 EPOCHS": [
+        { name: "best (7).pt", isDirectory: false, path: "SEGMENTATION MODELS/YOLO V11 MEDIUM 60 EPOCHS/best (7).pt" }
       ]
     };
 
-    setContents(staticContents[actualFolderName] || []);
+    setContents(staticContents[fullPath] || []);
     setLoading(false);
   }, [folderName]);
 
@@ -54,20 +80,7 @@ export default function FolderContentView() {
     window.history.back();
   };
 
-  const openViewer = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    const currentPath = decodeURIComponent(folderName || '');
-    const fileUrl = `/MODELS/${currentPath ? `${currentPath}/` : ''}${encodeURIComponent(fileName)}`;
-    
-    setViewerFile({
-      name: fileName,
-      type: extension || '',
-      url: fileUrl
-    });
-    setViewerOpen(true);
-  };
-
-  const closeViewer = () => {
+const closeViewer = () => {
     setViewerOpen(false);
     setViewerFile(null);
   };
@@ -94,22 +107,16 @@ export default function FolderContentView() {
     }
   };
 
-  // Function to handle file click
-  const handleFileClick = (fileName: string, isDirectory: boolean) => {
+  const handleFileClick = (fileName: string, isDirectory: boolean, entryPath: string) => {
     if (isDirectory) {
-      // Navigate to subdirectory - combine current path with subfolder name
-      const currentPath = decodeURIComponent(folderName || '');
-      const newPath = currentPath ? `${currentPath}/${fileName}` : fileName;
-      window.location.href = `/research-mode/experimentation/${encodeURIComponent(newPath)}`;
+      window.location.href = `/research-mode/experimentation/${encodeURIComponent(entryPath)}`;
     } else {
-      // For image and pdf files, open in viewer modal
       const extension = fileName.split('.').pop()?.toLowerCase();
+      const fileUrl = `/MODELS/${entryPath}`;
       if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'pdf'].includes(extension || '')) {
-        openViewer(fileName);
+        setViewerFile({ name: fileName, type: extension || '', url: fileUrl });
+        setViewerOpen(true);
       } else {
-        // For other files, initiate download
-        const currentPath = decodeURIComponent(folderName || '');
-        const fileUrl = `/MODELS/${currentPath ? `${currentPath}/` : ''}${encodeURIComponent(fileName)}`;
         window.open(fileUrl, '_blank');
       }
     }
@@ -235,7 +242,7 @@ export default function FolderContentView() {
               <ChevronLeft className="w-4 h-4" />
             </button>
             <h1 className="text-xl md:text-2xl font-bold text-amber-900 dark:text-amber-100 px-16 text-center break-words">
-              {getActualFolderName(folderName)}
+              {decodeURIComponent(folderName).split('/').pop()}
             </h1>
           </div>
           
@@ -255,7 +262,7 @@ export default function FolderContentView() {
                   <li 
                     key={index} 
                     className="flex items-center gap-3 py-3 hover:bg-amber-50 dark:hover:bg-gray-800/50 rounded-lg px-2 transition-colors cursor-pointer"
-                    onClick={() => handleFileClick(entry.name, entry.isDirectory)}
+                    onClick={() => handleFileClick(entry.name, entry.isDirectory, entry.path)}
                   >
                     {entry.isDirectory ? (
                       <>
