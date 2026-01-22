@@ -107,6 +107,19 @@ export default function AboutPage() {
             The goal is to provide beekeepers with smart, easy-to-use tools that use Artificial Intelligence and Computer Vision technology to assess hive health, forecast queen cell growth, and maintain healthy bee colonies.
           </p>
         </div>
+
+        {/* About iBrood */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/50 p-8 mt-10 shadow-sm">
+          <h2 className="text-2xl font-heading font-bold text-amber-900 mb-4 text-center">About iBrood</h2>
+          <p className="text-amber-700/80 leading-relaxed max-w-3xl mx-auto mb-6">
+            iBrood is an intelligent system designed to help beekeepers monitor hive health through AI-powered analysis of queen cell development and brood patterns. Our mission is to make advanced hive monitoring accessible to beekeepers of all experience levels.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm text-amber-700/70">
+            <div><span className="font-semibold">Version:</span> iBrood 2.0</div>
+            <div><span className="font-semibold">Last Updated:</span> Jan 22, 2026</div>
+            <div><span className="font-semibold">Build:</span> PWA v2.0</div>
+          </div>
+        </div>
       </main>
 
       <Footer />
