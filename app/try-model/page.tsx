@@ -90,7 +90,7 @@ export default function TryModelPage() {
         <div className="fixed inset-0 bg-gradient-to-b from-amber-50/50 to-orange-50/30 dark:from-gray-900 dark:to-gray-900 z-40" />
       )}
       {showReminder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] animate-in fade-in duration-300">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 shadow-2xl animate-in zoom-in duration-300">
             <div className="text-center">
               <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -111,7 +111,7 @@ export default function TryModelPage() {
       )}
       
       {isLoading && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9998]">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-500 mx-auto mb-4"></div>
             <p className="text-amber-900 dark:text-amber-100 font-semibold">Starting your session...</p>
